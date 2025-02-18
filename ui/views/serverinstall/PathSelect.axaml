@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:custom="clr-namespace:SCLauncher.ui.controls"
+             xmlns:serverinstall="clr-namespace:SCLauncher.model.serverinstall"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SCLauncher.ui.views.serverinstall.PathSelect"
+             x:DataType="serverinstall:ServerInstallParams">
+	
+	<Design.DataContext>
+		<serverinstall:ServerInstallParams/>
+	</Design.DataContext>
+	
+	<Grid Margin="10" 
+	      ColumnDefinitions="* Auto"
+	      RowDefinitions="Auto, Auto">
+		
+		<Label Grid.Row="0" Grid.Column="0"
+		       Content="Server install directory"
+		       VerticalAlignment="Center"
+		/>
+		
+		<CheckBox Grid.Row="0" Grid.Column="1"
+		          Content="Create sub-folder"
+		          IsChecked="{Binding CreateSubfolder}"
+		/>
+
+		<custom:FilePickerTextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+		                          Margin="0 5"
+		                          Mode="Folder" Title="Select install directory"
+		                          Text="{Binding Path}"
+		                          Name="InstallPath"
+		/>
+
+	</Grid>
+	
+</UserControl>

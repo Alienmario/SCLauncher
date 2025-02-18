@@ -1,0 +1,8 @@
+bin/
+obj/
+/packages/
+.idea
+riderModule.iml
+/_ReSharper.Caches/
+/FodyWeavers.xsd
+/SCLauncher.sln.DotSettings.user

@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:SCLauncher.ui.views"
+        mc:Ignorable="d"
+        x:Class="SCLauncher.ui.views.MainWindow"
+        Title="SCLauncher"
+        Icon="/ui/assets/logo-sc.png"
+        ExtendClientAreaToDecorationsHint="True"
+        Background="Transparent" TransparencyLevelHint="Mica"
+        WindowStartupLocation="CenterScreen"
+        Width="700" Height="450"
+        MinWidth="600" MinHeight="200">
+	
+	<Window.Styles>
+		<Style Selector="Label#LauncherTitle">
+			<Setter Property="Foreground" Value="#EFEFEF"/>
+			<Setter Property="FontSize" Value="14"/>
+			<Setter Property="FontWeight" Value="Normal"/>
+		</Style>
+		<Style Selector="TabItem">
+			<Style Selector="^ PathIcon#SettingsCog">
+				<Setter Property="RenderTransform" Value="rotate(0)"/>
+				<Setter Property="Transitions">
+					<Transitions>
+						<TransformOperationsTransition Property="RenderTransform" Duration="0:0:1" Easing="CubicEaseOut"/>
+					</Transitions>
+				</Setter>
+			</Style>
+			<Style Selector="^:pointerover PathIcon#SettingsCog">
+				<Setter Property="RenderTransform" Value="rotate(120deg)"/>
+			</Style>
+		</Style>
+	</Window.Styles>
+	
+	<DockPanel Margin="0 5 0 5">
+		<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5 0 0 0" Spacing="5" IsHitTestVisible="False">
+			<Border CornerRadius="4" ClipToBounds="True">
+				<Image Source="/ui/assets/logo-sc.png" Width="20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+			</Border>
+			<Label Name="LauncherTitle" VerticalAlignment="Center">Launcher</Label>
+		</StackPanel>
+
+		<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="5">
+			
+			<TabControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<DockPanel LastChildFill="True"/>
+				</ItemsPanelTemplate>
+			</TabControl.ItemsPanel>
+			
+			<TabItem Name="HostServerTab" Header="Host server">
+				<views:HostServer/>
+			</TabItem>
+			
+			<TabItem Name="JoinServerTab" Header="Join server">
+				<views:JoinServer/>
+			</TabItem>
+			
+			<TabItem Name="SingleplayerTab" Header="Singleplayer">
+				<views:SinglePlayer/>
+			</TabItem>
+			
+			<TabItem Name="ModsTab" Header="Mods">
+				<views:Mods/>
+			</TabItem>
+			
+			<TabItem Name="SettingsTab" HorizontalAlignment="Right">
+				<TabItem.Header>
+					<Panel Classes="TabItemHeader">
+						<PathIcon Name="SettingsCog" Data="{StaticResource settings_regular}"/>
+					</Panel>
+				</TabItem.Header>
+				<views:Settings/>
+			</TabItem>
+		</TabControl>
+	</DockPanel>
+	
+</Window>
