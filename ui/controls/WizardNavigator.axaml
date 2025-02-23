@@ -21,7 +21,7 @@
 				</Button>
 			</DockPanel>
 		</Border>
-		<ScrollViewer Name="ContentArea"/>
+		<Border Name="ContentArea"/>
 	</DockPanel>
 	
 </UserControl>

@@ -9,7 +9,8 @@ public partial class WizardNavigator : UserControl
 {
 	public interface IWizardContent
 	{
-		void OnAttachedToWizard(WizardNavigator wizard, bool reAttached) {}
+		void OnAttachedToWizard(WizardNavigator wizard, bool unstacked) {}
+		void OnDetachedFromWizard(WizardNavigator wizard, bool stacked) {}
 		void OnNextPageRequest(WizardNavigator wizard) {}
 		bool OnPrevPageRequest(WizardNavigator wizard)
 		{
@@ -25,13 +26,10 @@ public partial class WizardNavigator : UserControl
 		ResetControls();
 		ForwardButton.Click += ForwardClicked;
 		BackButton.Click += BackClicked;
+		CancelButton.Click += CancelClicked;
 	}
 
-	public event EventHandler<RoutedEventArgs>? CancelClick
-	{
-		add => CancelButton.Click += value;
-		remove => CancelButton.Click -= value;
-	}
+	public event EventHandler? Cancelled;
 
 	public bool ShowNavBar
 	{
@@ -41,8 +39,8 @@ public partial class WizardNavigator : UserControl
 
 	private new object? Content
 	{
-		get => ContentArea.Content;
-		set => ContentArea.Content = value;
+		get => ContentArea.Child;
+		set => ContentArea.Child = (Control?)value;
 	}
 
 	private bool AllowBack { get; set; }
@@ -51,17 +49,17 @@ public partial class WizardNavigator : UserControl
 
 	public int GetStackCount() => _navStack.Count;
 
+	public object? GetContent() => Content;
+
 	private void SetContent(object? content, bool pushStack, bool reAttached)
 	{
 		if (pushStack && Content != null)
 		{
 			_navStack.Push(Content);
 		}
+		(Content as IWizardContent)?.OnDetachedFromWizard(this, pushStack);
 		Content = content;
-		if (content is IWizardContent wc)
-		{
-			wc.OnAttachedToWizard(this, reAttached);
-		}
+		(Content as IWizardContent)?.OnAttachedToWizard(this, reAttached);
 		UpdateControls();
 	}
 	
@@ -78,13 +76,6 @@ public partial class WizardNavigator : UserControl
 		UpdateControls();
 	}
 
-	public void Reset()
-	{
-		_navStack.Clear();
-		Content = null;
-		ResetControls();
-	}
-
 	public void ResetControls()
 	{
 		SetControls(true, true, true);
@@ -96,6 +87,13 @@ public partial class WizardNavigator : UserControl
 		ForwardButton.IsEnabled = AllowForward;
 		CancelButton.IsVisible = AllowCancel;
 		ShowNavBar = BackButton.IsEnabled || ForwardButton.IsEnabled || CancelButton.IsVisible;
+	}
+
+	public void Reset()
+	{
+		_navStack.Clear();
+		Content = null;
+		ResetControls();
 	}
 
 	private void ForwardClicked(object? sender, RoutedEventArgs e)
@@ -117,5 +115,15 @@ public partial class WizardNavigator : UserControl
 		{
 			SetContent(prev, false, true);
 		}
+	}
+
+	private void CancelClicked(object? sender, RoutedEventArgs e)
+	{
+		OnCancelled();
+	}
+
+	protected virtual void OnCancelled()
+	{
+		Cancelled?.Invoke(this, EventArgs.Empty);
 	}
 }

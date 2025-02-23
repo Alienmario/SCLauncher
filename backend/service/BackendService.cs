@@ -6,15 +6,17 @@ namespace SCLauncher.backend.service;
 public class BackendService(ConfigHolder config)
 {
 	private string? _steamDir;
+	private SteamAppInfo? _activeApp;
 
 	public void Initialize()
 	{
+		_activeApp = new SteamAppInfo(362890, 346680, "Black Mesa", "Black Mesa Dedicated Server");
 		_steamDir = SteamUtils.FindSteamInstallDir();
 
 		if (_steamDir != null)
 		{
-			config.GamePath = SteamUtils.FindAppPath(_steamDir, GetGameAppId());
-			config.ServerPath = SteamUtils.FindAppPath(_steamDir, GetServerAppId());
+			config.GamePath = SteamUtils.FindAppPath(_steamDir, GetActiveApp().Id);
+			config.ServerPath = SteamUtils.FindAppPath(_steamDir, GetActiveApp().ServerId);
 		}
 	}
 
@@ -23,14 +25,9 @@ public class BackendService(ConfigHolder config)
 		return _steamDir;
 	}
 	
-	public int GetGameAppId()
+	public SteamAppInfo GetActiveApp()
 	{
-		return 362890;
-	}
-	
-	public int GetServerAppId()
-	{
-		return 346680;
+		return _activeApp!;
 	}
 
 }

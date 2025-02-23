@@ -14,7 +14,7 @@ public partial class MethodSelect : UserControl, WizardNavigator.IWizardContent
 		InitializeComponent();
 	}
 
-	public void OnAttachedToWizard(WizardNavigator wizard, bool reAttached)
+	public void OnAttachedToWizard(WizardNavigator wizard, bool unstacked)
 	{
 		wizard.SetControls(forward: false, back: true);
 		Wizard = wizard;

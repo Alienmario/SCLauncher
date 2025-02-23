@@ -43,8 +43,4 @@
 		<AvaloniaResource Include="ui\assets\**" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="backend\serverinstall\" />
-	</ItemGroup>
-
 </Project>

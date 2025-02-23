@@ -1,5 +1,7 @@
+using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using SCLauncher.backend.service;
 using SCLauncher.model;
 using SCLauncher.model.serverinstall;
 using SCLauncher.ui.views.serverinstall;
@@ -14,7 +16,7 @@ public partial class HostServer : UserControl
 
 		ConfigHolder config = App.GetService<ConfigHolder>();
 		SwitchContent(ServerNotFoundPanel);
-		ServerWizard.CancelClick += ServerWizardCancelled;
+		ServerWizard.Cancelled += ServerWizardCancelled;
 	}
 
 	private void LocateServerClicked(object? sender, RoutedEventArgs e)
@@ -28,10 +30,12 @@ public partial class HostServer : UserControl
 		SwitchContent(ServerWizard);
 		ServerWizard.Reset();
 		ServerWizard.SetContent(new MethodSelect());
-		ServerWizard.DataContext = new ServerInstallParams();
+
+		var installService = App.GetService<ServerInstallService>();
+		ServerWizard.DataContext = installService.NewInstallParams();
 	}
 
-	private void ServerWizardCancelled(object? sender, RoutedEventArgs e)
+	private void ServerWizardCancelled(object? sender, EventArgs eventArgs)
 	{
 		SwitchContent(ServerNotFoundPanel);
 	}

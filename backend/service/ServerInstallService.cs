@@ -1,16 +1,22 @@
-using SCLauncher.backend.util;
-using SCLauncher.model;
+using System.Collections.Generic;
+using SCLauncher.backend.serverinstall;
+using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.service;
 
-public class ServerInstallService(
-	ConfigHolder config,
-	BackendService backendService)
+public class ServerInstallService(BackendService backend)
 {
-	
-	public void StartSteamInstall()
+
+	public ServerInstallParams NewInstallParams()
 	{
-		SteamUtils.InstallApp(backendService.GetServerAppId());
+		return new ServerInstallParams(
+			backend.GetActiveApp().ServerFolder,
+			backend.GetActiveApp().ServerId);
+	}
+	
+	public IAsyncEnumerable<ServerInstallMessage> RunInstaller(ServerInstallParams installParams)
+	{
+		return ServerInstaller.Run(installParams);
 	}
 	
 }

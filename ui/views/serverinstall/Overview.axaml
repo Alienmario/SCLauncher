@@ -8,7 +8,61 @@
              x:DataType="serverinstall:ServerInstallParams">
 	
 	<Design.DataContext>
-		<serverinstall:ServerInstallParams/>
+		<serverinstall:ServerInstallParams
+			Subfolder="Black Mesa Dedicated Server"
+			Method="External"
+			Path="C:\Program Files\Program Files\Program Files\Program Files\Program Files\Program Files"
+		/>
 	</Design.DataContext>
+	
+	<UserControl.Styles>
+		<Style Selector="Label.Summary">
+			<Setter Property="FontSize">20</Setter>
+			<Setter Property="FontWeight" Value="Bold"/>
+		</Style>
+		<Style Selector="Label.Key">
+			<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
+			<Setter Property="Margin" Value="0 0 10 5"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+		</Style>
+		<Style Selector="TextBlock.Value">
+			<Setter Property="TextWrapping">Wrap</Setter>
+			<Setter Property="Margin" Value="0 0 0 5"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="CheckBox.Value">
+			<Setter Property="Margin" Value="0 0 0 5"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+	</UserControl.Styles>
+	
+	<Grid Margin="10" 
+	      ColumnDefinitions="Auto *"
+	      RowDefinitions="Auto, Auto, Auto, Auto">
+		
+		<Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+		       Content="Summary" Classes="Summary" Margin="0 0 0 20"/>
+		
+		<Label Grid.Row="1" Grid.Column="0" Content="Install method" Classes="Key"/>
+		<TextBlock Grid.Row="1" Grid.Column="1" Classes="Value"
+		           Text="{Binding Method}"/>
+		
+		<Label Grid.Row="2" Grid.Column="0" Content="Install directory" Classes="Key"
+		       IsVisible="{Binding #Path.IsVisible}"/>
+		<TextBlock Grid.Row="2" Grid.Column="1" Name="Path" Classes="Value"
+		           Text="{Binding Path, Mode=OneTime}"
+		           IsVisible="{Binding Method, Converter={x:Static ObjectConverters.Equal},
+					ConverterParameter={x:Static serverinstall:ServerInstallMethod.External}}">
+		</TextBlock>
+
+		<!--<Label Grid.Row="3" Grid.Column="0" Content="Create sub-folder" Classes="Key"
+		       IsVisible="{Binding #Path.IsVisible}"/>
+		<CheckBox Grid.Row="3" Grid.Column="1" Name="CreateSubFolder" Classes="Value"
+		          IsChecked="{Binding CreateSubfolder}" IsEnabled="False"
+		          IsVisible="{Binding #Path.IsVisible}"
+		/>-->
+		
+	</Grid>
 	
 </UserControl>

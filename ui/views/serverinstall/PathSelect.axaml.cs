@@ -1,3 +1,4 @@
+using System.IO;
 using Avalonia.Controls;
 using SCLauncher.ui.controls;
 
@@ -10,22 +11,23 @@ public partial class PathSelect : UserControl, WizardNavigator.IWizardContent
 		InitializeComponent();
 	}
 
-	public void OnAttachedToWizard(WizardNavigator wizard, bool reAttached)
+	public void OnAttachedToWizard(WizardNavigator wizard, bool unstacked)
 	{
 		wizard.SetControls(forward: IsValid(), back: true);
 		
-		if (reAttached)
+		if (unstacked)
 			return;
 
 		InstallPath.TextChanged += (sender, args) =>
 		{
-			wizard.SetControls(forward: IsValid());
+			if (wizard.GetContent() == this)
+				wizard.SetControls(forward: IsValid());
 		};
 	}
-	
+
 	private bool IsValid()
 	{
-		return !string.IsNullOrWhiteSpace(InstallPath.Text);
+		return Directory.Exists(InstallPath.Text);
 	}
 
 	public void OnNextPageRequest(WizardNavigator wizard)
