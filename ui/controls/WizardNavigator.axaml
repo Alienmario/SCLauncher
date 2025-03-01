@@ -9,10 +9,10 @@
 		<Border Name="NavBar" Padding="0 10" DockPanel.Dock="Bottom">
 			<DockPanel>
 				<Button Name="BackButton" DockPanel.Dock="Left" Margin="0 0 10 0">
-					<PathIcon Data="{StaticResource chevron_left_regular}"/>
+					<PathIcon Name="BackButtonIcon" Data="{StaticResource chevron_left_regular}"/>
 				</Button>
 				<Button Name="ForwardButton" DockPanel.Dock="Right" Margin="10 0 0 0">
-					<PathIcon Data="{StaticResource chevron_right_regular}"/>
+					<PathIcon Name="ForwardButtonIcon" Data="{StaticResource chevron_right_regular}"/>
 				</Button>
 				<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
 				        VerticalAlignment="Stretch" VerticalContentAlignment="Center"

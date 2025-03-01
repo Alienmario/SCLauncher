@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SCLauncher.backend.serverinstall;
 using SCLauncher.model.serverinstall;
@@ -11,7 +12,10 @@ public class ServerInstallService(BackendService backend)
 	{
 		return new ServerInstallParams(
 			backend.GetActiveApp().ServerFolder,
-			backend.GetActiveApp().ServerId);
+			backend.GetActiveApp().ServerId)
+		{
+			Parts = new HashSet<ServerInstallPart>(Enum.GetValues<ServerInstallPart>())
+		};
 	}
 	
 	public IAsyncEnumerable<ServerInstallMessage> RunInstaller(ServerInstallParams installParams)

@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -14,24 +15,40 @@ public partial class InstallStatus : UserControl, WizardNavigator.IWizardContent
 		InitializeComponent();
 	}
 
-	public async void OnAttachedToWizard(WizardNavigator wizard, bool unstacked)
+	public void OnAttachedToWizard(WizardNavigator wizard, bool unstacked)
 	{
 		wizard.SetControls(forward: false, back: false);
+		RunInstaller(wizard);
+	}
 
-		if (DataContext is ServerInstallParams data)
+	private async void RunInstaller(WizardNavigator wizard)
+	{
+		try
 		{
-			var installService = App.GetService<ServerInstallService>();
-			var cancellation = new CancellationTokenSource();
-			wizard.Cancelled += (sender, args) => cancellation.Cancel();
-			
-			await foreach (var msg in installService.RunInstaller(data).WithCancellation(cancellation.Token))
+			if (DataContext is ServerInstallParams data)
 			{
-				Console.Text += $"{msg.Time:HH:mm:ss}  {msg.Text}\n";
-				if (Scroller.Offset.NearlyEquals(Scroller.ScrollBarMaximum))
+				var installService = App.GetService<ServerInstallService>();
+				var cancellation = new CancellationTokenSource();
+				wizard.Cancelled += (sender, args) => cancellation.Cancel();
+				
+				await foreach (var msg in installService.RunInstaller(data).WithCancellation(cancellation.Token))
 				{
-					Scroller.ScrollToEnd();
+					AppendMessage(msg);
 				}
 			}
+		}
+		catch (Exception e)
+		{
+			AppendMessage(new ServerInstallMessage("Application error occured\n" + e));
+		}
+	}
+
+	private void AppendMessage(ServerInstallMessage msg)
+	{
+		Console.Text += $"{msg.Time:HH:mm:ss}  {msg.Text}\n";
+		if (Scroller.Offset.NearlyEquals(Scroller.ScrollBarMaximum))
+		{
+			Scroller.ScrollToEnd();
 		}
 	}
 }

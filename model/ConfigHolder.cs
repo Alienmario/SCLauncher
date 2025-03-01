@@ -8,5 +8,7 @@ public partial class ConfigHolder : INotifyPropertyChanged
 	public string? GamePath { get; set; }
 	
 	public string? ServerPath { get; set; }
+	
+	public string? CurrentTab { get; set; }
 
 }

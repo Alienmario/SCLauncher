@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
 using SCLauncher.backend;
 using SCLauncher.backend.service;
@@ -24,6 +25,8 @@ public partial class App : Application
 		services.AddBackendServices();
 		services.AddUIServices();
 		_services = services.BuildServiceProvider();
+		
+		GetService<BackendService>().Initialize();
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
@@ -31,8 +34,6 @@ public partial class App : Application
 			desktop.MainWindow = mainWindow;
 		}
 		
-		GetService<BackendService>().Initialize();
-
 		base.OnFrameworkInitializationCompleted();
 	}
 
@@ -40,4 +41,11 @@ public partial class App : Application
 	{
 		return (Current as App)!._services!.GetRequiredService<T>();
 	}
+	
+	public static object? GetResource(string name)
+	{
+		Current!.TryGetResource(name, Current.ActualThemeVariant, out object? res);
+		return res;
+	}
+	
 }

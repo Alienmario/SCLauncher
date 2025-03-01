@@ -14,6 +14,7 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 	public void OnAttachedToWizard(WizardNavigator wizard, bool unstacked)
 	{
 		wizard.SetControls(forward: true, back: true);
+		wizard.ForwardButtonRunsAction = true;
 
 		if (DataContext is ServerInstallParams data)
 		{

@@ -12,7 +12,7 @@ public static class ServerInstaller
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		yield return new ServerInstallMessage("Server installation started");
-		for (int i = 0; i < 500; i++)
+		for (int i = 0; i < 50; i++)
 		{
 			if (cancellationToken.IsCancellationRequested)
 			{

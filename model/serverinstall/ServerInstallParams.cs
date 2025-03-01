@@ -6,9 +6,12 @@ namespace SCLauncher.model.serverinstall;
 
 public partial class ServerInstallParams(string subfolder, int appId) : INotifyPropertyChanged
 {
-	
+
 	[Obsolete("Design only")]
-	public ServerInstallParams() : this("", -1) {}
+	public ServerInstallParams() : this("", -1)
+	{
+		Parts = new HashSet<ServerInstallPart>(Enum.GetValues<ServerInstallPart>());
+	}
 
 	public string Subfolder { get; set; } = subfolder;
 

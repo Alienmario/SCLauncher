@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 
 namespace SCLauncher.ui.controls;
 
@@ -36,6 +37,11 @@ public partial class WizardNavigator : UserControl
 		get => NavBar.IsVisible;
 		set => NavBar.IsVisible = value;
 	}
+	
+	public bool ForwardButtonRunsAction
+	{
+		set => ForwardButtonIcon.Data = (Geometry?)App.GetResource(value ? "play_regular" : "chevron_right_regular");
+	}
 
 	private new object? Content
 	{
@@ -57,10 +63,10 @@ public partial class WizardNavigator : UserControl
 		{
 			_navStack.Push(Content);
 		}
+		ResetControls();
 		(Content as IWizardContent)?.OnDetachedFromWizard(this, pushStack);
 		Content = content;
 		(Content as IWizardContent)?.OnAttachedToWizard(this, reAttached);
-		UpdateControls();
 	}
 	
 	public void SetContent(object? content, bool pushStack = true)
@@ -78,6 +84,7 @@ public partial class WizardNavigator : UserControl
 
 	public void ResetControls()
 	{
+		ForwardButtonRunsAction = false;
 		SetControls(true, true, true);
 	}
 

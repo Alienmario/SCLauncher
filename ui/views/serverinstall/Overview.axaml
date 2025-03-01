@@ -19,30 +19,30 @@
 		<Style Selector="Label.Summary">
 			<Setter Property="FontSize">20</Setter>
 			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Margin" Value="0 0 0 10"/>
+		</Style>
+		<Style Selector=":is(Control).Key">
+			<Setter Property="Margin" Value="0 0 10 5"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
 		</Style>
 		<Style Selector="Label.Key">
 			<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
-			<Setter Property="Margin" Value="0 0 10 5"/>
+			<Setter Property="FontWeight" Value="Normal"/>
+		</Style>
+		<Style Selector=":is(Control).Value">
+			<Setter Property="Margin" Value="0 0 0 5"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
-			<Setter Property="FontWeight" Value="Bold"/>
 		</Style>
 		<Style Selector="TextBlock.Value">
 			<Setter Property="TextWrapping">Wrap</Setter>
-			<Setter Property="Margin" Value="0 0 0 5"/>
-			<Setter Property="VerticalAlignment" Value="Center"/>
-		</Style>
-		<Style Selector="CheckBox.Value">
-			<Setter Property="Margin" Value="0 0 0 5"/>
-			<Setter Property="VerticalAlignment" Value="Center"/>
 		</Style>
 	</UserControl.Styles>
 	
-	<Grid Margin="10" 
+	<Grid Margin="10"
 	      ColumnDefinitions="Auto *"
 	      RowDefinitions="Auto, Auto, Auto, Auto">
 		
-		<Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-		       Content="Summary" Classes="Summary" Margin="0 0 0 20"/>
+		<Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Summary" Classes="Summary"/>
 		
 		<Label Grid.Row="1" Grid.Column="0" Content="Install method" Classes="Key"/>
 		<TextBlock Grid.Row="1" Grid.Column="1" Classes="Value"
@@ -55,6 +55,23 @@
 		           IsVisible="{Binding Method, Converter={x:Static ObjectConverters.Equal},
 					ConverterParameter={x:Static serverinstall:ServerInstallMethod.External}}">
 		</TextBlock>
+		
+		<Label Grid.Row="3" Grid.Column="0" Content="Components" Classes="Key"/>
+		<ItemsControl Grid.Row="3" Grid.Column="1" ItemsSource="{Binding Parts}" Classes="Value">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<WrapPanel Orientation="Horizontal"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal" Margin="0 0 10 0">
+						<CheckBox IsEnabled="False" IsChecked="True"/>
+						<TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+					</StackPanel>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
 
 		<!--<Label Grid.Row="3" Grid.Column="0" Content="Create sub-folder" Classes="Key"
 		       IsVisible="{Binding #Path.IsVisible}"/>
