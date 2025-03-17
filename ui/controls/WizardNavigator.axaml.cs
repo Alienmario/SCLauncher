@@ -19,8 +19,6 @@ public partial class WizardNavigator : UserControl
 		}
 	}
 
-	private readonly Stack<object> _navStack = new();
-
 	public WizardNavigator()
 	{
 		InitializeComponent();
@@ -30,7 +28,7 @@ public partial class WizardNavigator : UserControl
 		CancelButton.Click += CancelClicked;
 	}
 
-	public event EventHandler? Cancelled;
+	public event EventHandler? OnExit;
 
 	public bool ShowNavBar
 	{
@@ -40,7 +38,12 @@ public partial class WizardNavigator : UserControl
 	
 	public bool ForwardButtonRunsAction
 	{
-		set => ForwardButtonIcon.Data = (Geometry?)App.GetResource(value ? "play_regular" : "chevron_right_regular");
+		set => ForwardButtonIcon.Data = (Geometry?)App.GetResource(value ? "rocket_regular" : "chevron_right_regular");
+	}
+	public bool Completed
+	{
+		set => CancelButton.Content = value ? "Close" : "Cancel";
+		get => (string)CancelButton.Content! == "Close";
 	}
 
 	private new object? Content
@@ -49,6 +52,7 @@ public partial class WizardNavigator : UserControl
 		set => ContentArea.Child = (Control?)value;
 	}
 
+	private readonly Stack<object> _navStack = new();
 	private bool AllowBack { get; set; }
 	private bool AllowForward { get; set; }
 	private bool AllowCancel { get; set; }
@@ -100,6 +104,7 @@ public partial class WizardNavigator : UserControl
 	{
 		_navStack.Clear();
 		Content = null;
+		Completed = false;
 		ResetControls();
 	}
 
@@ -126,11 +131,11 @@ public partial class WizardNavigator : UserControl
 
 	private void CancelClicked(object? sender, RoutedEventArgs e)
 	{
-		OnCancelled();
+		BeforeExit();
 	}
 
-	protected virtual void OnCancelled()
+	protected virtual void BeforeExit()
 	{
-		Cancelled?.Invoke(this, EventArgs.Empty);
+		OnExit?.Invoke(this, EventArgs.Empty);
 	}
 }

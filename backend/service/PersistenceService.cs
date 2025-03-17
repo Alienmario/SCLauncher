@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SCLauncher.backend.service;
 
@@ -11,7 +11,7 @@ public class PersistenceService
 {
 	private readonly string _dir;
 
-	private readonly Dictionary<string, object> _persistedObjects = new();
+	private readonly Dictionary<string, (object Instance, JsonSerializerContext? Context)> _persistedObjects = new();
 
 	private readonly JsonSerializerOptions _serializerOptions = new();
 
@@ -60,12 +60,12 @@ public class PersistenceService
 		SaveAll();
 	}
 
-	public void Bind(string name, object o, bool loadNow = true)
+	public void Bind(string name, object instance, JsonSerializerContext? context = null, bool loadNow = true)
 	{
-		_persistedObjects.Add(name, o);
+	    _persistedObjects.Add(name, (instance, context));
 		if (loadNow)
 		{
-			LoadAndMerge(name, o);
+	        LoadAndMerge(name, instance, context);
 		}
 	}
 	
@@ -76,26 +76,30 @@ public class PersistenceService
 
 	public void SaveAll()
 	{
-		foreach (var entry in _persistedObjects)
+		foreach (var (name, (instance, context)) in _persistedObjects)
 		{
-			Save(entry.Key, entry.Value);
+		    Save(name, instance, context);
 		}
 	}
 	
 	public void LoadAll()
 	{
-		foreach (var entry in _persistedObjects)
+		foreach (var (name, (instance, context)) in _persistedObjects)
 		{
-			LoadAndMerge(entry.Key, entry.Value);
+		    LoadAndMerge(name, instance, context);
 		}
 	}
 
-	public bool Save(string name, object o)
+	public bool Save(string name, object o, JsonSerializerContext? context = null)
 	{
 		if (!Available)
 			return false;
 		
-		string json = JsonSerializer.Serialize(o, _serializerOptions);
+		string json = JsonSerializer.Serialize(o, new JsonSerializerOptions(_serializerOptions)
+		{
+			TypeInfoResolver = context
+		});
+		
 		string path = Path.Join(_dir, name + ".json");
 		try
 		{
@@ -109,16 +113,16 @@ public class PersistenceService
 		}
 	}
 
-	public void LoadAndMerge(string name, object o)
+	public void LoadAndMerge(string name, object instance, JsonSerializerContext? context = null)
 	{
-		object? loaded = Load(name, o.GetType());
+		object? loaded = Load(name, instance.GetType(), context);
 		if (loaded != null)
 		{
-			MergeProperties(loaded, o);
+			MergeProperties(loaded, instance);
 		}
 	}
 	
-	public object? Load(string name, Type type)
+	public object? Load(string name, Type type, JsonSerializerContext? context = null)
 	{
 		if (!Available)
 			return null;
@@ -127,7 +131,10 @@ public class PersistenceService
 		try
 		{
 			string json = File.ReadAllText(path);
-			return JsonSerializer.Deserialize(json, type, _serializerOptions);
+			return JsonSerializer.Deserialize(json, type, new JsonSerializerOptions(_serializerOptions)
+			{
+				TypeInfoResolver = context
+			});
 		}
 		catch (Exception e)
 		{

@@ -11,7 +11,7 @@ public class BackendService(ConfigHolder config, PersistenceService persistence)
 
 	public void Initialize()
 	{
-		persistence.Bind("config", config);
+		persistence.Bind("config", config, JsonSourceGenerationContext.Default);
 		
 		_activeApp = new SteamAppInfo(362890, 346680, "Black Mesa", "Black Mesa Dedicated Server");
 		_steamDir = SteamUtils.FindSteamInstallDir();
@@ -26,14 +26,7 @@ public class BackendService(ConfigHolder config, PersistenceService persistence)
 		}
 	}
 
-	public string? GetSteamDir()
-	{
-		return _steamDir;
-	}
-	
-	public SteamAppInfo GetActiveApp()
-	{
-		return _activeApp!;
-	}
+	public string? GetSteamDir() => _steamDir;
 
+	public SteamAppInfo GetActiveApp() => _activeApp!;
 }

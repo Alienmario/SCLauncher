@@ -1,6 +1,6 @@
 namespace SCLauncher.model.serverinstall;
 
-public enum ServerInstallPart
+public enum ServerInstallComponent
 {
 	Server,
 	MetaMod,

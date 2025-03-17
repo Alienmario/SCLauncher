@@ -2,8 +2,6 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using SCLauncher.backend.service;
-using SCLauncher.model;
-using SCLauncher.model.serverinstall;
 using SCLauncher.ui.views.serverinstall;
 
 namespace SCLauncher.ui.views;
@@ -14,9 +12,8 @@ public partial class HostServer : UserControl
 	{
 		InitializeComponent();
 
-		ConfigHolder config = App.GetService<ConfigHolder>();
 		SwitchContent(ServerNotFoundPanel);
-		ServerWizard.Cancelled += ServerWizardCancelled;
+		ServerWizard.OnExit += ServerWizardOnExit;
 	}
 
 	private void LocateServerClicked(object? sender, RoutedEventArgs e)
@@ -35,16 +32,16 @@ public partial class HostServer : UserControl
 		ServerWizard.DataContext = installService.NewInstallParams();
 	}
 
-	private void ServerWizardCancelled(object? sender, EventArgs eventArgs)
+	private void ServerWizardOnExit(object? sender, EventArgs eventArgs)
 	{
 		SwitchContent(ServerNotFoundPanel);
 	}
 
 	private void SwitchContent(Control content)
 	{
-		foreach (var ctrl in ContentParent.Children)
+		foreach (var control in ContentParent.Children)
 		{
-			ctrl.IsVisible = ctrl == content;
+			control.IsVisible = control == content;
 		}
 	}
 }

@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
+using SCLauncher.backend.serverinstall;
+using SCLauncher.backend.serverinstall.components;
 using SCLauncher.backend.service;
 using SCLauncher.model;
-using SCLauncher.ui.views;
+using SCLauncher.model.install;
 
 namespace SCLauncher.backend;
 
@@ -15,6 +17,14 @@ public static class ServiceConfig
 		collection.AddSingleton<BackendService>();
 		collection.AddSingleton<ServerInstallService>();
 		collection.AddSingleton<PersistenceService>();
+		
+		// Server install
+		collection.AddSingleton<ServerInstallRunner>();
+		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, ServerInstaller>();
+		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, MetaModInstaller>();
+		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, SourceModInstaller>();
+		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, SourceCoopInstaller>();
+		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, SrcdsFixInstaller>();
 	}
 	
 }

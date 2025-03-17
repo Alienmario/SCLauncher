@@ -4,18 +4,12 @@ using System.ComponentModel;
 
 namespace SCLauncher.model.serverinstall;
 
-public partial class ServerInstallParams(string subfolder, int appId) : INotifyPropertyChanged
+public partial class ServerInstallParams : INotifyPropertyChanged
 {
-
-	[Obsolete("Design only")]
-	public ServerInstallParams() : this("", -1)
+	public ServerInstallParams()
 	{
-		Parts = new HashSet<ServerInstallPart>(Enum.GetValues<ServerInstallPart>());
+		Components = new HashSet<ServerInstallComponent>(Enum.GetValues<ServerInstallComponent>());
 	}
-
-	public string Subfolder { get; set; } = subfolder;
-
-	public int AppId { get; set; } = appId;
 
 	public ServerInstallMethod? Method { get; set; }
 
@@ -23,6 +17,12 @@ public partial class ServerInstallParams(string subfolder, int appId) : INotifyP
 
 	public bool CreateSubfolder { get; set; } = true;
 
-	public ISet<ServerInstallPart> Parts { get; set; } = new HashSet<ServerInstallPart>();
+	public required string Subfolder { get; set; }
+	
+	public required int AppId { get; set; }
+	
+	public ISet<ServerInstallComponent> Components { get; set; }
+
+	public bool AllowUpgrades { get; set; } = true;
 
 }
