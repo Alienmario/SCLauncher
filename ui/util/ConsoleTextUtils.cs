@@ -25,7 +25,7 @@ public static class ConsoleTextUtils
 	{
 		Run run = new Run($"{msg.Time:HH:mm:ss}  {msg.Text}\n")
 		{
-			Foreground = msg.MessageStatus switch
+			Foreground = msg.Status switch
 			{
 				MessageStatus.Success => SuccessBrush,
 				MessageStatus.Warning => WarningBrush,

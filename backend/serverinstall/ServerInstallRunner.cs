@@ -47,7 +47,7 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 			{
 				yield return message;
 				
-				if (message.MessageStatus == MessageStatus.Error)
+				if (message.Status == MessageStatus.Error)
 					yield break;
 			}
 			

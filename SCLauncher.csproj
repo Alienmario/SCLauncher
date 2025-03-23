@@ -44,4 +44,8 @@
 		<AvaloniaResource Include="ui\assets\**" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Depot-Downloader-API\DepotDownloader\DepotDownloader.csproj" />
+	</ItemGroup>
+
 </Project>

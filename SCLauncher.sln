@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCLauncher", "SCLauncher.csproj", "{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DepotDownloader", "..\Depot-Downloader-API\DepotDownloader\DepotDownloader.csproj", "{876A0185-8DAB-4C57-B11C-FEA8079B2DF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{876A0185-8DAB-4C57-B11C-FEA8079B2DF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{876A0185-8DAB-4C57-B11C-FEA8079B2DF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{876A0185-8DAB-4C57-B11C-FEA8079B2DF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{876A0185-8DAB-4C57-B11C-FEA8079B2DF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
