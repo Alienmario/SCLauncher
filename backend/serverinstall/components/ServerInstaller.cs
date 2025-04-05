@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +16,7 @@ public class ServerInstaller : IServerComponentInstaller<ComponentInfo>
 	public ServerInstallComponent Type => ServerInstallComponent.Server;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
-		[EnumeratorCancellation] CancellationToken cancellationToken)
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
@@ -30,7 +27,7 @@ public class ServerInstaller : IServerComponentInstaller<ComponentInfo>
 		}
 		else
 		{
-			await foreach (var message in InstallViaDepotDownloaderApi(ctx, cancellationToken))
+			await foreach (var message in InstallViaDepotDownloader(ctx, cancellationToken))
 			{
 				yield return message;
 			}
@@ -38,81 +35,32 @@ public class ServerInstaller : IServerComponentInstaller<ComponentInfo>
 	}
 
 	public static async IAsyncEnumerable<StatusMessage> InstallViaSteamClient(ServerInstallContext ctx,
-		[EnumeratorCancellation] CancellationToken cancellationToken)
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		SteamUtils.InstallApp(ctx.Params.AppId);
 		yield return new StatusMessage("Waiting for Steam to finish downloading");
 	}
 
-	public static async IAsyncEnumerable<StatusMessage> InstallViaDepotDownloaderApi(ServerInstallContext ctx,
-		[EnumeratorCancellation] CancellationToken cancellationToken)
+	private static async IAsyncEnumerable<StatusMessage> InstallViaDepotDownloader(ServerInstallContext ctx,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
-		Exception? exception = null;
-		bool completed = false;
-		using BlockingCollection<StatusMessage> messages = new();
-		using ConsoleMessageRewriter consoleRewriter = new(messages);
-
-		DownloadCallbacks callbacks = new DownloadCallbacks
+		var cfg = new AppDownloadConfig
 		{
-			DepotDownloadComplete = complete =>
-			{
-				completed = true;
-			}
+			InstallDirectory = ctx.ServerFolder,
+			VerifyAll = true,
+			AppId = (uint) ctx.Params.AppId
 		};
-		
-		Task dlTask = Task.Run(async () =>
+
+		int? exitCode = null;
+		await foreach ((string message, bool error) in SubProcess.AppDownload(cfg, i => exitCode = i, cancellationToken))
 		{
-			ContentDownloader.Config.InstallDirectory = ctx.ServerFolder;
-			ContentDownloader.Config.VerifyAll = true;
-
-			await Task.Run(() =>
-			{
-				ContentDownloader.InitializeSteam3(null, null);
-			}, cancellationToken).WaitAsync(TimeSpan.FromSeconds(7), cancellationToken);
-			
-			await ContentDownloader.DownloadAppAsync(
-				(uint) ctx.Params.AppId, 
-				[],
-				ContentDownloader.DEFAULT_BRANCH,
-				null, null, null, false, false, callbacks);
-			
-		}, cancellationToken).ContinueWith(t => exception = t.Exception, cancellationToken);
-
-		while (true)
-		{
-			Task<StatusMessage> msgTakeTask = Task.Run(() => messages.Take(cancellationToken), cancellationToken);
-			await Task.WhenAny(dlTask, msgTakeTask);
-		
-			if (msgTakeTask.IsCompletedSuccessfully)
-			{
-				yield return msgTakeTask.Result;
-				
-				if (msgTakeTask.Result.Status == MessageStatus.Error)
-				{
-					break;
-				}
-			}
-
-			if (dlTask.IsCompleted)
-			{
-				break;
-			}
-		
-			if (cancellationToken.IsCancellationRequested)
-				break;
+			yield return new StatusMessage(message);
 		}
 
-		if (exception != null)
-		{
-			Trace.WriteLine(exception);
-			yield return new StatusMessage("Download failed\n" + exception, MessageStatus.Error);
-		}
-		else if (!completed && !cancellationToken.IsCancellationRequested)
+		if (exitCode != SubProcess.Success)
 		{
 			yield return new StatusMessage("Download failed", MessageStatus.Error);
 		}
-		
-		ContentDownloader.ShutdownSteam3();
 	}
 	
 	public Task<ComponentInfo?> GatherInfo(ServerInstallContext ctx)

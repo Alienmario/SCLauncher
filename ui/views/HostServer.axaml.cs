@@ -13,7 +13,7 @@ public partial class HostServer : UserControl
 		InitializeComponent();
 
 		SwitchContent(ServerNotFoundPanel);
-		ServerWizard.OnExit += ServerWizardOnExit;
+		ServerWizard.OnExit += OnServerWizardExit;
 	}
 
 	private void LocateServerClicked(object? sender, RoutedEventArgs e)
@@ -32,7 +32,7 @@ public partial class HostServer : UserControl
 		ServerWizard.DataContext = installService.NewInstallParams();
 	}
 
-	private void ServerWizardOnExit(object? sender, EventArgs eventArgs)
+	private void OnServerWizardExit(object? sender, EventArgs eventArgs)
 	{
 		SwitchContent(ServerNotFoundPanel);
 	}

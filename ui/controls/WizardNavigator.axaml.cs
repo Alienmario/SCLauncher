@@ -52,12 +52,12 @@ public partial class WizardNavigator : UserControl
 		set => ContentArea.Child = (Control?)value;
 	}
 
-	private readonly Stack<object> _navStack = new();
+	private readonly Stack<object> navStack = new();
 	private bool AllowBack { get; set; }
 	private bool AllowForward { get; set; }
 	private bool AllowCancel { get; set; }
 
-	public int GetStackCount() => _navStack.Count;
+	public int GetStackCount() => navStack.Count;
 
 	public object? GetContent() => Content;
 
@@ -65,7 +65,7 @@ public partial class WizardNavigator : UserControl
 	{
 		if (pushStack && Content != null)
 		{
-			_navStack.Push(Content);
+			navStack.Push(Content);
 		}
 		ResetControls();
 		(Content as IWizardContent)?.OnDetachedFromWizard(this, pushStack);
@@ -100,12 +100,16 @@ public partial class WizardNavigator : UserControl
 		ShowNavBar = BackButton.IsEnabled || ForwardButton.IsEnabled || CancelButton.IsVisible;
 	}
 
-	public void Reset()
+	public void Reset(bool clearEventHandlers = false)
 	{
-		_navStack.Clear();
+		navStack.Clear();
 		Content = null;
 		Completed = false;
 		ResetControls();
+		if (clearEventHandlers)
+		{
+			OnExit = null;
+		}
 	}
 
 	private void ForwardClicked(object? sender, RoutedEventArgs e)
@@ -123,7 +127,7 @@ public partial class WizardNavigator : UserControl
 			return;
 		}
 
-		if (_navStack.TryPop(out var prev))
+		if (navStack.TryPop(out var prev))
 		{
 			SetContent(prev, false, true);
 		}

@@ -26,7 +26,7 @@ public class ServerInstallService(
 
 	public IAsyncEnumerable<StatusMessage> GetInstaller(ServerInstallParams installParams)
 	{
-		return runner.Run(installParams);
+		return runner.Get(installParams);
 	}
 
 	/// Returns components that are currently installed.

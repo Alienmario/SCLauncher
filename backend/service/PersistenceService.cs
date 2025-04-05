@@ -9,18 +9,18 @@ namespace SCLauncher.backend.service;
 
 public class PersistenceService
 {
-	private readonly string _dir;
+	private readonly string dir;
 
-	private readonly Dictionary<string, (object Instance, JsonSerializerContext? Context)> _persistedObjects = new();
+	private readonly Dictionary<string, (object Instance, JsonSerializerContext? Context)> persistedObjects = new();
 
-	private readonly JsonSerializerOptions _serializerOptions = new();
+	private readonly JsonSerializerOptions serializerOptions = new();
 
 	public bool Available { get; }
 
 	public bool PrettyPrint
 	{
-		get => _serializerOptions.WriteIndented;
-		set => _serializerOptions.WriteIndented = value;
+		get => serializerOptions.WriteIndented;
+		set => serializerOptions.WriteIndented = value;
 	}
 	
 	public PersistenceService()
@@ -29,22 +29,22 @@ public class PersistenceService
 		
 		try
 		{
-			_dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+			dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 		}
 		catch (Exception e)
 		{
 			Debug.WriteLine(e);
 		}
 		
-		if (string.IsNullOrWhiteSpace(_dir))
+		if (string.IsNullOrWhiteSpace(dir))
 		{
-			_dir = ".";
+			dir = ".";
 		}
 		
-		_dir = Path.Join(_dir, "SCLauncher");
+		dir = Path.Join(dir, "SCLauncher");
 		try
 		{
-			Directory.CreateDirectory(_dir);
+			Directory.CreateDirectory(dir);
 			Available = true;
 		}
 		catch (Exception e)
@@ -62,7 +62,7 @@ public class PersistenceService
 
 	public void Bind(string name, object instance, JsonSerializerContext? context = null, bool loadNow = true)
 	{
-	    _persistedObjects.Add(name, (instance, context));
+	    persistedObjects.Add(name, (instance, context));
 		if (loadNow)
 		{
 	        LoadAndMerge(name, instance, context);
@@ -71,12 +71,12 @@ public class PersistenceService
 	
 	public bool Forget(string name)
 	{
-		return _persistedObjects.Remove(name);
+		return persistedObjects.Remove(name);
 	}
 
 	public void SaveAll()
 	{
-		foreach (var (name, (instance, context)) in _persistedObjects)
+		foreach (var (name, (instance, context)) in persistedObjects)
 		{
 		    Save(name, instance, context);
 		}
@@ -84,7 +84,7 @@ public class PersistenceService
 	
 	public void LoadAll()
 	{
-		foreach (var (name, (instance, context)) in _persistedObjects)
+		foreach (var (name, (instance, context)) in persistedObjects)
 		{
 		    LoadAndMerge(name, instance, context);
 		}
@@ -95,12 +95,12 @@ public class PersistenceService
 		if (!Available)
 			return false;
 		
-		string json = JsonSerializer.Serialize(o, new JsonSerializerOptions(_serializerOptions)
+		string json = JsonSerializer.Serialize(o, new JsonSerializerOptions(serializerOptions)
 		{
 			TypeInfoResolver = context
 		});
 		
-		string path = Path.Join(_dir, name + ".json");
+		string path = Path.Join(dir, name + ".json");
 		try
 		{
 			File.WriteAllText(path, json);
@@ -127,11 +127,11 @@ public class PersistenceService
 		if (!Available)
 			return null;
 		
-		string path = Path.Join(_dir, name + ".json");
+		string path = Path.Join(dir, name + ".json");
 		try
 		{
 			string json = File.ReadAllText(path);
-			return JsonSerializer.Deserialize(json, type, new JsonSerializerOptions(_serializerOptions)
+			return JsonSerializer.Deserialize(json, type, new JsonSerializerOptions(serializerOptions)
 			{
 				TypeInfoResolver = context
 			});

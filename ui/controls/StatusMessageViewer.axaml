@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:model="clr-namespace:SCLauncher.model"
+             xmlns:converters="clr-namespace:SCLauncher.ui.converters"
+             xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="40"
+             x:Class="SCLauncher.ui.controls.StatusMessageViewer"
+             x:DataType="{x:Type objectModel:ObservableCollection, x:TypeArguments=model:StatusMessage}">
+
+	<Design.DataContext>
+		<objectModel:ObservableCollection x:TypeArguments="model:StatusMessage">
+			<model:StatusMessage>
+				<x:Arguments>
+					<x:String>Test message</x:String>
+					<model:MessageStatus>Info</model:MessageStatus>
+				</x:Arguments>
+			</model:StatusMessage>
+			<model:StatusMessage>
+				<x:Arguments>
+					<x:String>Test message2</x:String>
+					<model:MessageStatus>Warning</model:MessageStatus>
+				</x:Arguments>
+			</model:StatusMessage>
+			<model:StatusMessage>
+				<x:Arguments>
+					<x:String>Test message3</x:String>
+					<model:MessageStatus>Success</model:MessageStatus>
+				</x:Arguments>
+			</model:StatusMessage>
+			<model:StatusMessage>
+				<x:Arguments>
+					<x:String>Test message4</x:String>
+					<model:MessageStatus>Error</model:MessageStatus>
+				</x:Arguments>
+			</model:StatusMessage>
+		</objectModel:ObservableCollection>
+	</Design.DataContext>
+
+	<ScrollViewer Name="Scroller">
+		<ItemsControl ItemsSource="{Binding}">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<SelectableTextBlock
+						Foreground="{Binding Status,
+							TargetNullValue={DynamicResource TextControlHeaderForeground},
+							Converter={x:Static converters:MessageStatusColorConverter.Instance}}"
+						TextWrapping="Wrap"
+						FontFamily="Consolas, Courier New, monospace">
+						<SelectableTextBlock.Text>
+							<MultiBinding StringFormat="{}{0:HH:mm:ss} {1}">
+								<Binding Path="Time"/>
+								<Binding Path="Text"/>
+							</MultiBinding>
+						</SelectableTextBlock.Text>
+					</SelectableTextBlock>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+	</ScrollViewer>
+
+</UserControl>

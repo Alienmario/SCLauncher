@@ -11,12 +11,12 @@ namespace SCLauncher.backend.serverinstall;
 
 public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<ComponentInfo>> installers)
 {
-	public async IAsyncEnumerable<StatusMessage> Run(ServerInstallParams installParams,
+	public async IAsyncEnumerable<StatusMessage> Get(ServerInstallParams installParams,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		ServerInstallContext ctx = new ServerInstallContext(installParams);
 		
-		yield return new StatusMessage("Installation process started");
+		yield return new StatusMessage("Installation started");
 
 		foreach (var component in Enum.GetValues<ServerInstallComponent>())
 		{
@@ -27,19 +27,16 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 			if (installer == null)
 				continue;
 			
-			if (cancellationToken.IsCancellationRequested)
-				yield break;
+			cancellationToken.ThrowIfCancellationRequested();
 
 			ComponentInfo? info = await installer.GatherInfo(ctx);
 			
-			if (cancellationToken.IsCancellationRequested)
-				yield break;
+			cancellationToken.ThrowIfCancellationRequested();
 			
 			if (!await installer.ShouldInstall(ctx, info))
 				continue;
 			
-			if (cancellationToken.IsCancellationRequested)
-				yield break;
+			cancellationToken.ThrowIfCancellationRequested();
 			
 			yield return new StatusMessage($"Installing component <{component}>");
 

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia;
 using SCLauncher.ui;
+using Tmds.Utils;
 
 namespace SCLauncher;
 
@@ -19,15 +20,21 @@ static class Program
 	// SynchronizationContext-reliant code before AppMain is called: things aren't initialized
 	// yet and stuff might break.
 	[STAThread]
-	public static void Main(string[] args)
+	public static int Main(string[] args)
 	{
+		// Starting a subprocess function? [Tmds.ExecFunction]
+		if (ExecFunction.IsExecFunctionCommand(args))
+		{
+			return ExecFunction.Program.Main(args);
+		}
+		
 		TaskScheduler.UnobservedTaskException += (sender, e) =>
 		{
 			Trace.WriteLine(e.Exception);
 			e.SetObserved();
 		};
 
-		BuildAvaloniaApp()
+		return BuildAvaloniaApp()
 			.StartWithClassicDesktopLifetime(args);
 	}
 

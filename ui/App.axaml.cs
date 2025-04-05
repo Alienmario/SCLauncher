@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
 using SCLauncher.backend;
 using SCLauncher.backend.service;
@@ -11,7 +10,7 @@ namespace SCLauncher.ui;
 
 public partial class App : Application
 {
-	private ServiceProvider? _services;
+	private ServiceProvider? services;
 
 	public override void Initialize()
 	{
@@ -24,7 +23,7 @@ public partial class App : Application
 		var services = new ServiceCollection();
 		services.AddBackendServices();
 		services.AddUIServices();
-		_services = services.BuildServiceProvider();
+		this.services = services.BuildServiceProvider();
 		
 		GetService<BackendService>().Initialize();
 
@@ -39,7 +38,7 @@ public partial class App : Application
 
 	public static T GetService<T>() where T : class
 	{
-		return (Current as App)!._services!.GetRequiredService<T>();
+		return (Current as App)!.services!.GetRequiredService<T>();
 	}
 	
 	public static object? GetResource(string name)
