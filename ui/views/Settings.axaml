@@ -3,27 +3,27 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:custom="clr-namespace:SCLauncher.ui.controls"
+             xmlns:model="clr-namespace:SCLauncher.model"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SCLauncher.ui.views.Settings">
+             x:Class="SCLauncher.ui.views.Settings"
+             x:DataType="model:ConfigHolder">
 	
-	<Grid Margin="5" 
-	      ColumnDefinitions="*"
-	      RowDefinitions="Auto, Auto, Auto, Auto">
+	<StackPanel Margin="0 10 0 0">
 		
-		<Label Grid.Row="0"
-		       Content="Game path"
-		       VerticalAlignment="Center" HorizontalAlignment="Left"/>
-		<custom:FilePickerTextBox Grid.Row="1" Margin="0 5"
-		                          Mode="Folder" Title="Select game path"
-		                          Name="GamePath"/>
+		<Label Content="Steam installation" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+		<custom:FilePickerTextBox Mode="Folder" Title="Select Steam installation folder" Name="SteamPath"
+		                          Text="{Binding SteamPath}"/>
 		
-		<Label Grid.Row="2"
-		       Content="Server path"
-		       VerticalAlignment="Center" HorizontalAlignment="Left"
+		<Label Content="Game path" VerticalAlignment="Center" HorizontalAlignment="Left"
 		       Margin="0 10 0 0"/>
-		<custom:FilePickerTextBox Grid.Row="3" Margin="0 5"
-		                          Mode="Folder" Title="Select server path"
-		                          Name="ServerPath"/>
-	</Grid>
+		<custom:FilePickerTextBox Mode="Folder" Title="Select game path" Name="GamePath"
+		                          Text="{Binding GamePath}"/>
+		
+		<Label Content="Server path" VerticalAlignment="Center" HorizontalAlignment="Left"
+		       Margin="0 10 0 0"/>
+		<custom:FilePickerTextBox Mode="Folder" Title="Select server path" Name="ServerPath"
+		                          Text="{Binding ServerPath}"/>
+		
+	</StackPanel>
 	
 </UserControl>

@@ -10,7 +10,7 @@ public class SteamAppInfo
 		ServerFolder = serverFolder;
 	}
 
-	public int Id { get;}
+	public int Id { get; }
 	
 	public int ServerId { get; }
 	

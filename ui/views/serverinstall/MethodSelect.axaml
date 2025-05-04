@@ -13,7 +13,7 @@
 				<Panel>
 					<Svg Path="/ui/assets/logo-steam.svg" Width="150" Height="150"/>
 					<Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10">
-						Download to your steam library
+						Download to your Steam library
 					</Label>
 				</Panel>
 			</Button>

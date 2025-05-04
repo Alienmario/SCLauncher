@@ -49,21 +49,21 @@ public class ServerInstallService(
 
 	/// Returns components that can be installed.
 	/// Excludes already installed up-to-date components and those not applicable to current platform.
-	public async Task<ISet<ServerInstallComponent>> GatherInstallableComponents(ServerInstallParams p)
+	public async Task<IDictionary<ServerInstallComponent, ComponentInfo?>> GatherInstallableComponents(ServerInstallParams p)
 	{
 		var ctx = new ServerInstallContext(p);
-		var set = new HashSet<ServerInstallComponent>();
+		var dict = new Dictionary<ServerInstallComponent, ComponentInfo?>();
 		
 		foreach (var component in Enum.GetValues<ServerInstallComponent>())
 		{
 			var info = await GatherComponentInfo(component, ctx);
 			if (await GetComponentInstaller(component).ShouldInstall(ctx, info))
 			{
-				set.Add(component);
+				dict.Add(component, info);
 			}
 		}
 		
-		return set;
+		return dict;
 	}
 
 	public async Task<ComponentInfo?> GatherComponentInfo(ServerInstallComponent component, ServerInstallParams p)

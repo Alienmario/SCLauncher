@@ -21,5 +21,6 @@ Global
 		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

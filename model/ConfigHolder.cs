@@ -9,6 +9,8 @@ public partial class ConfigHolder : INotifyPropertyChanged
 	
 	public string? ServerPath { get; set; }
 	
+	public string? SteamPath { get; set; }
+	
 	public string? CurrentTab { get; set; }
 
 }

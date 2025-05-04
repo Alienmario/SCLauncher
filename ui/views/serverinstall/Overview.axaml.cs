@@ -1,9 +1,12 @@
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using SCLauncher.backend.service;
+using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
 using SCLauncher.ui.controls;
 
@@ -13,10 +16,19 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 {
 	private WizardNavigator? Wizard { get; set; }
 	private CancellationTokenSource? PreparationCancelSrc { get; set; }
+	private ObservableCollection<OverviewComponentEntry> InstallComponents { get; } = [];
 	
 	public Overview()
 	{
 		InitializeComponent();
+
+		ComponentsGrid.DataContext = InstallComponents;
+		
+		if (Design.IsDesignMode)
+		{
+			InstallComponents.Add(new OverviewComponentEntry { Component = ServerInstallComponent.Server, Status = "Install" });
+			InstallComponents.Add(new OverviewComponentEntry { Component = ServerInstallComponent.SourceMod, Status = "Upgrade from x.x.x" });
+		}
 	}
 	
 	public void OnAttachedToWizard(WizardNavigator wizard, bool unstacked)
@@ -25,19 +37,19 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 		wizard.SetControls(forward: false, back: true);
 		wizard.ForwardButtonRunsAction = true;
 
-		if (DataContext is ServerInstallParams data)
+		if (DataContext is ServerInstallParams installParams)
 		{
-			if (data.CreateSubfolder)
+			if (installParams.CreateSubfolder)
 			{
-				Path.Text = System.IO.Path.Join(data.Path, data.Subfolder);
+				PathText.Text = Path.Join(installParams.Path, installParams.Subfolder);
 			}
 			else
 			{
-				Path.Text = data.Path;
+				PathText.Text = installParams.Path;
 			}
 
 			PreparationCancelSrc = new CancellationTokenSource();
-			Prepare(data, PreparationCancelSrc.Token);
+			Prepare(installParams, PreparationCancelSrc.Token);
 		}
 	}
 
@@ -51,6 +63,12 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 
 	public void OnNextPageRequest(WizardNavigator wizard)
 	{
+		if (DataContext is ServerInstallParams installParams)
+		{
+			installParams.Components = InstallComponents
+				.Select(i => i.Component)
+				.ToHashSet();
+		}
 		wizard.SetContent(new InstallConsole());
 	}
 
@@ -63,18 +81,29 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 			if (cancellationToken.IsCancellationRequested)
 				return;
 			
-			ISet<ServerInstallComponent> components = await installService.GatherInstallableComponents(installParams);
+			var installableComponents = await installService.GatherInstallableComponents(installParams);
+			
 			if (cancellationToken.IsCancellationRequested)
 				return;
 			
-			installParams.Components = components;
-
 			Dispatcher.UIThread.Post(() =>
 			{
-				if (!cancellationToken.IsCancellationRequested)
+				if (cancellationToken.IsCancellationRequested)
+					return;
+				
+				foreach ((ServerInstallComponent component, ComponentInfo? componentInfo) in installableComponents)
 				{
-					Wizard?.SetControls(forward: true);
+					var status = componentInfo != null
+						? componentInfo.Version != null ? $"Upgrade ({componentInfo.Version} -> Latest)" : "Upgrade"
+						: "Install";
+				
+					InstallComponents.Add(new OverviewComponentEntry
+					{
+						Component = component,
+						Status = status
+					});
 				}
+				Wizard?.SetControls(forward: true);
 			});
 		}, cancellationToken).LogExceptions();
 	}

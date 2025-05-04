@@ -11,6 +11,8 @@ namespace SCLauncher.ui.views.serverinstall;
 
 public partial class InstallConsole : UserControl, WizardNavigator.IWizardContent
 {
+	private bool postDetach;
+	
 	public InstallConsole()
 	{
 		InitializeComponent();
@@ -20,6 +22,11 @@ public partial class InstallConsole : UserControl, WizardNavigator.IWizardConten
 	{
 		wizard.SetControls(forward: false, back: false);
 		RunInstaller(wizard);
+	}
+
+	public void OnDetachedFromWizard(WizardNavigator wizard, bool stacked)
+	{
+		postDetach = true;
 	}
 
 	private async void RunInstaller(WizardNavigator wizard)
@@ -33,13 +40,10 @@ public partial class InstallConsole : UserControl, WizardNavigator.IWizardConten
 			try
 			{
 				var installService = App.GetService<ServerInstallService>();
-
 				await foreach (var msg in installService.GetInstaller(data).WithCancellation(cancellation.Token))
 				{
 					AppendMessage(msg);
 				}
-
-				wizard.Completed = true;
 			}
 			catch (Exception e)
 			{
@@ -51,12 +55,16 @@ public partial class InstallConsole : UserControl, WizardNavigator.IWizardConten
 			finally
 			{
 				wizard.OnExit -= cancelOnExitHandler;
+				if (!postDetach)
+				{
+					wizard.Completed = true;
+				}
 			}
 		}
 	}
 
 	private void AppendMessage(StatusMessage msg)
 	{
-		Console.AddMessage(msg);
+		ConsoleViewer.AddMessage(msg);
 	}
 }

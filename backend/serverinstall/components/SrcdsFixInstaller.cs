@@ -19,7 +19,7 @@ public class SrcdsFixInstaller : IServerComponentInstaller<ComponentInfo>
 		yield break;
 	}
 
-	public Task<ComponentInfo?> GatherInfo(ServerInstallContext ctx)
+	public Task<ComponentInfo?> GatherInfo(ServerInstallContext ctx, CancellationToken cancellationToken = default)
 	{
 		return Task.FromResult<ComponentInfo?>(null);
 	}

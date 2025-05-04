@@ -1,40 +1,38 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Gameloop.Vdf;
 using Gameloop.Vdf.Linq;
 using Microsoft.Win32;
 
-namespace SCLauncher.backend.util;
+namespace SCLauncher.backend.util.steam;
 
 // Credits to DasDarki/JBPPP2
 
 public static class SteamUtils
 {
 	
-	public static bool LaunchApp(int appId)
+	public static void LaunchApp(int appId)
 	{
 		Process.Start(new ProcessStartInfo("steam://launch/" + appId + "/dialog")
 		{
 			UseShellExecute = true,
 			Verb = "open"
 		});
-
-		return true;
 	}
 
-	public static bool InstallApp(int appId)
+	public static void InstallApp(int appId)
 	{
 		Process.Start(new ProcessStartInfo("steam://install/" + appId)
 		{
 			UseShellExecute = true,
 			Verb = "open"
 		});
-
-		return true;
 	}
-
-	public static string? FindAppPath(string steamDir, int appId)
+	
+	public static async Task<SteamAppManifest?> FindAppManifestAsync(string steamDir, int appId, CancellationToken ct = default)
 	{
 		if (string.IsNullOrEmpty(steamDir))
 		{
@@ -48,7 +46,7 @@ public static class SteamUtils
 			return null;
 		}
 
-		VProperty vdf = VdfConvert.Deserialize(File.ReadAllText(path));
+		VProperty vdf = VdfConvert.Deserialize(await File.ReadAllTextAsync(path, ct));
 
 		foreach (var val in vdf.Value.Children())
 		{
@@ -62,32 +60,35 @@ public static class SteamUtils
 				continue;
 			}
 
-			var libPath = obj["path"]?.Value<string>();
+			SteamLibrary library = new SteamLibrary(obj);
+			var libPath = library.Path;
 
 			if (string.IsNullOrEmpty(libPath))
 			{
 				continue;
 			}
 
-			var appManifest = Path.Combine(libPath, "steamapps", "appmanifest_" + appId + ".acf");
+			var manifestPath = Path.Combine(libPath, "steamapps", "appmanifest_" + appId + ".acf");
 
-			if (!File.Exists(appManifest))
+			if (!File.Exists(manifestPath))
 			{
 				continue;
 			}
 
-			VProperty manifest = VdfConvert.Deserialize(File.ReadAllText(appManifest));
-			var installDir = manifest.Value["installdir"]?.Value<string>();
-
-			if (string.IsNullOrEmpty(installDir))
-			{
+			VProperty vManifest = VdfConvert.Deserialize(await File.ReadAllTextAsync(manifestPath, ct));
+			if (vManifest.Value is not VObject vManifestVal)
 				continue;
-			}
-
-			return Path.Combine(libPath, "steamapps", "common", installDir);
+			
+			return new SteamAppManifest(vManifestVal, library);
 		}
 
 		return null;
+	}
+
+	public static async Task<string?> FindAppPathAsync(string steamDir, int appId, CancellationToken ct = default)
+	{
+		var manifest = await FindAppManifestAsync(steamDir, appId, ct);
+		return manifest?.GetAbsInstallPath();
 	}
 
 	public static string? FindSteamInstallDir()

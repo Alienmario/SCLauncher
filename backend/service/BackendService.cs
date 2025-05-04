@@ -1,12 +1,11 @@
 using System.IO;
-using SCLauncher.backend.util;
+using SCLauncher.backend.util.steam;
 using SCLauncher.model;
 
 namespace SCLauncher.backend.service;
 
 public class BackendService(ConfigHolder config, PersistenceService persistence)
 {
-	private string? steamDir;
 	private SteamAppInfo? activeApp;
 
 	public void Initialize()
@@ -14,19 +13,23 @@ public class BackendService(ConfigHolder config, PersistenceService persistence)
 		persistence.Bind("config", config, JsonSourceGenerationContext.Default);
 		
 		activeApp = new SteamAppInfo(362890, 346680, "Black Mesa", "Black Mesa Dedicated Server");
-		steamDir = SteamUtils.FindSteamInstallDir();
 
+		var steamDir = SteamUtils.FindSteamInstallDir();
 		if (steamDir != null)
 		{
+			config.SteamPath = steamDir;
+			
 			if (!Directory.Exists(config.GamePath))
-				config.GamePath = SteamUtils.FindAppPath(steamDir, GetActiveApp().Id) ?? config.GamePath;
+				config.GamePath = SteamUtils.FindAppPathAsync(steamDir, GetActiveApp().Id).GetAwaiter().GetResult()
+				                  ?? config.GamePath;
 			
 			if (!Directory.Exists(config.ServerPath))
-				config.ServerPath = SteamUtils.FindAppPath(steamDir, GetActiveApp().ServerId) ?? config.ServerPath;
+				config.ServerPath = SteamUtils.FindAppPathAsync(steamDir, GetActiveApp().ServerId).GetAwaiter().GetResult()
+				                    ?? config.ServerPath;
 		}
 	}
 
-	public string? GetSteamDir() => steamDir;
+	public string? GetSteamDir() => config.SteamPath;
 
 	public SteamAppInfo GetActiveApp() => activeApp!;
 }

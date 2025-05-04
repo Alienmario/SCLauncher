@@ -3,7 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:serverinstall="clr-namespace:SCLauncher.model.serverinstall"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:serverinstall1="clr-namespace:SCLauncher.ui.views.serverinstall"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
              x:Class="SCLauncher.ui.views.serverinstall.Overview"
              x:DataType="serverinstall:ServerInstallParams">
 	
@@ -16,17 +17,14 @@
 	</Design.DataContext>
 	
 	<UserControl.Styles>
-		<Style Selector="Label.Summary">
-			<Setter Property="FontSize">18</Setter>
-		</Style>
 		<Style Selector=":is(Control).Key">
 			<Setter Property="Margin" Value="0 0 10 5"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
 		</Style>
 		<Style Selector="Label.Key">
 			<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
-			<Setter Property="FontWeight" Value="Light"/>
 			<Setter Property="HorizontalContentAlignment" Value="Left"/>
+			<Setter Property="Padding" Value="0 3"/>
 		</Style>
 		<Style Selector=":is(Control).Value">
 			<Setter Property="Margin" Value="0 0 0 5"/>
@@ -37,47 +35,54 @@
 		</Style>
 	</UserControl.Styles>
 	
-	<DockPanel Margin="0 10 0 10" LastChildFill="False">
-		
-		<Border DockPanel.Dock="Bottom"
-		        BorderBrush="#31EFEFEF"
-		        BorderThickness="0 0 0 1"
-		        CornerRadius="5"/>
+	<DockPanel Margin="0 10">
 		
 		<Grid ColumnDefinitions="Auto *"
-		      RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+		      RowDefinitions="Auto, Auto, Auto"
 		      VerticalAlignment="Center"
 		      DockPanel.Dock="Top">
 			
-			<Label Grid.Row="1" Grid.Column="0" Content="Install method" Classes="Key"/>
-			<TextBlock Grid.Row="1" Grid.Column="1" Classes="Value"
-			           Text="{Binding Method}"/>
+			<Label Grid.Row="1" Grid.Column="0" Content="Install method:" Classes="Key"/>
+			<TextBlock Grid.Row="1" Grid.Column="1" Classes="Value" Text="{Binding Method}"/>
 			
-			<Label Grid.Row="2" Grid.Column="0" Content="Install directory" Classes="Key"
-			       IsVisible="{Binding #Path.IsVisible}"/>
-			<TextBlock Grid.Row="2" Grid.Column="1" Name="Path" Classes="Value"
+			<Label Grid.Row="2" Grid.Column="0" Content="Install directory:" Classes="Key"
+			       IsVisible="{Binding #PathText.IsVisible}"/>
+			<TextBlock Grid.Row="2" Grid.Column="1" Name="PathText" Classes="Value"
 			           Text="{Binding Path, Mode=OneTime}"
 			           IsVisible="{Binding Method, Converter={x:Static ObjectConverters.Equal},
 						ConverterParameter={x:Static serverinstall:ServerInstallMethod.External}}"/>
-
-			<Label Grid.Row="3" Grid.Column="0" Content="Components" Classes="Key"/>
-			<ItemsControl Grid.Row="3" Grid.Column="1" ItemsSource="{Binding Components}" Classes="Value">
+		</Grid>
+		
+		<ScrollViewer AllowAutoHide="False">
+			<ItemsControl Name="ComponentsGrid" ItemsSource="{Binding}" Margin="1 0">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<WrapPanel Orientation="Horizontal"/>
+						<StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Spacing="10"/>
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<StackPanel Orientation="Horizontal" Margin="0 0 10 0">
-							<CheckBox IsEnabled="False" IsChecked="True"/>
-							<TextBlock Text="{Binding}" VerticalAlignment="Center"/>
-						</StackPanel>
+						<DockPanel>
+							<TextBlock DockPanel.Dock="Left"
+							           Text="{Binding Component, DataType=serverinstall1:OverviewComponentEntry}"
+							           VerticalAlignment="Center"/>
+							<TextBlock DockPanel.Dock="Right"
+							           Text="{Binding Status, DataType=serverinstall1:OverviewComponentEntry}"
+							           VerticalAlignment="Center"/>
+							<Border BorderThickness="0 0 0 0.5" Margin="6 0 6 4">
+								<Border.BorderBrush>
+									<LinearGradientBrush SpreadMethod="Repeat" StartPoint="2,4" EndPoint="4,6">
+										<GradientStop Offset="0" Color="Gray" />
+										<GradientStop Offset="0.5" Color="Gray" />
+										<GradientStop Offset="0.501" Color="Transparent" />
+									</LinearGradientBrush>
+								</Border.BorderBrush>
+							</Border>
+						</DockPanel>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
-
-		</Grid>
+		</ScrollViewer>
 		
 	</DockPanel>
 </UserControl>

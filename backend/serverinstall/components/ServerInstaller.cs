@@ -1,44 +1,57 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DepotDownloader;
-using SCLauncher.backend.util;
+using SCLauncher.backend.service;
+using SCLauncher.backend.util.steam;
 using SCLauncher.model;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
+using SteamKit2.Authentication;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public class ServerInstaller : IServerComponentInstaller<ComponentInfo>
+public class ServerInstaller(BackendService backend) : IServerComponentInstaller<ComponentInfo>
 {
 	
 	public ServerInstallComponent Type => ServerInstallComponent.Server;
 	
-	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
-		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	public IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx, CancellationToken cancellationToken = default)
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
-			await foreach (var message in InstallViaSteamClient(ctx, cancellationToken))
-			{
-				yield return message;
-			}
+			return InstallViaSteamClient(ctx, cancellationToken);
 		}
 		else
 		{
-			await foreach (var message in InstallViaDepotDownloader(ctx, cancellationToken))
-			{
-				yield return message;
-			}
+			return InstallViaDepotDownloader(ctx, cancellationToken);
 		}
 	}
 
-	public static async IAsyncEnumerable<StatusMessage> InstallViaSteamClient(ServerInstallContext ctx,
+	public async IAsyncEnumerable<StatusMessage> InstallViaSteamClient(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
+		if (!Directory.Exists(backend.GetSteamDir()))
+		{
+			yield return new StatusMessage(
+				"Steam not found! Install it or adjust path in settings, then retry.", MessageStatus.Error);
+			yield break;
+		}
+
 		SteamUtils.InstallApp(ctx.Params.AppId);
 		yield return new StatusMessage("Waiting for Steam to finish downloading");
+		
+		while (true)
+		{
+			await Task.Delay(1000, cancellationToken);
+			ComponentInfo? info = await GatherInfo(ctx, cancellationToken);
+			if (info != null)
+			{
+				break;
+			}
+		}
 	}
 
 	private static async IAsyncEnumerable<StatusMessage> InstallViaDepotDownloader(ServerInstallContext ctx,
@@ -46,13 +59,16 @@ public class ServerInstaller : IServerComponentInstaller<ComponentInfo>
 	{
 		var cfg = new AppDownloadConfig
 		{
-			InstallDirectory = ctx.ServerFolder,
+			InstallDirectory = ctx.InstallDir,
 			VerifyAll = true,
-			AppId = (uint) ctx.Params.AppId
+			AppId = (uint)ctx.Params.AppId
 		};
 
 		int? exitCode = null;
-		await foreach ((string message, bool error) in SubProcess.AppDownload(cfg, i => exitCode = i, cancellationToken))
+		await foreach ((string message, bool error) in SubProcess.AppDownload(cfg,
+			               i => exitCode = i,
+			               new UserConsoleAuthenticator(),
+			               cancellationToken))
 		{
 			yield return new StatusMessage(message);
 		}
@@ -63,14 +79,65 @@ public class ServerInstaller : IServerComponentInstaller<ComponentInfo>
 		}
 	}
 	
-	public Task<ComponentInfo?> GatherInfo(ServerInstallContext ctx)
+	public async Task<ComponentInfo?> GatherInfo(ServerInstallContext ctx, CancellationToken cancellationToken = default)
 	{
-		return Task.FromResult<ComponentInfo?>(null);
-	}
+		if (ctx.Params.Method == ServerInstallMethod.Steam)
+		{
+			string? steamDir = backend.GetSteamDir();
+			if (steamDir == null)
+				return null;
 
-	public Task<bool> ShouldInstall(ServerInstallContext ctx, ComponentInfo? installationInfo)
-	{
-		return Task.FromResult(true);
+			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.AppId, cancellationToken);
+			if (manifest == null)
+				return null;
+			
+			if (!manifest.StateFlags.HasFlag(SteamAppState.StateFullyInstalled))
+				return null;
+
+			string? absInstallPath = manifest.GetAbsInstallPath();
+			if (absInstallPath == null)
+				return null;
+
+			return new ComponentInfo
+			{
+				Path = absInstallPath
+			};
+		}
+		else
+		{
+			if (!Directory.Exists(ctx.InstallDir))
+				return null;
+
+			string? version = null;
+			try {
+				foreach (string dir in Directory.EnumerateDirectories(ctx.InstallDir))
+				{
+					string steaminfPath = Path.Combine(dir, "steam.inf");
+					if (File.Exists(steaminfPath))
+					{
+						foreach (string line in await File.ReadAllLinesAsync(steaminfPath, cancellationToken))
+						{
+							if (line.StartsWith("PatchVersion="))
+							{
+								version = line["PatchVersion=".Length..];
+								break;
+							}
+						}
+					}
+				}
+			}
+			catch (IOException) {}
+
+			// if we didn't find the version, installation may be incomplete
+			if (version == null)
+				return null;
+
+			return new ComponentInfo
+			{
+				Path = ctx.InstallDir,
+				Version = version
+			};
+		}
 	}
 
 }
