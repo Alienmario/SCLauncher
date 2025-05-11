@@ -5,7 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DepotDownloader;
 using SCLauncher.backend.service;
-using SCLauncher.backend.util.steam;
+using SCLauncher.backend.steam;
+using SCLauncher.backend.util;
 using SCLauncher.model;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
@@ -16,7 +17,7 @@ namespace SCLauncher.backend.serverinstall.components;
 public class ServerInstaller(BackendService backend) : IServerComponentInstaller<ComponentInfo>
 {
 	
-	public ServerInstallComponent Type => ServerInstallComponent.Server;
+	public ServerInstallComponent ComponentType => ServerInstallComponent.Server;
 	
 	public IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx, CancellationToken cancellationToken = default)
 	{
@@ -40,14 +41,14 @@ public class ServerInstaller(BackendService backend) : IServerComponentInstaller
 			yield break;
 		}
 
-		SteamUtils.InstallApp(ctx.Params.AppId);
+		SteamUtils.InstallApp(ctx.Params.AppInfo.ServerAppId);
 		yield return new StatusMessage("Waiting for Steam to finish downloading");
 		
 		while (true)
 		{
 			await Task.Delay(1000, cancellationToken);
-			ComponentInfo? info = await GatherInfo(ctx, cancellationToken);
-			if (info != null)
+			ComponentInfo info = await GatherInfoAsync(ctx, false, cancellationToken);
+			if (info.Installed)
 			{
 				break;
 			}
@@ -61,7 +62,7 @@ public class ServerInstaller(BackendService backend) : IServerComponentInstaller
 		{
 			InstallDirectory = ctx.InstallDir,
 			VerifyAll = true,
-			AppId = (uint)ctx.Params.AppId
+			AppId = (uint)ctx.Params.AppInfo.ServerAppId
 		};
 
 		int? exitCode = null;
@@ -79,24 +80,27 @@ public class ServerInstaller(BackendService backend) : IServerComponentInstaller
 		}
 	}
 	
-	public async Task<ComponentInfo?> GatherInfo(ServerInstallContext ctx, CancellationToken cancellationToken = default)
+	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
+		CancellationToken cancellationToken = default)
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
+			// this is explicitly checked during install
 			string? steamDir = backend.GetSteamDir();
 			if (steamDir == null)
-				return null;
+				return ComponentInfo.ReadyToInstall;
 
-			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.AppId, cancellationToken);
+			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.AppInfo.ServerAppId, cancellationToken);
 			if (manifest == null)
-				return null;
+				return ComponentInfo.ReadyToInstall;
 			
+			// in-between states, passing ReadyToInstall is fine, nothing weird will happen
 			if (!manifest.StateFlags.HasFlag(SteamAppState.StateFullyInstalled))
-				return null;
+				return ComponentInfo.ReadyToInstall;
 
 			string? absInstallPath = manifest.GetAbsInstallPath();
 			if (absInstallPath == null)
-				return null;
+				return ComponentInfo.ReadyToInstall;
 
 			return new ComponentInfo
 			{
@@ -106,7 +110,7 @@ public class ServerInstaller(BackendService backend) : IServerComponentInstaller
 		else
 		{
 			if (!Directory.Exists(ctx.InstallDir))
-				return null;
+				return ComponentInfo.ReadyToInstall;
 
 			string? version = null;
 			try {
@@ -130,7 +134,7 @@ public class ServerInstaller(BackendService backend) : IServerComponentInstaller
 
 			// if we didn't find the version, installation may be incomplete
 			if (version == null)
-				return null;
+				return ComponentInfo.ReadyToInstall;
 
 			return new ComponentInfo
 			{

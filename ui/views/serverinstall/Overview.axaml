@@ -4,16 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:serverinstall="clr-namespace:SCLauncher.model.serverinstall"
              xmlns:serverinstall1="clr-namespace:SCLauncher.ui.views.serverinstall"
+             xmlns:design="clr-namespace:SCLauncher.ui.design"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
              x:Class="SCLauncher.ui.views.serverinstall.Overview"
              x:DataType="serverinstall:ServerInstallParams">
 	
 	<Design.DataContext>
-		<serverinstall:ServerInstallParams
-			Subfolder="Black Mesa Dedicated Server"
-			Method="External"
-			Path="C:\Program Files\Program Files\Program Files\Program Files\Program Files\Program Files"
-		/>
+		<design:DServerInstallParams/>
 	</Design.DataContext>
 	
 	<UserControl.Styles>
@@ -57,19 +54,22 @@
 			<ItemsControl Name="ComponentsGrid" ItemsSource="{Binding}" Margin="1 0">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Spacing="10"/>
+						<StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Spacing="0"/>
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
 						<DockPanel>
+							<CheckBox DockPanel.Dock="Left" VerticalAlignment="Top"
+							          IsChecked="{Binding Install, DataType=serverinstall1:OverviewComponentEntry}"
+							          IsEnabled="{Binding InstallEditable, DataType=serverinstall1:OverviewComponentEntry}"/>
 							<TextBlock DockPanel.Dock="Left"
 							           Text="{Binding Component, DataType=serverinstall1:OverviewComponentEntry}"
 							           VerticalAlignment="Center"/>
 							<TextBlock DockPanel.Dock="Right"
 							           Text="{Binding Status, DataType=serverinstall1:OverviewComponentEntry}"
 							           VerticalAlignment="Center"/>
-							<Border BorderThickness="0 0 0 0.5" Margin="6 0 6 4">
+							<Border BorderThickness="0 0 0 0.5" Margin="6 0 6 10" VerticalAlignment="Bottom">
 								<Border.BorderBrush>
 									<LinearGradientBrush SpreadMethod="Repeat" StartPoint="2,4" EndPoint="4,6">
 										<GradientStop Offset="0" Color="Gray" />

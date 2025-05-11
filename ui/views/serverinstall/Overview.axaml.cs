@@ -16,18 +16,28 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 {
 	private WizardNavigator? Wizard { get; set; }
 	private CancellationTokenSource? PreparationCancelSrc { get; set; }
-	private ObservableCollection<OverviewComponentEntry> InstallComponents { get; } = [];
+	private ObservableCollection<OverviewComponentEntry> ComponentEntries { get; } = [];
 	
 	public Overview()
 	{
 		InitializeComponent();
 
-		ComponentsGrid.DataContext = InstallComponents;
+		ComponentsGrid.DataContext = ComponentEntries;
 		
 		if (Design.IsDesignMode)
 		{
-			InstallComponents.Add(new OverviewComponentEntry { Component = ServerInstallComponent.Server, Status = "Install" });
-			InstallComponents.Add(new OverviewComponentEntry { Component = ServerInstallComponent.SourceMod, Status = "Upgrade from x.x.x" });
+			ComponentEntries.Add(new OverviewComponentEntry
+			{
+				Component = ServerInstallComponent.Server, Status = "Ready to install", Install = true, InstallEditable = false
+			});
+			ComponentEntries.Add(new OverviewComponentEntry
+			{
+				Component = ServerInstallComponent.MetaMod, Status = "Already installed", Install = false
+			});
+			ComponentEntries.Add(new OverviewComponentEntry
+			{
+				Component = ServerInstallComponent.SourceMod, Status = "Upgrade from x.x.x", Install = true
+			});
 		}
 	}
 	
@@ -41,7 +51,7 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 		{
 			if (installParams.CreateSubfolder)
 			{
-				PathText.Text = Path.Join(installParams.Path, installParams.Subfolder);
+				PathText.Text = Path.Join(installParams.Path, installParams.AppInfo.ServerInstallFolder);
 			}
 			else
 			{
@@ -65,7 +75,8 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 	{
 		if (DataContext is ServerInstallParams installParams)
 		{
-			installParams.Components = InstallComponents
+			installParams.Components = ComponentEntries
+				.Where(i => i.Install)
 				.Select(i => i.Component)
 				.ToHashSet();
 		}
@@ -81,7 +92,7 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 			if (cancellationToken.IsCancellationRequested)
 				return;
 			
-			var installableComponents = await installService.GatherInstallableComponents(installParams);
+			var componentInfos = await installService.GatherComponentInfoAsync(installParams);
 			
 			if (cancellationToken.IsCancellationRequested)
 				return;
@@ -91,16 +102,31 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 				if (cancellationToken.IsCancellationRequested)
 					return;
 				
-				foreach ((ServerInstallComponent component, ComponentInfo? componentInfo) in installableComponents)
+				foreach ((ServerInstallComponent component, ComponentInfo componentInfo) in componentInfos)
 				{
-					var status = componentInfo != null
-						? componentInfo.Version != null ? $"Upgrade ({componentInfo.Version} -> Latest)" : "Upgrade"
-						: "Install";
+					string? status = null;
+					if (componentInfo.Installable)
+						status = "Ready to install";
+					if (componentInfo.Installed)
+						status = "Already installed";
+					if (componentInfo.Upgradable)
+					{
+						status = "Upgrade";
+						if (componentInfo.Version != null && componentInfo.UpgradeVersion != null)
+						{
+							status += $" ({componentInfo.Version} -> {componentInfo.UpgradeVersion})";
+						}
+					}
+					
+					if (status == null)
+						continue;
 				
-					InstallComponents.Add(new OverviewComponentEntry
+					ComponentEntries.Add(new OverviewComponentEntry
 					{
 						Component = component,
-						Status = status
+						Status = status,
+						Install = !status.Equals("Already installed"),
+						InstallEditable = !status.Equals("Ready to install")
 					});
 				}
 				Wizard?.SetControls(forward: true);

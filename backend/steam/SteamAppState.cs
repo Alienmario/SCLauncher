@@ -1,6 +1,6 @@
 using System;
 
-namespace SCLauncher.backend.util.steam;
+namespace SCLauncher.backend.steam;
 
 [Flags]
 public enum SteamAppState

@@ -1,4 +1,6 @@
+using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
+using SCLauncher.backend.install;
 using SCLauncher.backend.serverinstall;
 using SCLauncher.backend.serverinstall.components;
 using SCLauncher.backend.service;
@@ -25,6 +27,9 @@ public static class ServiceConfig
 		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, SourceModInstaller>();
 		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, SourceCoopInstaller>();
 		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, SrcdsFixInstaller>();
+		
+		collection.AddSingleton(new HttpClient());
+		collection.AddSingleton<InstallHelper>();
 	}
 	
 }

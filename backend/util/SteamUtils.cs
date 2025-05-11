@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using Gameloop.Vdf;
 using Gameloop.Vdf.Linq;
 using Microsoft.Win32;
+using SCLauncher.backend.steam;
 
-namespace SCLauncher.backend.util.steam;
+namespace SCLauncher.backend.util;
 
 // Credits to DasDarki/JBPPP2
 

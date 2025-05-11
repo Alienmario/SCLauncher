@@ -8,6 +8,6 @@ public interface IServerComponentInstaller<TComponentInfo> : IComponentInstaller
 					where TComponentInfo : ComponentInfo
 {
 
-	public ServerInstallComponent Type { get; }
-
+	public ServerInstallComponent ComponentType { get; }
+	
 }

@@ -1,32 +1,78 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using SCLauncher.backend.install;
 using SCLauncher.model;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public class MetaModInstaller : IServerComponentInstaller<ComponentInfo>
+public class MetaModInstaller(InstallHelper helper) : IServerComponentInstaller<ComponentInfo>
 {
-	
-	public ServerInstallComponent Type => ServerInstallComponent.MetaMod;
+	private const string MetamodVersion = "1.12";
+
+	public ServerInstallComponent ComponentType => ServerInstallComponent.MetaMod;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken cancellationToken)
 	{
-		yield break;
+		(string url, string filename) dl = await GetDownloadAsync(MetamodVersion, cancellationToken);
+		string archivePath = Path.Join(ctx.InstallDir, dl.filename);
+		
+		yield return new StatusMessage($"Downloading...\n URL: {dl.url}\n TARGET: \"{archivePath}\"");
+		
+		try
+		{
+			await helper.DownloadAsync(dl.url, archivePath, cancellationToken);
+		}
+		catch (Exception)
+		{
+			helper.SafeDelete(archivePath);
+			throw;
+		}
+
+		yield return new StatusMessage($"Extracting...");
+		
+		try
+		{
+			await helper.ExtractAsync(archivePath, ctx.GameModDir, true, cancellationToken);
+		}
+		finally
+		{
+			helper.SafeDelete(archivePath);
+		}
 	}
 
-	public Task<ComponentInfo?> GatherInfo(ServerInstallContext ctx, CancellationToken cancellationToken = default)
+	public Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
+		CancellationToken cancellationToken = default)
 	{
-		return Task.FromResult<ComponentInfo?>(null);
+		ComponentInfo info = ComponentInfo.ReadyToInstall;
+		
+		string metamod = Path.Join(ctx.AddonsDir, "metamod");
+		if (Directory.Exists(metamod))
+		{
+			info = new ComponentInfo { Path = metamod };
+		}
+		
+		return Task.FromResult(info);
 	}
 
-	public Task<bool> ShouldInstall(ServerInstallContext ctx, ComponentInfo? installationInfo)
+	private async Task<(string url, string filename)> GetDownloadAsync(string version,
+		CancellationToken cancellationToken = default)
 	{
-		return Task.FromResult(true);
+		string platform = Environment.OSVersion.Platform switch
+		{
+			PlatformID.Win32NT => "windows",
+			PlatformID.Unix => "linux",
+			_ => throw new PlatformNotSupportedException()
+		};
+		string baseUrl = $"https://mms.alliedmods.net/mmsdrop/{version}/";
+		string filename = await helper.HttpClient.GetStringAsync($"{baseUrl}mmsource-latest-{platform}", cancellationToken);
+		return (baseUrl + filename, filename);
 	}
 
 }

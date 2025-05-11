@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using SCLauncher.backend.serverinstall;
 using SCLauncher.model;
@@ -11,74 +12,45 @@ namespace SCLauncher.backend.service;
 
 public class ServerInstallService(
 	BackendService backend,
-	ServerInstallRunner runner,
-	IEnumerable<IServerComponentInstaller<ComponentInfo>> installers)
+	ServerInstallRunner serverInstallRunner,
+	IEnumerable<IServerComponentInstaller<ComponentInfo>> componentInstallers)
 {
 
 	public ServerInstallParams NewInstallParams()
 	{
 		return new ServerInstallParams
 		{
-			Subfolder = backend.GetActiveApp().ServerFolder,
-			AppId = backend.GetActiveApp().ServerId
+			AppInfo = backend.GetActiveApp()
 		};
 	}
 
 	public IAsyncEnumerable<StatusMessage> GetInstaller(ServerInstallParams installParams)
 	{
-		return runner.Get(installParams);
+		return serverInstallRunner.Get(installParams);
 	}
 
-	/// Returns components that are currently installed.
-	public async Task<IDictionary<ServerInstallComponent, ComponentInfo>> GatherInstalledComponents(ServerInstallParams p)
+	public async Task<IDictionary<ServerInstallComponent, ComponentInfo>> GatherComponentInfoAsync(ServerInstallParams p)
 	{
 		var ctx = new ServerInstallContext(p);
-		var dict = new Dictionary<ServerInstallComponent, ComponentInfo>();
 		
 		foreach (var component in Enum.GetValues<ServerInstallComponent>())
 		{
-			var info = await GatherComponentInfo(component, ctx);
-			if (info != null)
-			{
-				dict.Add(component, info);
-			}
+			await GatherComponentInfoAsync(component, ctx);
 		}
 		
-		return dict;
-	}
-
-	/// Returns components that can be installed.
-	/// Excludes already installed up-to-date components and those not applicable to current platform.
-	public async Task<IDictionary<ServerInstallComponent, ComponentInfo?>> GatherInstallableComponents(ServerInstallParams p)
-	{
-		var ctx = new ServerInstallContext(p);
-		var dict = new Dictionary<ServerInstallComponent, ComponentInfo?>();
-		
-		foreach (var component in Enum.GetValues<ServerInstallComponent>())
-		{
-			var info = await GatherComponentInfo(component, ctx);
-			if (await GetComponentInstaller(component).ShouldInstall(ctx, info))
-			{
-				dict.Add(component, info);
-			}
-		}
-		
-		return dict;
-	}
-
-	public async Task<ComponentInfo?> GatherComponentInfo(ServerInstallComponent component, ServerInstallParams p)
-	{
-		return await GatherComponentInfo(component, new ServerInstallContext(p));
+		return ctx.ComponentInfos;
 	}
 	
-	private async Task<ComponentInfo?> GatherComponentInfo(ServerInstallComponent component, ServerInstallContext ctx)
+	internal async Task GatherComponentInfoAsync(ServerInstallComponent component, ServerInstallContext ctx,
+		CancellationToken cancellationToken = default)
 	{
-		return await GetComponentInstaller(component).GatherInfo(ctx);
+		ctx.ComponentInfos[component] = await GetComponentInstaller(component)
+			.GatherInfoAsync(ctx, true, cancellationToken);
 	}
 
-	private IServerComponentInstaller<ComponentInfo> GetComponentInstaller(ServerInstallComponent component)
+	internal IServerComponentInstaller<ComponentInfo> GetComponentInstaller(ServerInstallComponent component)
 	{
-		return installers.First(i => i.Type == component);
+		return componentInstallers.First(i => i.ComponentType == component);
 	}
 	
 }

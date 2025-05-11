@@ -1,6 +1,6 @@
 using Gameloop.Vdf.Linq;
 
-namespace SCLauncher.backend.util.steam;
+namespace SCLauncher.backend.steam;
 
 public class SteamLibrary(VObject vObject)
 {

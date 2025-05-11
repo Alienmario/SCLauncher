@@ -11,7 +11,7 @@ namespace SCLauncher.backend.serverinstall.components;
 public class SrcdsFixInstaller : IServerComponentInstaller<ComponentInfo>
 {
 	
-	public ServerInstallComponent Type => ServerInstallComponent.SrcdsFix;
+	public ServerInstallComponent ComponentType => ServerInstallComponent.SrcdsFix;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken cancellationToken)
@@ -19,14 +19,10 @@ public class SrcdsFixInstaller : IServerComponentInstaller<ComponentInfo>
 		yield break;
 	}
 
-	public Task<ComponentInfo?> GatherInfo(ServerInstallContext ctx, CancellationToken cancellationToken = default)
+	public Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
+		CancellationToken cancellationToken = default)
 	{
-		return Task.FromResult<ComponentInfo?>(null);
-	}
-
-	public Task<bool> ShouldInstall(ServerInstallContext ctx, ComponentInfo? installationInfo)
-	{
-		return Task.FromResult(true);
+		return Task.FromResult(new ComponentInfo());
 	}
 
 }

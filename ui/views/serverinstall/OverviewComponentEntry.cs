@@ -6,4 +6,6 @@ public class OverviewComponentEntry
 {
 	public required ServerInstallComponent Component { get; set; }
 	public required string Status { get; set; }
+	public bool Install { get; set; }
+	public bool InstallEditable { get; set; }
 }

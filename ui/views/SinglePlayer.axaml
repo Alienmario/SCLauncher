@@ -4,5 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SCLauncher.ui.views.SinglePlayer">
-	About that beer I owe ya..
+	
+	<StackPanel Margin="0 10 0 0">
+		<Label>About that beer I owe ya..</Label>
+	</StackPanel>
+
 </UserControl>
