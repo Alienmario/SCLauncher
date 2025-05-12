@@ -32,11 +32,11 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 			});
 			ComponentEntries.Add(new OverviewComponentEntry
 			{
-				Component = ServerInstallComponent.MetaMod, Status = "Already installed", Install = false
+				Component = ServerInstallComponent.MetaMod, Status = "Already installed", Install = false, InstallEditable = true
 			});
 			ComponentEntries.Add(new OverviewComponentEntry
 			{
-				Component = ServerInstallComponent.SourceMod, Status = "Upgrade from x.x.x", Install = true
+				Component = ServerInstallComponent.SourceMod, Status = "Upgrade from x.x.x", Install = true, InstallEditable = true
 			});
 		}
 	}
@@ -130,6 +130,7 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 					});
 				}
 				Wizard?.SetControls(forward: true);
+				LoadingIndicator.IsActive = false;
 			});
 		}, cancellationToken).LogExceptions();
 	}

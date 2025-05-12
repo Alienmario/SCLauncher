@@ -14,7 +14,7 @@ using SteamKit2.Authentication;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public class ServerInstaller(BackendService backend) : IServerComponentInstaller<ComponentInfo>
+public class DedicatedServerInstaller(BackendService backend) : IServerComponentInstaller<ComponentInfo>
 {
 	
 	public ServerInstallComponent ComponentType => ServerInstallComponent.Server;

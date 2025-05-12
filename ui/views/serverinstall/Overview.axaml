@@ -5,6 +5,7 @@
              xmlns:serverinstall="clr-namespace:SCLauncher.model.serverinstall"
              xmlns:serverinstall1="clr-namespace:SCLauncher.ui.views.serverinstall"
              xmlns:design="clr-namespace:SCLauncher.ui.design"
+             xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
              x:Class="SCLauncher.ui.views.serverinstall.Overview"
              x:DataType="serverinstall:ServerInstallParams">
@@ -50,7 +51,7 @@
 						ConverterParameter={x:Static serverinstall:ServerInstallMethod.External}}"/>
 		</Grid>
 		
-		<ScrollViewer AllowAutoHide="False">
+		<ScrollViewer AllowAutoHide="False" DockPanel.Dock="Bottom">
 			<ItemsControl Name="ComponentsGrid" ItemsSource="{Binding}" Margin="1 0">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
@@ -83,6 +84,11 @@
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
 		</ScrollViewer>
+		
+		<li:LoadingIndicator Name="LoadingIndicator" IsActive="True" Mode="DoubleBounce" SpeedRatio="1.5"
+		                     Foreground="{StaticResource Highlight}"
+		                     MaxHeight="150"
+		                     VerticalAlignment="Bottom"/>
 		
 	</DockPanel>
 </UserControl>

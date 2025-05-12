@@ -22,7 +22,7 @@ public static class ServiceConfig
 		
 		// Server install
 		collection.AddSingleton<ServerInstallRunner>();
-		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, ServerInstaller>();
+		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, DedicatedServerInstaller>();
 		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, MetaModInstaller>();
 		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, SourceModInstaller>();
 		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, SourceCoopInstaller>();

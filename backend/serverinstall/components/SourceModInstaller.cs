@@ -14,26 +14,26 @@ namespace SCLauncher.backend.serverinstall.components;
 public class SourceModInstaller(InstallHelper helper) : IServerComponentInstaller<ComponentInfo>
 {
 	
-	private const string SourcemodVersion = "1.12";
+	private const string SourceModVersion = "1.12";
 
 	public ServerInstallComponent ComponentType => ServerInstallComponent.SourceMod;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken cancellationToken)
 	{
-		(string url, string filename) dl = await GetDownloadAsync(SourcemodVersion, cancellationToken);
+		(string url, string filename) dl = await GetDownloadAsync(SourceModVersion, cancellationToken);
 		string archivePath = Path.Join(ctx.InstallDir, dl.filename);
 		
-		yield return new StatusMessage($"Downloading...\n URL: {dl.url}\n TARGET: \"{archivePath}\"");
+		yield return new StatusMessage($"Downloading...\n URL: {dl.url}\n Target: \"{archivePath}\"");
 		
 		try
 		{
 			await helper.DownloadAsync(dl.url, archivePath, cancellationToken);
 		}
-		catch (Exception)
+		catch (Exception e)
 		{
 			helper.SafeDelete(archivePath);
-			throw;
+			throw new InstallException("Failed to download SourceMod", e);
 		}
 
 		yield return new StatusMessage($"Extracting...");
@@ -41,6 +41,10 @@ public class SourceModInstaller(InstallHelper helper) : IServerComponentInstalle
 		try
 		{
 			await helper.ExtractAsync(archivePath, ctx.GameModDir, true, cancellationToken);
+		}
+		catch (Exception e)
+		{
+			throw new InstallException("Failed to extract SourceMod", e);
 		}
 		finally
 		{

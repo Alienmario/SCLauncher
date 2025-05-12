@@ -7,12 +7,16 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Octokit;
+using FileMode = System.IO.FileMode;
 
 namespace SCLauncher.backend.install;
 
 public class InstallHelper(HttpClient httpClient)
 {
 	public HttpClient HttpClient => httpClient;
+	
+	public GitHubClient GithubClient => new GitHubClient(new ProductHeaderValue("SourceCoopLauncher"));
 
 	public async Task ExtractAsync(string archive, string destination, bool overwriteFiles,
 		CancellationToken cancellationToken = default)

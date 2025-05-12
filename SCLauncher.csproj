@@ -15,7 +15,7 @@
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.2.6" />
 		<PackageReference Include="Avalonia.Desktop" Version="11.2.6" />
-		<PackageReference Include="Avalonia.Svg.Skia" Version="11.2.0.2"/>
+		<PackageReference Include="Avalonia.Svg.Skia" Version="11.2.0.2" />
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.6" />
 		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.6" />
 		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
@@ -27,9 +27,11 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" PrivateAssets="All"/>
-		<PackageReference Include="Gameloop.Vdf" Version="0.6.2"/>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1"/>
+		<PackageReference Include="LoadingIndicators.Avalonia" Version="11.0.11.1" />
+		<PackageReference Include="Octokit" Version="14.0.0" />
+		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" PrivateAssets="All" />
+		<PackageReference Include="Gameloop.Vdf" Version="0.6.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -44,7 +46,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<AvaloniaResource Include="ui\assets\**"/>
+		<AvaloniaResource Include="ui\assets\**" />
+		<EmbeddedResource Include="backend\serverinstall\components\srcds-fix-x64.exe" />
+		<EmbeddedResource Include="backend\serverinstall\components\srcds-fix-x86.exe" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -13,33 +13,37 @@ namespace SCLauncher.backend.serverinstall.components;
 
 public class MetaModInstaller(InstallHelper helper) : IServerComponentInstaller<ComponentInfo>
 {
-	private const string MetamodVersion = "1.12";
+	private const string MetaModVersion = "1.12";
 
 	public ServerInstallComponent ComponentType => ServerInstallComponent.MetaMod;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken cancellationToken)
 	{
-		(string url, string filename) dl = await GetDownloadAsync(MetamodVersion, cancellationToken);
+		(string url, string filename) dl = await GetDownloadAsync(MetaModVersion, cancellationToken);
 		string archivePath = Path.Join(ctx.InstallDir, dl.filename);
 		
-		yield return new StatusMessage($"Downloading...\n URL: {dl.url}\n TARGET: \"{archivePath}\"");
+		yield return new StatusMessage($"Downloading...\n URL: {dl.url}\n Target: \"{archivePath}\"");
 		
 		try
 		{
 			await helper.DownloadAsync(dl.url, archivePath, cancellationToken);
 		}
-		catch (Exception)
+		catch (Exception e)
 		{
 			helper.SafeDelete(archivePath);
-			throw;
+			throw new InstallException("Failed to download MetaMod", e);
 		}
 
 		yield return new StatusMessage($"Extracting...");
-		
+
 		try
 		{
 			await helper.ExtractAsync(archivePath, ctx.GameModDir, true, cancellationToken);
+		}
+		catch (Exception e)
+		{
+			throw new InstallException("Failed to extract MetaMod", e);
 		}
 		finally
 		{
