@@ -1,17 +1,18 @@
+using Avalonia;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 using SCLauncher.model;
 
 namespace SCLauncher.ui.converters;
 
-public class MessageStatusColorConverter() : FuncValueConverter<MessageStatus?, Brush?>(status =>
+public class MessageStatusColorConverter() : FuncValueConverter<MessageStatus?, object?>(status =>
 {
 	return status switch
 	{
 		MessageStatus.Success => SuccessBrush,
 		MessageStatus.Warning => WarningBrush,
 		MessageStatus.Error => ErrorBrush,
-		_ => null
+		_ => AvaloniaProperty.UnsetValue
 	};
 })
 {

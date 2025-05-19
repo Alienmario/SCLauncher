@@ -14,7 +14,7 @@ using SteamKit2.Authentication;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public class DedicatedServerInstaller(BackendService backend) : IServerComponentInstaller<ComponentInfo>
+public class DedicatedServerInstaller(BackendService backend, ConfigHolder config) : IServerComponentInstaller<ComponentInfo>
 {
 	
 	public ServerInstallComponent ComponentType => ServerInstallComponent.Server;
@@ -36,9 +36,7 @@ public class DedicatedServerInstaller(BackendService backend) : IServerComponent
 	{
 		if (!Directory.Exists(backend.GetSteamDir()))
 		{
-			yield return new StatusMessage(
-				"Steam not found! Install it or adjust path in settings, then retry.", MessageStatus.Error);
-			yield break;
+			throw new InstallException("Steam not found! Install it or specify Steam path in settings, then retry.");
 		}
 
 		SteamUtils.InstallApp(ctx.Params.AppInfo.ServerAppId);
@@ -50,12 +48,13 @@ public class DedicatedServerInstaller(BackendService backend) : IServerComponent
 			ComponentInfo info = await GatherInfoAsync(ctx, false, cancellationToken);
 			if (info.Installed)
 			{
+				config.ServerPath = info.Path;
 				break;
 			}
 		}
 	}
 
-	private static async IAsyncEnumerable<StatusMessage> InstallViaDepotDownloader(ServerInstallContext ctx,
+	private async IAsyncEnumerable<StatusMessage> InstallViaDepotDownloader(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		var cfg = new AppDownloadConfig
@@ -76,8 +75,10 @@ public class DedicatedServerInstaller(BackendService backend) : IServerComponent
 
 		if (exitCode != SubProcess.Success)
 		{
-			yield return new StatusMessage("Download failed", MessageStatus.Error);
+			throw new InstallException("Dedicated server download failed");
 		}
+
+		config.ServerPath = ctx.InstallDir;
 	}
 	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,

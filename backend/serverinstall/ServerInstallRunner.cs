@@ -41,19 +41,9 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 			
 			yield return new StatusMessage($"Installing component <{component}>");
 
-			bool errors = false;
 			await foreach (var message in installer.Install(ctx, cancellationToken))
 			{
 				yield return message;
-				
-				if (message.Status == MessageStatus.Error)
-					errors = true;
-			}
-
-			if (errors)
-			{
-				yield return new StatusMessage("Installation aborted", MessageStatus.Error);
-				yield break;
 			}
 
 			cancellationToken.ThrowIfCancellationRequested();
@@ -63,8 +53,7 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 			{
 				yield return new StatusMessage($"Failed to validate component installation <{component}>",
 					MessageStatus.Error);
-				yield return new StatusMessage("Installation aborted", MessageStatus.Error);
-				yield break;
+				throw new InstallException();
 			}
 			
 			yield return new StatusMessage($"Component <{component}> installed");

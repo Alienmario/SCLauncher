@@ -29,7 +29,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 		}
 		catch (Exception e)
 		{
-			throw new InstallException("Unable to find latest SourceCoop release", e);
+			throw new InstallException("Unable to find latest SourceCoop release on GitHub", e);
 		}
 
 		(string url, string filename) dl = GetDownload(ctx, release);

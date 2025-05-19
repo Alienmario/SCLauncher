@@ -12,7 +12,7 @@ public partial class HostServer : UserControl
 	{
 		InitializeComponent();
 
-		SwitchContent(ServerNotFoundPanel);
+		SwitchContent(ServerConsole);
 		ServerWizard.OnExit += OnServerWizardExit;
 	}
 

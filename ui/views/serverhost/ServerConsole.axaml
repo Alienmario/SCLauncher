@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+             xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="300"
+             x:Class="SCLauncher.ui.views.serverhost.ServerConsole">
+	
+	<UserControl.Styles>
+		
+		<Style Selector="TextBox#CommandTextBox">
+			<Setter Property="BorderThickness" Value="0"/>
+			<Style Selector="^:focus-within /template/ Border">
+				<Setter Property="BorderThickness" Value="0"/>
+			</Style>
+		</Style>
+		
+		<Style Selector="li|LoadingIndicator#StatusIndicator">
+			<Style Selector="^.offline">
+				<Setter Property="Foreground" Value="OrangeRed"/>
+			</Style>
+			<Style Selector="^.online">
+				<Setter Property="Foreground" Value="DeepSkyBlue"/>
+			</Style>
+		</Style>
+		
+	</UserControl.Styles>
+	
+	<DockPanel>
+		
+		<!-- Header status row -->
+		<DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0 0 10 0">
+			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+				<Button Background="DarkGreen" Padding="50 2" CornerRadius="10 0 0 0"
+				        Content="Start" Name="StartButton"/>
+				<Button Background="DarkRed" Padding="50 2" CornerRadius="0 10 0 0"
+				        Content="Stop" Name="StopButton"/>
+			</StackPanel>
+			<StackPanel DockPanel.Dock="Left" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+				<Viewbox Stretch="Uniform" Height="25">
+					<li:LoadingIndicator Name="StatusIndicator" Mode="DoubleBounce" SpeedRatio="0.25"/>
+				</Viewbox>
+				<Label VerticalAlignment="Center" Name="StatusIndicatorText"/>
+			</StackPanel>
+		</DockPanel>
+		
+		<!-- Footer command input row -->
+		<Border DockPanel.Dock="Bottom" CornerRadius="5"
+		        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0 10 0 0">
+			<DockPanel>
+				<TextBox Name="CommandTextBox" VerticalContentAlignment="Center">
+					<TextBox.InnerLeftContent>
+						<Label VerticalAlignment="Center" Content=">" Margin="10 0 0 0"
+						       Foreground="{DynamicResource TextControlPlaceholderForeground}"/>
+					</TextBox.InnerLeftContent>
+					<TextBox.InnerRightContent>
+						<Button DockPanel.Dock="Right" Content="Submit" Name="SubmitButton" Classes="accent"
+						        Click="SubmitButton_OnClick" HotKey="Enter" CornerRadius="0 4 4 0"/>
+					</TextBox.InnerRightContent>
+				</TextBox>
+			</DockPanel>
+		</Border>
+		
+		<!-- Console -->
+		<Border Background="Black" BorderBrush="{StaticResource SystemAccentColor}"
+		        BorderThickness="1" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+			<controls:StatusMessageViewer Name="ConsoleViewer" Limit="500" Margin="5 1 2 1"/>
+		</Border>
+		
+	</DockPanel>
+	
+</UserControl>

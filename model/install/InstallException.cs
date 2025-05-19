@@ -1,10 +1,10 @@
 using System;
 
-namespace SCLauncher.backend.install;
+namespace SCLauncher.model.install;
 
 public class InstallException : Exception
 {
-	public InstallException()
+	public InstallException() : base("")
 	{
 	}
 

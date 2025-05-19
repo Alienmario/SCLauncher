@@ -29,23 +29,29 @@ public class ServerInstallService(
 		return serverInstallRunner.Get(installParams);
 	}
 
-	public async Task<IDictionary<ServerInstallComponent, ComponentInfo>> GatherComponentInfoAsync(ServerInstallParams p)
+	public async Task<IDictionary<ServerInstallComponent, ComponentInfo>> GatherComponentInfoAsync(
+		ServerInstallParams p,
+		bool checkForUpgrades,
+		CancellationToken cancellationToken = default)
 	{
 		var ctx = new ServerInstallContext(p);
 		
 		foreach (var component in Enum.GetValues<ServerInstallComponent>())
 		{
-			await GatherComponentInfoAsync(component, ctx);
+			await GatherComponentInfoAsync(component, ctx, checkForUpgrades, cancellationToken);
 		}
 		
 		return ctx.ComponentInfos;
 	}
 	
-	internal async Task GatherComponentInfoAsync(ServerInstallComponent component, ServerInstallContext ctx,
+	internal async Task GatherComponentInfoAsync(
+		ServerInstallComponent component,
+		ServerInstallContext ctx,
+		bool checkForUpgrades,
 		CancellationToken cancellationToken = default)
 	{
 		ctx.ComponentInfos[component] = await GetComponentInstaller(component)
-			.GatherInfoAsync(ctx, true, cancellationToken);
+			.GatherInfoAsync(ctx, checkForUpgrades, cancellationToken);
 	}
 
 	internal IServerComponentInstaller<ComponentInfo> GetComponentInstaller(ServerInstallComponent component)

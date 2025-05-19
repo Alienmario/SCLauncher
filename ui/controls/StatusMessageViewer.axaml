@@ -44,7 +44,6 @@
 				<DataTemplate>
 					<SelectableTextBlock
 						Foreground="{Binding Status,
-							TargetNullValue={DynamicResource TextControlHeaderForeground},
 							Converter={x:Static converters:MessageStatusColorConverter.Instance}}"
 						TextWrapping="Wrap"
 						FontFamily="Consolas, Courier New, monospace">

@@ -4,17 +4,21 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SCLauncher.ui.views.HostServer"
-             xmlns:custom="clr-namespace:SCLauncher.ui.controls">
+             xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+             xmlns:serverhost="clr-namespace:SCLauncher.ui.views.serverhost">
 	
 	<DockPanel Name="ContentParent" Margin="0 10 0 0">
+		
 		<StackPanel Name="ServerNotFoundPanel" IsVisible="False" DockPanel.Dock="Top" Orientation="Vertical" Spacing="10">
 			<TextBlock Margin="5" FontSize="36">Server installation not found...</TextBlock>
 			<Button Click="InstallServerClicked" CornerRadius="10">- Install server</Button>
 			<Button Click="LocateServerClicked" CornerRadius="10">- Locate server manually</Button>
 		</StackPanel>
 		
-		<custom:WizardNavigator Name="ServerWizard" IsVisible="False"/>
+		<controls:WizardNavigator Name="ServerWizard" IsVisible="False"/>
+		
+		<serverhost:ServerConsole Name="ServerConsole" IsVisible="False"/>
+		
 	</DockPanel>
-	
 	
 </UserControl>

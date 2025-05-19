@@ -18,6 +18,7 @@ public static class ServiceConfig
 		collection.AddSingleton<ConfigHolder>();
 		collection.AddSingleton<BackendService>();
 		collection.AddSingleton<ServerInstallService>();
+		collection.AddSingleton<ServerControlService>();
 		collection.AddSingleton<PersistenceService>();
 		
 		// Server install

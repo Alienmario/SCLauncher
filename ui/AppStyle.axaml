@@ -3,6 +3,12 @@
 	
 	<Styles.Resources>
 		<SolidColorBrush x:Key="Highlight">Orange</SolidColorBrush>
+		
+		<LinearGradientBrush x:Key="DashedLineBrush" SpreadMethod="Repeat" StartPoint="2,4" EndPoint="4,6">
+			<GradientStop Offset="0" Color="Gray" />
+			<GradientStop Offset="0.5" Color="Gray" />
+			<GradientStop Offset="0.501" Color="Transparent" />
+		</LinearGradientBrush>
 	</Styles.Resources>
 	
 	<!-- Fix icon buttons -->
@@ -12,17 +18,12 @@
 	<Style Selector="TabItem:pointerover .TabItemHeader PathIcon">
 		<Setter Property="Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselectedPointerOver}"/>
 	</Style>
-
-	<Style Selector="Button.PathBrowser">
-		<Setter Property="Background" Value="Transparent"/>
-		<Style Selector="^ PathIcon">
-			<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
-		</Style>
-		<Style Selector="^:pointerover">
-			<Style Selector="^ /template/ ContentPresenter">
-				<Setter Property="Background" Value="#373737"/>
-			</Style>
-		</Style>
+	
+	<Style Selector="Border.DashedUnderline">
+		<Setter Property="BorderThickness" Value="0 0 0 0.5"/>
+		<Setter Property="BorderBrush" Value="{StaticResource DashedLineBrush}"/>
+		<Setter Property="Margin" Value="6 0 6 10"/>
+		<Setter Property="VerticalAlignment" Value="Bottom"/>
 	</Style>
 	
 </Styles>

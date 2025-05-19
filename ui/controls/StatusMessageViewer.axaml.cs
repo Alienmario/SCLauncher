@@ -12,6 +12,8 @@ public partial class StatusMessageViewer : UserControl
 		set => base.DataContext = value;
 	}
 
+	public int Limit { get; set; } = int.MaxValue;
+	
 	public StatusMessageViewer()
 	{
 		InitializeComponent();
@@ -22,7 +24,14 @@ public partial class StatusMessageViewer : UserControl
 
 	public void AddMessage(StatusMessage message, bool scroll = true)
 	{
-		DataContext?.Add(message);
+		if (DataContext != null)
+		{
+			DataContext.Add(message);
+			if (DataContext.Count > Limit)
+			{
+				DataContext.RemoveAt(0);
+			}
+		}
 		if (scroll && Scroller.Offset.NearlyEquals(Scroller.ScrollBarMaximum))
 		{
 			Scroller.ScrollToEnd();

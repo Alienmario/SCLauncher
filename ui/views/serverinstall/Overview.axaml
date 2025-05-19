@@ -70,15 +70,7 @@
 							<TextBlock DockPanel.Dock="Right"
 							           Text="{Binding Status, DataType=serverinstall1:OverviewComponentEntry}"
 							           VerticalAlignment="Center"/>
-							<Border BorderThickness="0 0 0 0.5" Margin="6 0 6 10" VerticalAlignment="Bottom">
-								<Border.BorderBrush>
-									<LinearGradientBrush SpreadMethod="Repeat" StartPoint="2,4" EndPoint="4,6">
-										<GradientStop Offset="0" Color="Gray" />
-										<GradientStop Offset="0.5" Color="Gray" />
-										<GradientStop Offset="0.501" Color="Transparent" />
-									</LinearGradientBrush>
-								</Border.BorderBrush>
-							</Border>
+							<Border Classes="DashedUnderline"/>
 						</DockPanel>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>

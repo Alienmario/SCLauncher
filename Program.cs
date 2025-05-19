@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia;
@@ -50,5 +51,19 @@ static class Program
 			}
 		},
 		TaskContinuationOptions.OnlyOnFaulted);
+	}
+
+	// Extension method for extracting all nested messages from exceptions
+	public static string GetAllMessages(this Exception? e, string delimiter = " - ")
+	{
+		var messages = new List<string>();
+		do
+		{
+			if (!string.IsNullOrWhiteSpace(e!.Message))
+				messages.Add(e.Message);
+			e = e.InnerException;
+		}
+		while (e != null);
+		return string.Join(delimiter, messages);
 	}
 }

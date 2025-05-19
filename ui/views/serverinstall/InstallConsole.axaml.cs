@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using SCLauncher.backend.service;
 using SCLauncher.model;
+using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
 using SCLauncher.ui.controls;
 
@@ -47,9 +48,16 @@ public partial class InstallConsole : UserControl, WizardNavigator.IWizardConten
 			}
 			catch (Exception e)
 			{
-				if (e is not OperationCanceledException)
+				if (e is InstallException)
 				{
-					AppendMessage(new StatusMessage("Application error occured\n" + e, MessageStatus.Error));
+					string message = e.GetAllMessages();
+					message = "Installation failed" + (message.Length == 0 ? "" : ": " + message);
+					AppendMessage(new StatusMessage(message, MessageStatus.Error));
+				}
+				else if (e is not OperationCanceledException)
+				{
+					AppendMessage(new StatusMessage(
+						"Application error occured (let a dev know!)\nStack trace:\n" + e, MessageStatus.Error));
 				}
 			}
 			finally

@@ -12,8 +12,17 @@ using SCLauncher.ui.controls;
 
 namespace SCLauncher.ui.views.serverinstall;
 
+public class OverviewComponentEntry
+{
+	public required ServerInstallComponent Component { get; set; }
+	public required string Status { get; set; }
+	public bool Install { get; set; }
+	public bool InstallEditable { get; set; }
+}
+
 public partial class Overview : UserControl, WizardNavigator.IWizardContent
 {
+	
 	private WizardNavigator? Wizard { get; set; }
 	private CancellationTokenSource? PreparationCancelSrc { get; set; }
 	private ObservableCollection<OverviewComponentEntry> ComponentEntries { get; } = [];
@@ -92,7 +101,8 @@ public partial class Overview : UserControl, WizardNavigator.IWizardContent
 			if (cancellationToken.IsCancellationRequested)
 				return;
 			
-			var componentInfos = await installService.GatherComponentInfoAsync(installParams);
+			var componentInfos = await installService.GatherComponentInfoAsync(
+				installParams, true, cancellationToken);
 			
 			if (cancellationToken.IsCancellationRequested)
 				return;
