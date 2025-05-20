@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net9.0</TargetFramework>
@@ -23,6 +23,7 @@
 			<IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
 			<PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
 		</PackageReference>
+		<PackageReference Include="DepotDownloaderSubProcess" Version="3.3.0" />
 		<PackageReference Include="Fody" Version="6.9.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -50,9 +51,11 @@
 		<EmbeddedResource Include="backend\serverinstall\components\srcds-fix-x64.exe" />
 		<EmbeddedResource Include="backend\serverinstall\components\srcds-fix-x86.exe" />
 	</ItemGroup>
-
+	
+	<!--
 	<ItemGroup>
 	  <ProjectReference Include="..\DepotDownloaderSubProcess\DepotDownloader\DepotDownloader.csproj" />
 	</ItemGroup>
+	-->
 	
 </Project>
