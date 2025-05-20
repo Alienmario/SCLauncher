@@ -1,11 +1,9 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCLauncher", "SCLauncher.csproj", "{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933} = {BCB76E99-DEE6-4709-AC74-5A26AF6A1933}
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DepotDownloader", "..\DepotDownloaderSubProcess\DepotDownloader\DepotDownloader.csproj", "{BCB76E99-DEE6-4709-AC74-5A26AF6A1933}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
