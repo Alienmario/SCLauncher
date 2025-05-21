@@ -5,20 +5,32 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SCLauncher.ui.views.HostServer"
              xmlns:controls="clr-namespace:SCLauncher.ui.controls"
-             xmlns:serverhost="clr-namespace:SCLauncher.ui.views.serverhost">
+             xmlns:serverhost="clr-namespace:SCLauncher.ui.views.serverhost"
+             xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia">
 	
-	<DockPanel Name="ContentParent" Margin="0 10 0 0">
+	<Grid Name="ContentParent" Margin="0 10 0 0">
 		
-		<StackPanel Name="ServerNotFoundPanel" IsVisible="False" DockPanel.Dock="Top" Orientation="Vertical" Spacing="10">
-			<TextBlock Margin="5" FontSize="36">Server installation not found...</TextBlock>
-			<Button Click="InstallServerClicked" CornerRadius="10">- Install server</Button>
-			<Button Click="LocateServerClicked" CornerRadius="10">- Locate server manually</Button>
+		<DockPanel Name="LoadingPanel" IsVisible="False">
+			<Label Content="Analyzing server files" DockPanel.Dock="Bottom" HorizontalContentAlignment="Center"/>
+			<Viewbox Stretch="Uniform"
+			         HorizontalAlignment="Center" VerticalAlignment="Center"
+			         MaxHeight="500">
+				<li:LoadingIndicator Name="LoadingIndicator" IsActive="True" Mode="ArcsRing"
+				                     Foreground="{StaticResource Highlight}"/>
+			</Viewbox>
+		</DockPanel>
+		
+		<StackPanel Name="ServerNotFoundPanel" IsVisible="False" Orientation="Vertical" Spacing="10">
+			<TextBlock Name="ServerNotFoundText" Margin="5" FontSize="36" TextWrapping="Wrap"/>
+			<Button Click="OnInstallServerClicked" CornerRadius="10">- Install</Button>
+			<Button Click="OnLocateServerClicked" CornerRadius="10">- Locate server manually</Button>
+			<Button Click="OnRecheckAvailabilityClicked" CornerRadius="10">- Recheck</Button>
 		</StackPanel>
 		
-		<controls:WizardNavigator Name="ServerWizard" IsVisible="False"/>
+		<controls:WizardNavigator Name="ServerInstallWizard" IsVisible="False"/>
 		
 		<serverhost:ServerConsole Name="ServerConsole" IsVisible="False"/>
 		
-	</DockPanel>
+	</Grid>
 	
 </UserControl>

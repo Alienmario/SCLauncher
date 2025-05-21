@@ -7,6 +7,7 @@
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+		<DebugType>embedded</DebugType>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<!-- DepotDownloader and its dependencies are not trim compatible -->
 		<PublishTrimmed>false</PublishTrimmed>
@@ -51,11 +52,5 @@
 		<EmbeddedResource Include="backend\serverinstall\components\srcds-fix-x64.exe" />
 		<EmbeddedResource Include="backend\serverinstall\components\srcds-fix-x86.exe" />
 	</ItemGroup>
-	
-	<!--
-	<ItemGroup>
-	  <ProjectReference Include="..\DepotDownloaderSubProcess\DepotDownloader\DepotDownloader.csproj" />
-	</ItemGroup>
-	-->
 	
 </Project>

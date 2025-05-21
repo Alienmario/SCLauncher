@@ -6,8 +6,10 @@
 
 #### Features
 - Install game server including necessary dependencies for SourceCoop
-#### Planned features
 - Host game server
+#### Planned features
+- Configure game server
+- Built-in tunneling (playit.gg or alternatives)
 - Join game servers
 - Install new campaign mods on server and client
 - Select active campaign mod on server and client

@@ -86,11 +86,12 @@ public class ServerControlService(ConfigHolder config, BackendService backend, S
 	{
 		if (serverProcess != null)
 		{
-			serverProcess.Kill();
+			Process process = serverProcess;
+			process.Kill();
 			Task.Run(() =>
 			{
-				serverProcess.WaitForExit();
-				serverProcess.Dispose();
+				process.WaitForExit();
+				process.Dispose();
 			});
 			serverProcess = null;
 		}
@@ -104,10 +105,10 @@ public class ServerControlService(ConfigHolder config, BackendService backend, S
 		}
 	}
 
-	public async Task<bool> IsAvailableAsync(CancellationToken cancellationToken = default)
+	public async Task<(bool IsAvailable, bool IsPartial)> IsAvailableAsync(CancellationToken cancellationToken = default)
 	{
 		if (config.ServerPath == null)
-			return false;
+			return (false, false);
 
 		var p = new ServerInstallParams
 		{
@@ -119,7 +120,8 @@ public class ServerControlService(ConfigHolder config, BackendService backend, S
 		
 		var infos = await installService.GatherComponentInfoAsync(p, false, cancellationToken);
 		bool installIncomplete = infos.Values.Any(info => info is { Installable: true, Installed: false });
-		return !installIncomplete;
+		bool installPartial = infos.Values.Any(info => info is { Installable: true, Installed: true }) && installIncomplete;
+		return (!installIncomplete, installPartial);
 	}
 
 }
