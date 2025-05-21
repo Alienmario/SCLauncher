@@ -52,7 +52,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	{
 		Dispatcher.UIThread.Post(() =>
 		{
-			StatusIndicatorText.Content = running ? "Online" : "Offline";
+			StatusIndicatorLabel.Content = running ? "Online" : "Offline";
 			StatusIndicator.Classes.Replace([running ? "online" : "offline"]);
 		});
 	}

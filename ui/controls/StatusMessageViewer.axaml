@@ -38,7 +38,7 @@
 		</objectModel:ObservableCollection>
 	</Design.DataContext>
 
-	<ScrollViewer Name="Scroller">
+	<ScrollViewer Name="Scroller" Margin="3.5 1.5 1.5 1.5">
 		<ItemsControl ItemsSource="{Binding}">
 			<ItemsControl.ItemTemplate>
 				<DataTemplate>

@@ -1,6 +1,11 @@
 using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.ui.views.serverinstall;
 
@@ -8,33 +13,51 @@ namespace SCLauncher.ui.views;
 
 public partial class HostServer : UserControl
 {
+	
 	public HostServer()
 	{
 		InitializeComponent();
-
-		SwitchContent(ServerConsole);
-		ServerWizard.OnExit += OnServerWizardExit;
+		ServerInstallWizard.OnExit += OnServerInstallWizardExit;
 	}
 
-	private void LocateServerClicked(object? sender, RoutedEventArgs e)
+	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+	{
+		Control? content = GetContent();
+		if (content == null
+		    || content == ServerNotFoundPanel
+		    || (content == ServerConsole && !App.GetService<ServerControlService>().Running))
+		{
+			CheckAvailability();
+		}
+	}
+	
+	private void OnLocateServerClicked(object? sender, RoutedEventArgs e)
 	{
 		var mainWindow = App.GetService<MainWindow>();
 		mainWindow.GoToSettings();
+		Settings settings = (mainWindow.SettingsTab.Content as Settings)!;
+		settings.ServerPath.SelectAll();
+		settings.ServerPath.Focus();
 	}
 
-	private void InstallServerClicked(object? sender, RoutedEventArgs e)
+	private void OnInstallServerClicked(object? sender, RoutedEventArgs e)
 	{
-		SwitchContent(ServerWizard);
-		ServerWizard.Reset();
-		ServerWizard.SetContent(new MethodSelect());
+		SwitchContent(ServerInstallWizard);
+		ServerInstallWizard.Reset();
+		ServerInstallWizard.SetContent(new MethodSelect());
 
 		var installService = App.GetService<ServerInstallService>();
-		ServerWizard.DataContext = installService.NewInstallParams();
+		ServerInstallWizard.DataContext = installService.NewInstallParams();
 	}
 
-	private void OnServerWizardExit(object? sender, EventArgs eventArgs)
+	private void OnRecheckAvailabilityClicked(object? sender, RoutedEventArgs e)
 	{
-		SwitchContent(ServerNotFoundPanel);
+		CheckAvailability();
+	}
+	
+	private void OnServerInstallWizardExit(object? sender, EventArgs eventArgs)
+	{
+		CheckAvailability();
 	}
 
 	private void SwitchContent(Control content)
@@ -44,4 +67,44 @@ public partial class HostServer : UserControl
 			control.IsVisible = control == content;
 		}
 	}
+
+	private Control? GetContent()
+	{
+		return ContentParent.Children.FirstOrDefault(control => control.IsVisible);
+	}
+
+	private void CheckAvailability()
+	{
+		SwitchContent(LoadingPanel);
+		var serverControlService = App.GetService<ServerControlService>();
+		var cancellationTokenSource = new CancellationTokenSource();
+		var cancellationToken = cancellationTokenSource.Token;
+		Task.Run(async () =>
+		{
+			return await serverControlService.IsAvailableAsync(cancellationToken);
+		}, cancellationToken).ContinueWith(task =>
+		{
+			Dispatcher.UIThread.Post(() =>
+			{
+				if (!task.IsCompletedSuccessfully)
+				{
+					task.LogExceptions();
+					ServerNotFoundText.Text = "There was an issue verifying current installation...";
+					SwitchContent(ServerNotFoundPanel);
+				}
+				else if (task.Result.IsAvailable)
+				{
+					SwitchContent(ServerConsole);
+				}
+				else
+				{
+					ServerNotFoundText.Text = task.Result.IsPartial
+						? "Some addons are not installed..."
+						: "Server installation not found...";
+					SwitchContent(ServerNotFoundPanel);
+				}
+			});
+		}, cancellationToken);
+	}
+
 }
