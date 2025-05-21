@@ -1,9 +1,6 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCLauncher", "SCLauncher.csproj", "{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933} = {BCB76E99-DEE6-4709-AC74-5A26AF6A1933}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +12,5 @@ Global
 		{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BCB76E99-DEE6-4709-AC74-5A26AF6A1933}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
