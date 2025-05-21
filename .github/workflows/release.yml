@@ -1,4 +1,4 @@
-# This workflow builds and attaches a build to the release that triggered it
+# This workflow builds, zips and attaches an artifact to the release that triggered it
 
 name: Release
 
@@ -26,15 +26,15 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.x
+        dotnet-version: 9.0.x
     
     - name: Build
-      run: dotnet publish -c ${{ matrix.configuration }} -r ${{ matrix.platform }} -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true
+      run: dotnet publish -c ${{ matrix.configuration }} -r ${{ matrix.platform }} -o out -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true
     
     - name: Zip output
-      run: zip -qq -r $artifact ./bin/Release
+      run: zip -qq -j -r $artifact ./out
    
-    - name: Upload Release Asset
+    - name: Upload artifact
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
