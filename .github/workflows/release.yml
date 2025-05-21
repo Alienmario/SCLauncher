@@ -32,8 +32,7 @@ jobs:
       run: dotnet publish -c ${{ matrix.configuration }} -r ${{ matrix.platform }} -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true
     
     - name: Zip output
-      run: zip -qq -r $artifact Release
-      working-directory: ./bin
+      run: zip -qq -r $artifact ./bin/Release
    
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1.0.2
