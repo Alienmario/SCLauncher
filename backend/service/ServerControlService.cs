@@ -11,7 +11,7 @@ using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.service;
 
-public class ServerControlService(ConfigHolder config, BackendService backend, ServerInstallService installService)
+public class ServerControlService
 {
 	public event DataReceivedEventHandler? OutputReceived;
 	public event DataReceivedEventHandler? ErrorReceived;
@@ -19,7 +19,19 @@ public class ServerControlService(ConfigHolder config, BackendService backend, S
 	public bool Running => serverProcess != null && !serverProcess.HasExited;
 	
 	private Process? serverProcess;
-	
+	private readonly ConfigHolder config;
+	private readonly BackendService backend;
+	private readonly ServerInstallService installService;
+
+	public ServerControlService(ConfigHolder config, BackendService backend, ServerInstallService installService)
+	{
+		this.config = config;
+		this.backend = backend;
+		this.installService = installService;
+
+		AppDomain.CurrentDomain.ProcessExit += (sender, args) => Stop();
+	}
+
 	public void Start()
 	{
 		if (config.ServerPath == null)
