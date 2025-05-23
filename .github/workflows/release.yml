@@ -17,9 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      artifact_base: SCLauncher-${{ github.event.release.tag_name }}-${{ matrix.platform }}
-      artifact_ext: ${{ contains(matrix.platform, 'linux') && '.tar.gz' || '.zip' }}
-      artifact_full: ${{ env.artifact_base }}${{ env.artifact_ext }}
+      artifact: SCLauncher-${{ github.event.release.tag_name }}-${{ matrix.platform }}${{ contains(matrix.platform, 'linux') && '.tar.gz' || '.zip' }}
 
     steps:
     - name: Checkout
@@ -35,11 +33,11 @@ jobs:
     
     - name: Create archive (windows)
       if: contains(matrix.platform, 'win')
-      run: zip -qq -j -r ${{ env.artifact_full }} ./out
+      run: zip -qq -j -r ${{ env.artifact }} ./out
   
     - name: Create archive (linux)
       if: contains(matrix.platform, 'linux')
-      run: tar -czf ${{ env.artifact_full }} -C ./out .
+      run: tar -czf ${{ env.artifact }} -C ./out .
    
     - name: Upload artifact
       uses: actions/upload-release-asset@v1.0.2
@@ -49,8 +47,8 @@ jobs:
         # The URL for uploading assets to the release
         upload_url: ${{ github.event.release.upload_url }}
         # The path to the asset you want to upload
-        asset_path: ./${{ env.artifact_full }}
+        asset_path: ./${{ env.artifact }}
         # The name of the asset you want to upload
-        asset_name: ${{ env.artifact_full }}
+        asset_name: ${{ env.artifact }}
         # The content-type of the asset you want to upload. See the supported Media Types here: https://www.iana.org/assignments/media-types/media-types.xhtml for more information
         asset_content_type: ${{ contains(matrix.platform, 'linux') && 'application/gzip' || 'application/zip' }}
