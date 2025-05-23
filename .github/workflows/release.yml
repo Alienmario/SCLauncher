@@ -17,7 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      artifact: SCLauncher-${{ github.event.release.tag_name }}-${{ matrix.platform }}
+      artifact_base: SCLauncher-${{ github.event.release.tag_name }}-${{ matrix.platform }}
+      artifact_ext: ${{ contains(matrix.platform, 'linux') && '.tar.gz' || '.zip' }}
+      artifact_full: ${{ env.artifact_base }}${{ env.artifact_ext }}
 
     steps:
     - name: Checkout
@@ -31,13 +33,13 @@ jobs:
     - name: Build
       run: dotnet publish -c ${{ matrix.configuration }} -r ${{ matrix.platform }} -o out -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true
     
-    - name: Create archive
+    - name: Create archive (windows)
       if: contains(matrix.platform, 'win')
-      run: zip -qq -j -r ${{ env.artifact }}.zip ./out
+      run: zip -qq -j -r ${{ env.artifact_full }} ./out
   
-    - name: Create archive
+    - name: Create archive (linux)
       if: contains(matrix.platform, 'linux')
-      run: tar -czf ${{ env.artifact }}.tar.gz -C ./out .
+      run: tar -czf ${{ env.artifact_full }} -C ./out .
    
     - name: Upload artifact
       uses: actions/upload-release-asset@v1.0.2
@@ -47,8 +49,8 @@ jobs:
         # The URL for uploading assets to the release
         upload_url: ${{ github.event.release.upload_url }}
         # The path to the asset you want to upload
-        asset_path: ./${{ env.artifact }}
+        asset_path: ./${{ env.artifact_full }}
         # The name of the asset you want to upload
-        asset_name: ${{ env.artifact }}
+        asset_name: ${{ env.artifact_full }}
         # The content-type of the asset you want to upload. See the supported Media Types here: https://www.iana.org/assignments/media-types/media-types.xhtml for more information
         asset_content_type: ${{ contains(matrix.platform, 'linux') && 'application/gzip' || 'application/zip' }}
