@@ -134,9 +134,4 @@ public static class SteamUtils
 		return !string.IsNullOrWhiteSpace(path) && File.Exists(Path.Join(path, "steamapps", "libraryfolders.vdf"));
 	}
 
-	public static bool IsValidSteamInstallDir(string? path)
-	{
-		return !string.IsNullOrWhiteSpace(path) && File.Exists(Path.Join(path, "steamapps", "libraryfolders.vdf"));
-	}
-	
 }

@@ -50,7 +50,7 @@ public partial class PathSelect : UserControl, WizardNavigator.IWizardContent
 		{
 			Path.GetFullPath(InstallPath.Text!);
 		}
-		catch (Exception e)
+		catch (Exception)
 		{
 			return false;
 		}
