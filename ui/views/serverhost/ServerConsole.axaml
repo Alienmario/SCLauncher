@@ -72,7 +72,8 @@
 					</TextBox.InnerLeftContent>
 					<TextBox.InnerRightContent>
 						<Button DockPanel.Dock="Right" Content="Submit" Name="SubmitButton" Classes="accent"
-						        Click="SubmitButton_OnClick" HotKey="Enter" CornerRadius="0 4 4 0"/>
+						        Click="SubmitButton_OnClick" HotKey="Enter"
+						        CornerRadius="0 4 4 0" Focusable="False"/>
 					</TextBox.InnerRightContent>
 				</TextBox>
 			</DockPanel>

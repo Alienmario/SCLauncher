@@ -5,7 +5,7 @@
              xmlns:model="clr-namespace:SCLauncher.model"
              xmlns:converters="clr-namespace:SCLauncher.ui.converters"
              xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="40"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="150"
              x:Class="SCLauncher.ui.controls.StatusMessageViewer"
              x:DataType="{x:Type objectModel:ObservableCollection, x:TypeArguments=model:StatusMessage}">
 
@@ -17,7 +17,7 @@
 					<model:MessageStatus>Info</model:MessageStatus>
 				</x:Arguments>
 			</model:StatusMessage>
-			<model:StatusMessage>
+			<model:StatusMessage Details="This is a details message">
 				<x:Arguments>
 					<x:String>Test message2</x:String>
 					<model:MessageStatus>Warning</model:MessageStatus>
@@ -29,7 +29,7 @@
 					<model:MessageStatus>Success</model:MessageStatus>
 				</x:Arguments>
 			</model:StatusMessage>
-			<model:StatusMessage>
+			<model:StatusMessage Details="This is a details message">
 				<x:Arguments>
 					<x:String>Test message4</x:String>
 					<model:MessageStatus>Error</model:MessageStatus>
@@ -37,23 +37,70 @@
 			</model:StatusMessage>
 		</objectModel:ObservableCollection>
 	</Design.DataContext>
+	
+	<UserControl.Styles>
+		<!-- Avalonia.Themes.Fluent/Controls/FlyoutPresenter.xaml -->
+		<Style Selector="FlyoutPresenter">
+			<Setter Property="Cursor" Value="{x:Null}" />
+			<Setter Property="MaxWidth" Value="{Binding $parent[SelectableTextBlock].Bounds.Width}" />
+			<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+			<Setter Property="CornerRadius" Value="0" />
+			<Setter Property="Background">
+				<LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+					<GradientStop Color="Red" Offset="0.0"/>
+					<GradientStop Color="Green" Offset="0.5"/>
+					<GradientStop Color="Blue" Offset="1.0"/>
+				</LinearGradientBrush>
+			</Setter>
+			
+			<Style Selector="^ /template/ ScrollViewer">
+				<Setter Property="Background" Value="{DynamicResource FlyoutPresenterBackground}" />
+				<Setter Property="Opacity" Value="0.9" />
+				<Setter Property="BorderThickness" Value="1" />
+			</Style>
+		</Style>
+	</UserControl.Styles>
 
-	<ScrollViewer Name="Scroller" Margin="3.5 1.5 1.5 1.5">
+	<ScrollViewer Name="Scroller" Margin="3.5 1.5 1.5 1.5" BringIntoViewOnFocusChange="False">
 		<ItemsControl ItemsSource="{Binding}">
 			<ItemsControl.ItemTemplate>
-				<DataTemplate>
-					<SelectableTextBlock
-						Foreground="{Binding Status,
-							Converter={x:Static converters:MessageStatusColorConverter.Instance}}"
-						TextWrapping="Wrap"
-						FontFamily="Consolas, Courier New, monospace">
-						<SelectableTextBlock.Text>
-							<MultiBinding StringFormat="{}{0:HH:mm:ss} {1}">
-								<Binding Path="Time"/>
-								<Binding Path="Text"/>
-							</MultiBinding>
-						</SelectableTextBlock.Text>
-					</SelectableTextBlock>
+				<DataTemplate x:DataType="model:StatusMessage">
+					<DockPanel>
+						<TextBlock Text="{Binding Time, StringFormat='HH:mm:ss'}" Margin="0 0 5 0"
+						           Foreground="LightGray"/>
+						
+						<SelectableTextBlock
+							Foreground="{Binding Status,
+								Converter={x:Static converters:MessageStatusColorConverter.Instance}}"
+							TextDecorations="{Binding Details,
+								Converter={x:Static converters:UnderlineIfNotNullConverter.Instance}}"
+							Cursor="{Binding Details,
+								Converter={x:Static converters:SetCursorIfNotNullConverter.Hand}}"
+							TextWrapping="Wrap"
+							FontFamily="Consolas, Courier New, monospace"
+							Tapped="Message_PointerTapped"
+							Name="MsgText"
+							Text="{Binding Text}">
+							
+							<FlyoutBase.AttachedFlyout>
+								<Flyout Placement="TopEdgeAlignedLeft" ShowMode="TransientWithDismissOnPointerMoveAway" PlacementConstraintAdjustment="None">
+									<SelectableTextBlock Text="{Binding Details}"
+									                     TextDecorations="{x:Null}"
+									                     TextWrapping="Wrap"
+									                     Padding="5">
+									                     <SelectableTextBlock.Effect>
+										                     <DropShadowEffect Color="Black"
+										                                       Opacity="0.7"
+										                                       OffsetX="0"
+										                                       OffsetY="0"
+										                                       BlurRadius="8"/>
+									                     </SelectableTextBlock.Effect>
+									</SelectableTextBlock>
+								</Flyout>
+							</FlyoutBase.AttachedFlyout>
+							
+						</SelectableTextBlock>
+					</DockPanel>
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
 		</ItemsControl>

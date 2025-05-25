@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -13,22 +14,24 @@ namespace SCLauncher.backend.serverinstall.components;
 
 public class SrcdsFixInstaller : IServerComponentInstaller<ComponentInfo>
 {
-	public const string Executable32 = "srcds-fix-x86.exe";
-	public const string Executable64 = "srcds-fix-x64.exe";
+	public const string ExecutableWin32 = "srcds_sclauncher_x86.exe";
+	public const string ExecutableWin64 = "srcds_sclauncher_x64.exe";
+	public const string ExecutableLinux = "srcds_sclauncher";
 	
 	public ServerInstallComponent ComponentType => ServerInstallComponent.SrcdsFix;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken cancellationToken)
 	{
-		await using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(
-			typeof(SrcdsFixInstaller), Executable32);
+		string executable = GetExecForCurrentPlatform();
+		await using Stream? stream = Assembly.GetExecutingAssembly()
+			.GetManifestResourceStream(typeof(SrcdsFixInstaller), executable);
 		if (stream == null)
 		{
 			throw new InstallException("Unable to read embedded executable");
 		}
 
-		string exePath = Path.Join(ctx.InstallDir, Executable32);
+		string exePath = Path.Join(ctx.InstallDir, executable);
 		await using var fileStream = new FileStream(exePath, FileMode.OpenOrCreate);
 		await stream.CopyToAsync(fileStream, cancellationToken);
 		yield break;
@@ -37,21 +40,38 @@ public class SrcdsFixInstaller : IServerComponentInstaller<ComponentInfo>
 	public Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
 		CancellationToken cancellationToken = default)
 	{
-		if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+		string execPath;
+		try
+		{
+			execPath = Path.Join(ctx.InstallDir, GetExecForCurrentPlatform());
+		}
+		catch (PlatformNotSupportedException)
 		{
 			return Task.FromResult(ComponentInfo.DoNotInstall);
 		}
 
-		string exePath = Path.Join(ctx.InstallDir, Executable32);
-		if (!File.Exists(exePath))
+		if (!File.Exists(execPath))
 		{
 			return Task.FromResult(ComponentInfo.ReadyToInstall);
 		}
 		
 		return Task.FromResult(new ComponentInfo
 		{
-			Path = exePath
+			Path = execPath
 		});
+	}
+
+	public static string GetExecForCurrentPlatform(bool x64 = false)
+	{
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+		{
+			return x64 ? ExecutableWin64 : ExecutableWin32;
+		}
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+		{
+			return ExecutableLinux;
+		}
+		throw new PlatformNotSupportedException();
 	}
 
 }

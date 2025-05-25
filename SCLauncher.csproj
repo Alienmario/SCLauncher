@@ -49,8 +49,9 @@
 
 	<ItemGroup>
 		<AvaloniaResource Include="ui\assets\**" />
-		<EmbeddedResource Include="backend\serverinstall\components\srcds-fix-x64.exe" />
-		<EmbeddedResource Include="backend\serverinstall\components\srcds-fix-x86.exe" />
+		<EmbeddedResource Include="backend\serverinstall\components\srcds_sclauncher_x64.exe" />
+		<EmbeddedResource Include="backend\serverinstall\components\srcds_sclauncher_x86.exe" />
+		<EmbeddedResource Include="backend\serverinstall\components\srcds_sclauncher" />
 	</ItemGroup>
 	
 </Project>

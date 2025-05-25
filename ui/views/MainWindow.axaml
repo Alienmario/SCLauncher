@@ -7,18 +7,31 @@
         x:Class="SCLauncher.ui.views.MainWindow"
         Title="SCLauncher"
         Icon="/ui/assets/logo-sc.png"
-        ExtendClientAreaToDecorationsHint="True"
-        Background="Transparent" TransparencyLevelHint="Mica"
+        ExtendClientAreaToDecorationsHint="{OnPlatform Windows=True, Default=False}"
+        TransparencyLevelHint="{OnPlatform Windows='Mica,Blur', Default='None'}"
         WindowStartupLocation="CenterScreen"
         Width="700" Height="450"
         MinWidth="600" MinHeight="200">
-	
+
 	<Window.Styles>
-		<Style Selector="Label#LauncherTitle">
-			<Setter Property="Foreground" Value="#EFEFEF"/>
-			<Setter Property="FontSize" Value="14"/>
-			<Setter Property="FontWeight" Value="Normal"/>
+		<Style Selector="Window">
+			<OnPlatform>
+				<OnPlatform.Windows>
+					<Setter Property="Background" Value="Transparent"/>
+				</OnPlatform.Windows>
+				<OnPlatform.Default>
+					<Setter Property="Background">
+						<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+							<GradientStop Color="#1D1D1D" Offset="0.0"/>
+							<GradientStop Color="#242424" Offset="0.3"/>
+							<GradientStop Color="#242424" Offset="0.9"/>
+							<GradientStop Color="#1D1D1D" Offset="1.0"/>
+						</LinearGradientBrush>
+					</Setter>
+				</OnPlatform.Default>
+			</OnPlatform>
 		</Style>
+		
 		<Style Selector="TabItem">
 			<Style Selector="^ PathIcon#SettingsCog">
 				<Setter Property="RenderTransform" Value="rotate(0)"/>
@@ -35,11 +48,15 @@
 	</Window.Styles>
 	
 	<DockPanel Margin="0 5 0 5">
-		<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5 0 0 0" Spacing="5" IsHitTestVisible="False">
+		<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5 0 0 0" Spacing="5"
+		            IsHitTestVisible="False" IsVisible="{OnPlatform Windows=True, Default=False}">
 			<Border CornerRadius="4" ClipToBounds="True">
-				<Image Source="/ui/assets/logo-sc.png" Width="20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+				<Image Source="/ui/assets/logo-sc.png" Width="20"
+				       RenderOptions.BitmapInterpolationMode="HighQuality"/>
 			</Border>
-			<Label Name="LauncherTitle" VerticalAlignment="Center">Launcher</Label>
+			<Label VerticalAlignment="Center" FontSize="14" Foreground="#EFEFEF">
+				Launcher
+			</Label>
 		</StackPanel>
 
 		<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="5">

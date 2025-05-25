@@ -29,17 +29,17 @@ static class Program
 			return ExecFunction.Program.Main(args);
 		}
 		
-		TaskScheduler.UnobservedTaskException += (sender, e) =>
+		Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+		TaskScheduler.UnobservedTaskException += (sender, eventArgs) =>
 		{
-			Trace.WriteLine(e.Exception);
-			e.SetObserved();
+			eventArgs.Exception.Log();
+			eventArgs.SetObserved();
 		};
 
-		return BuildAvaloniaApp()
-			.StartWithClassicDesktopLifetime(args);
+		return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
 	}
 
-	// Extension method to log exceptions from tasks
+	// Extension method to log exceptions from tasks.
 	public static void LogExceptions(this Task task)
 	{
 		task.ContinueWith(t =>
@@ -47,13 +47,19 @@ static class Program
 			var aggException = t.Exception!.Flatten();
 			foreach (var exception in aggException.InnerExceptions)
 			{
-				Trace.WriteLine(exception);
+				exception.Log();
 			}
 		},
 		TaskContinuationOptions.OnlyOnFaulted);
 	}
 
-	// Extension method for extracting all nested messages from exceptions
+	// Extension method that logs an exception.
+	public static void Log(this Exception exception)
+	{
+		Trace.WriteLine(exception);
+	}
+
+	// Extension method for extracting all nested messages from exceptions.
 	public static string GetAllMessages(this Exception? e, string delimiter = " - ")
 	{
 		var messages = new List<string>();

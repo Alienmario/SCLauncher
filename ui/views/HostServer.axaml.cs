@@ -25,7 +25,7 @@ public partial class HostServer : UserControl
 		Control? content = GetContent();
 		if (content == null
 		    || content == ServerNotFoundPanel
-		    || (content == ServerConsole && !App.GetService<ServerControlService>().Running))
+		    || (content == ServerConsole && !App.GetService<ServerControlService>().IsRunning))
 		{
 			CheckAvailability();
 		}

@@ -1,9 +1,7 @@
 using System;
-using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
 using SCLauncher.ui.util;
 
 namespace SCLauncher.ui.controls;
@@ -27,17 +25,20 @@ public partial class FilePickerTextBox : TextBox
 		AvaloniaXamlLoader.Load(this);
 	}
 
-	private void BrowseClicked(object? sender, RoutedEventArgs e)
+	private async void BrowseClicked(object? sender, RoutedEventArgs args)
 	{
-		string? start = Text;
-		Task.Run(async () =>
+		try
 		{
-			string? result = await FilePickerUtil.PickFolder(this, Title, start);
+			string? result = await FilePickerUtil.PickFolder(this, Title, Text);
 			if (result != null)
 			{
-				Dispatcher.UIThread.Post(() => Text = result);
+				Text = result;
 			}
-		});
+		}
+		catch (Exception e)
+		{
+			e.Log();
+		}
 	}
 	
 }

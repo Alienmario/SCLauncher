@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using SCLauncher.model;
 
 namespace SCLauncher.ui.controls;
@@ -40,4 +42,11 @@ public partial class StatusMessageViewer : UserControl
 
 	public void Clear() => DataContext?.Clear();
 
+	private void Message_PointerTapped(object? sender, TappedEventArgs args)
+	{
+		if (sender is Control ctl && ctl.DataContext is StatusMessage msg && msg.Details != null)
+		{
+			FlyoutBase.ShowAttachedFlyout(ctl);
+		}
+	}
 }

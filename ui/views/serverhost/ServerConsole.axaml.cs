@@ -69,6 +69,28 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 
 	private void AppendMessage(StatusMessage msg)
 	{
+		if (msg.Text.StartsWith("""
+		                    Unable to load plugin "addons/metamod/bin/
+		                    """)
+		    || msg.Text.Contains("metamod/bin/linux64/server.so: wrong ELF class: ELFCLASS64"))
+		{
+			msg.Details = """
+			              This error message appears because Metamod includes both 32-bit and 64-bit binaries.
+			              It can be safely ignored.
+			              """;
+		}
+		
+		// Not using srcds_run anymore, but same solution applies -- "srcds_run: 342: ./srcds_linux: not found"
+		else if (msg.Text.StartsWith("Failed to open dedicated_srv.so"))
+		{
+			msg.Details = """
+			              Please install necessary system packages using the following commands:
+			              sudo dpkg --add-architecture i386
+			              sudo apt update
+			              sudo apt install lib32gcc-s1 lib32stdc++6
+			              """;
+		}
+		
 		ConsoleViewer.AddMessage(msg);
 	}
 	

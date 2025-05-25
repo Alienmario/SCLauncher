@@ -18,4 +18,5 @@
 - [DepotDownloader](https://github.com/SteamRE/DepotDownloader) / [DepotDownloaderSubProcess](https://github.com/Alienmario/DepotDownloaderSubProcess)
 - [Tmds.ExecFunction](https://github.com/tmds/Tmds.ExecFunction)
 - [srcds-pipe-passthrough-fix](https://github.com/tsuza/srcds-pipe-passthrough-fix)
+- [SourceLogger](https://github.com/LukWebsForge/SourceLogger)
 - [Gameloop.Vdf](https://github.com/shravan2x/Gameloop.Vdf)

@@ -15,6 +15,8 @@ public class StatusMessage(string text)
 
 	public MessageStatus Status { get; init; } = MessageStatus.Info;
 
+	public string? Details { get; set; }
+
 	public override string ToString()
 	{
 		return Text;

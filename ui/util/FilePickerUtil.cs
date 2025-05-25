@@ -19,12 +19,13 @@ public static class FilePickerUtil
 			return null;
 
 		IStorageFolder? startFolder = null;
-		if (start != null)
+		if (!string.IsNullOrWhiteSpace(start))
 		{
 			try
 			{
 				startFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(new Uri(start));
-			} catch (FormatException) {}
+			}
+			catch (FormatException) {}
 		}
 
 		var files = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
