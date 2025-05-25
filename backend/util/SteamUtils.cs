@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -94,19 +95,43 @@ public static class SteamUtils
 
 	public static string? FindSteamInstallDir()
 	{
-		if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
-			return null;
+
+			using var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Valve\Steam");
+			if (key == null)
+			{
+				return null;
+			}
+
+			var path = key.GetValue("InstallPath") as string;
+			return string.IsNullOrEmpty(path) ? null : path;
+		}
+		else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+		{
+			var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+			if (home.Equals(string.Empty))
+			{
+				return null;
+			}
+			var path = Path.Join(home, ".local/share/Steam");
+			if (Directory.Exists(path))
+			{
+				return path;
+			}
+			path = Path.Join(home, "snap/steam/common/.local/share/Steam");
+			if (Directory.Exists(path))
+			{
+				return path;
+			}
 		}
 
-		using var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Valve\Steam");
-		if (key == null)
-		{
-			return null;
-		}
+		return null;
+	}
 
-		var path = key.GetValue("InstallPath") as string;
-		return string.IsNullOrEmpty(path) ? null : path;
+	public static bool IsValidSteamInstallDir(string? path)
+	{
+		return !string.IsNullOrWhiteSpace(path) && File.Exists(Path.Join(path, "steamapps", "libraryfolders.vdf"));
 	}
 
 	public static bool IsValidSteamInstallDir(string? path)
