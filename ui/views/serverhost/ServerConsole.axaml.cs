@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -91,7 +92,26 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 			              """;
 		}
 		
+		else if (msg.Text.StartsWith("[SM] Blaming: srccoop"))
+		{
+			msg.Details = "Please report this error to the SourceCoop team!";
+		}
+		
+		else if (ScBadGamedataRegex().IsMatch(msg.Text))
+		{
+			msg.Details = """
+			              This error indicates that there might have been a game update which have broken SourceCoop.
+			              
+			              Check for SourceCoop updates.
+			              
+			              Even if there are none, the developers are probably already working on it, so check back later.
+			              """;
+		}
+		
 		ConsoleViewer.AddMessage(msg);
 	}
-	
+
+    [GeneratedRegex(@"\[srccoop.*\.smx\] Could not obtain gamedata")]
+    private static partial Regex ScBadGamedataRegex();
+    
 }

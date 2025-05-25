@@ -108,5 +108,10 @@ public static class SteamUtils
 		var path = key.GetValue("InstallPath") as string;
 		return string.IsNullOrEmpty(path) ? null : path;
 	}
+
+	public static bool IsValidSteamInstallDir(string? path)
+	{
+		return !string.IsNullOrWhiteSpace(path) && File.Exists(Path.Join(path, "steamapps", "libraryfolders.vdf"));
+	}
 	
 }

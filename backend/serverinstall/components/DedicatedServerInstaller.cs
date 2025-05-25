@@ -34,7 +34,7 @@ public class DedicatedServerInstaller(BackendService backend, ConfigHolder confi
 	public async IAsyncEnumerable<StatusMessage> InstallViaSteamClient(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
-		if (!Directory.Exists(backend.GetSteamDir()))
+		if (!SteamUtils.IsValidSteamInstallDir(backend.GetSteamDir()))
 		{
 			throw new InstallException("Steam not found! Install it or specify Steam path in settings, then retry.");
 		}

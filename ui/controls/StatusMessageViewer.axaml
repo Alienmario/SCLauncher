@@ -66,8 +66,10 @@
 			<ItemsControl.ItemTemplate>
 				<DataTemplate x:DataType="model:StatusMessage">
 					<DockPanel>
-						<TextBlock Text="{Binding Time, StringFormat='HH:mm:ss'}" Margin="0 0 5 0"
-						           Foreground="LightGray"/>
+						<TextBlock Text="{Binding Time, StringFormat='HH:mm:ss'}"
+						           Margin="0 0 5 0"
+						           Foreground="LightGray" 
+						           FontFamily="Consolas, Courier New, monospace"/>
 						
 						<SelectableTextBlock
 							Foreground="{Binding Status,
@@ -79,11 +81,11 @@
 							TextWrapping="Wrap"
 							FontFamily="Consolas, Courier New, monospace"
 							Tapped="Message_PointerTapped"
-							Name="MsgText"
 							Text="{Binding Text}">
 							
 							<FlyoutBase.AttachedFlyout>
-								<Flyout Placement="TopEdgeAlignedLeft" ShowMode="TransientWithDismissOnPointerMoveAway" PlacementConstraintAdjustment="None">
+								<Flyout Placement="TopEdgeAlignedLeft" ShowMode="TransientWithDismissOnPointerMoveAway"
+								        PlacementConstraintAdjustment="None">
 									<SelectableTextBlock Text="{Binding Details}"
 									                     TextDecorations="{x:Null}"
 									                     TextWrapping="Wrap"

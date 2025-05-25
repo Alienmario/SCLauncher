@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Avalonia.Controls;
 using SCLauncher.model;
@@ -42,7 +43,19 @@ public partial class PathSelect : UserControl, WizardNavigator.IWizardContent
 
 	private bool IsValid()
 	{
-		return Directory.Exists(InstallPath.Text);
+		if (Directory.Exists(InstallPath.Text))
+			return true;
+		
+		try
+		{
+			Path.GetFullPath(InstallPath.Text!);
+		}
+		catch (Exception e)
+		{
+			return false;
+		}
+
+		return Path.IsPathFullyQualified(InstallPath.Text!);
 	}
 
 	public void OnNextPageRequest(WizardNavigator wizard)
