@@ -10,7 +10,7 @@ public partial class MainWindow : Window
 	{
 		InitializeComponent();
 		
-		var config = App.GetService<ConfigHolder>();
+		var config = App.GetService<GlobalConfiguration>();
 		
 		foreach (object? item in Tabs.Items)
 		{

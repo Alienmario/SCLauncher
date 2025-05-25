@@ -4,7 +4,7 @@ using SCLauncher.model;
 namespace SCLauncher.backend;
 
 [JsonSourceGenerationOptions(UseStringEnumConverter = true)]
-[JsonSerializable(typeof(ConfigHolder))]
+[JsonSerializable(typeof(GlobalConfiguration))]
 internal partial class JsonSourceGenerationContext : JsonSerializerContext
 {
 	

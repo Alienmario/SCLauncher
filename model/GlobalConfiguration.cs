@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace SCLauncher.model;
 
-public partial class ConfigHolder : INotifyPropertyChanged
+public partial class GlobalConfiguration : INotifyPropertyChanged
 {
 	
 	public string? GamePath { get; set; }

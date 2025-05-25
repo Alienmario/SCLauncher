@@ -11,26 +11,26 @@ namespace SCLauncher.ui.views.serverhost;
 
 public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 {
-	private readonly ServerControlService serverControl;
+	private readonly ServerControlService serverController;
 	
 	public ServerConsole()
 	{
 		InitializeComponent();
-		serverControl = App.GetService<ServerControlService>();
+		serverController = App.GetService<ServerControlService>();
 
 		StartButton.Click += (sender, args) =>
 		{
-			serverControl.Start();
+			serverController.Start();
 		};
 		StopButton.Click += (sender, args) =>
 		{
-			serverControl.Stop();
+			serverController.Stop();
 		};
-		serverControl.StateChanged += OnServerStateChanged;
-		serverControl.OutputReceived += OnServerOutputReceived;
-		serverControl.ErrorReceived += OnServerErrorReceived;
+		serverController.StateChanged += OnServerStateChanged;
+		serverController.OutputReceived += OnServerOutputReceived;
+		serverController.ErrorReceived += OnServerErrorReceived;
 		
-		OnServerStateChanged(null, false);
+		OnServerStateChanged(this, false);
 	}
 
 	private void OnServerErrorReceived(object sender, DataReceivedEventArgs args)
@@ -62,7 +62,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	{
 		if (!string.IsNullOrWhiteSpace(CommandTextBox.Text))
 		{
-			serverControl.Command(CommandTextBox.Text);
+			serverController.Command(CommandTextBox.Text);
 		}
 
 		CommandTextBox.Text = null;

@@ -1,3 +1,5 @@
+using System;
+
 namespace SCLauncher.model;
 
 public class AppInfo
@@ -21,4 +23,8 @@ public class AppInfo
 	
 	public string ModFolder { get; }
 
+	public Func<ServerConfiguration> DefaultServerConfigProvider { init; private get; } = () => new ServerConfiguration();
+
+	public ServerConfiguration NewServerConfig() => DefaultServerConfigProvider.Invoke();
+	
 }

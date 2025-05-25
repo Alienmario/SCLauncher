@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using SCLauncher.backend.service;
+using SCLauncher.model.serverinstall;
 using SCLauncher.ui.views.serverinstall;
 
 namespace SCLauncher.ui.views;
@@ -92,13 +93,13 @@ public partial class HostServer : UserControl
 					ServerNotFoundText.Text = "There was an issue verifying current installation...";
 					SwitchContent(ServerNotFoundPanel);
 				}
-				else if (task.Result.IsAvailable)
+				else if (task.Result == ServerAvailability.Available)
 				{
 					SwitchContent(ServerConsole);
 				}
 				else
 				{
-					ServerNotFoundText.Text = task.Result.IsPartial
+					ServerNotFoundText.Text = task.Result == ServerAvailability.PartiallyInstalled
 						? "Some addons are not installed..."
 						: "Server installation not found...";
 					SwitchContent(ServerNotFoundPanel);

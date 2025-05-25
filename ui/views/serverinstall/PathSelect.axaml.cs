@@ -17,7 +17,7 @@ public partial class PathSelect : UserControl, WizardNavigator.IWizardContent
 		{
 			if (DataContext is ServerInstallParams p && string.IsNullOrWhiteSpace(p.Path))
 			{
-				var configPath = App.GetService<ConfigHolder>().ServerPath;
+				var configPath = App.GetService<GlobalConfiguration>().ServerPath;
 				if (!string.IsNullOrWhiteSpace(configPath))
 				{
 					p.Path = configPath;

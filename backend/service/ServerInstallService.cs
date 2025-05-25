@@ -20,7 +20,7 @@ public class ServerInstallService(
 	{
 		return new ServerInstallParams
 		{
-			AppInfo = backend.GetActiveApp()
+			AppInfo = backend.ActiveApp
 		};
 	}
 

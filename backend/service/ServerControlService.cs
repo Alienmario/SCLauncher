@@ -18,11 +18,11 @@ public class ServerControlService
 	public event EventHandler<bool>? StateChanged;
 
 	private Process? serverProcess;
-	private readonly ConfigHolder config;
+	private readonly GlobalConfiguration config;
 	private readonly BackendService backend;
 	private readonly ServerInstallService installService;
 
-	public ServerControlService(ConfigHolder config, BackendService backend, ServerInstallService installService)
+	public ServerControlService(GlobalConfiguration config, BackendService backend, ServerInstallService installService)
 	{
 		this.config = config;
 		this.backend = backend;
@@ -102,28 +102,20 @@ public class ServerControlService
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
 					RedirectStandardInput = true,
-					CreateNoWindow = true,
-					ArgumentList =
-					{
-						"-console",
-						"-nocrashdialog",
-						"-game", backend.GetActiveApp().ModFolder,
-						"-ip", "0.0.0.0",
-						"+maxplayers", "32",
-						"+mp_teamplay", "1",
-						"+map", "bm_c0a0a"
-					}
+					CreateNoWindow = true
 				}
 			};
 
-			// if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-			// {
-			// 	serverProcess.StartInfo.Environment.TryGetValue("LD_LIBRARY_PATH", out string? current);
-			// 	serverProcess.StartInfo.Environment["LD_LIBRARY_PATH"] = ".:bin" + (current != null ? ":" + current : "");
-			// }
-
-			// Trace.WriteLine("Using environment variables:");
-			// Trace.WriteLine(string.Join("\n", serverProcess.StartInfo.Environment.Select(kvp => $"{kvp.Key}={kvp.Value}")));
+			var args = serverProcess.StartInfo.ArgumentList;
+			var appInfo = backend.ActiveApp;
+			args.Add("-console");
+			args.Add("-nocrashdialog");
+			args.Add("-game");
+			args.Add(appInfo.ModFolder);
+			foreach (string confParam in appInfo.NewServerConfig().ToLaunchParams())
+			{
+				args.Add(confParam);
+			}
 			
 			serverProcess.OutputDataReceived += (s, e) => OutputReceived?.Invoke(s, e);
 			serverProcess.ErrorDataReceived += (s, e) => ErrorReceived?.Invoke(s, e);
@@ -177,14 +169,14 @@ public class ServerControlService
 		}
 	}
 
-	public async Task<(bool IsAvailable, bool IsPartial)> IsAvailableAsync(CancellationToken cancellationToken = default)
+	public async Task<ServerAvailability> IsAvailableAsync(CancellationToken cancellationToken = default)
 	{
 		if (config.ServerPath == null)
-			return (false, false);
+			return ServerAvailability.Unavailable;
 
 		var p = new ServerInstallParams
 		{
-			AppInfo = backend.GetActiveApp(),
+			AppInfo = backend.ActiveApp,
 			Method = ServerInstallMethod.External,
 			Path = config.ServerPath,
 			CreateSubfolder = false
@@ -193,7 +185,9 @@ public class ServerControlService
 		var infos = await installService.GatherComponentInfoAsync(p, false, cancellationToken);
 		bool installIncomplete = infos.Values.Any(info => info is { Installable: true, Installed: false });
 		bool installPartial = infos.Values.Any(info => info is { Installable: true, Installed: true }) && installIncomplete;
-		return (!installIncomplete, installPartial);
+		return installIncomplete
+			? installPartial ? ServerAvailability.PartiallyInstalled : ServerAvailability.Unavailable
+			: ServerAvailability.Available;
 	}
 
 }

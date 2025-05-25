@@ -15,7 +15,7 @@ public static class ServiceConfig
 	// that will register services to our service collection and make them available for injection.
 	public static void AddBackendServices(this IServiceCollection collection)
 	{
-		collection.AddSingleton<ConfigHolder>();
+		collection.AddSingleton<GlobalConfiguration>();
 		collection.AddSingleton<BackendService>();
 		collection.AddSingleton<ServerInstallService>();
 		collection.AddSingleton<ServerControlService>();

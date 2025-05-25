@@ -5,15 +5,24 @@ using SCLauncher.model;
 
 namespace SCLauncher.backend.service;
 
-public class BackendService(ConfigHolder config, PersistenceService persistence)
+public class BackendService(GlobalConfiguration config, PersistenceService persistence)
 {
 	private AppInfo? activeApp;
+
+	public AppInfo ActiveApp => activeApp!;
 
 	public void Initialize()
 	{
 		persistence.Bind("config", config, JsonSourceGenerationContext.Default);
 		
-		activeApp = new AppInfo(362890, 346680, "Black Mesa", "Black Mesa Dedicated Server", "bms");
+		activeApp = new AppInfo(362890, 346680, "Black Mesa", "Black Mesa Dedicated Server", "bms")
+		{
+			DefaultServerConfigProvider = () => new ServerConfiguration
+			{
+				Teamplay = true,
+				StartMap = "bm_c0a0a"
+			}
+		};
 
 		Task.Run(async () =>
 		{
@@ -23,17 +32,14 @@ public class BackendService(ConfigHolder config, PersistenceService persistence)
 				config.SteamPath = steamDir;
 
 				if (!Directory.Exists(config.GamePath))
-					config.GamePath = await SteamUtils.FindAppPathAsync(steamDir, GetActiveApp().GameAppId)
+					config.GamePath = await SteamUtils.FindAppPathAsync(steamDir, ActiveApp.GameAppId)
 					                  ?? config.GamePath;
 
 				if (!Directory.Exists(config.ServerPath))
-					config.ServerPath = await SteamUtils.FindAppPathAsync(steamDir, GetActiveApp().ServerAppId)
+					config.ServerPath = await SteamUtils.FindAppPathAsync(steamDir, ActiveApp.ServerAppId)
 					                    ?? config.ServerPath;
 			}
 		}).Wait();
 	}
 
-	public string? GetSteamDir() => config.SteamPath;
-
-	public AppInfo GetActiveApp() => activeApp!;
 }

@@ -10,7 +10,7 @@ public partial class Settings : UserControl
 	{
 		InitializeComponent();
 		
-		var config = App.GetService<ConfigHolder>();
+		var config = App.GetService<GlobalConfiguration>();
 		DataContext = config;
 	}
 	
