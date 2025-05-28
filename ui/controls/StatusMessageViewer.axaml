@@ -38,6 +38,16 @@
 		</objectModel:ObservableCollection>
 	</Design.DataContext>
 	
+	<UserControl.Resources>
+		<converters:DecorateIfNotNullConverter x:Key="DetailMessageDecorator">
+			<x:Arguments>
+				<TextDecoration Location="Underline"
+				                StrokeOffset="1" StrokeOffsetUnit="Pixel"
+				                StrokeThickness="1" StrokeThicknessUnit="Pixel"/>
+			</x:Arguments>
+		</converters:DecorateIfNotNullConverter>
+	</UserControl.Resources>
+	
 	<UserControl.Styles>
 		<!-- Avalonia.Themes.Fluent/Controls/FlyoutPresenter.xaml -->
 		<Style Selector="FlyoutPresenter">
@@ -63,6 +73,11 @@
 
 	<ScrollViewer Name="Scroller" Margin="3.5 1.5 1.5 1.5" BringIntoViewOnFocusChange="False">
 		<ItemsControl ItemsSource="{Binding}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<StackPanel Spacing="2"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
 			<ItemsControl.ItemTemplate>
 				<DataTemplate x:DataType="model:StatusMessage">
 					<DockPanel>
@@ -75,7 +90,7 @@
 							Foreground="{Binding Status,
 								Converter={x:Static converters:MessageStatusColorConverter.Instance}}"
 							TextDecorations="{Binding Details,
-								Converter={x:Static converters:UnderlineIfNotNullConverter.Instance}}"
+								Converter={StaticResource DetailMessageDecorator}}"
 							Cursor="{Binding Details,
 								Converter={x:Static converters:SetCursorIfNotNullConverter.Hand}}"
 							TextWrapping="Wrap"
