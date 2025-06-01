@@ -9,13 +9,6 @@
 	
 	<UserControl.Styles>
 		
-		<Style Selector="TextBox#CommandTextBox">
-			<Setter Property="BorderThickness" Value="0"/>
-			<Style Selector="^:focus-within /template/ Border">
-				<Setter Property="BorderThickness" Value="0"/>
-			</Style>
-		</Style>
-		
 		<Style Selector="li|LoadingIndicator#StatusIndicator">
 			<Style Selector="^.offline">
 				<Setter Property="Foreground" Value="OrangeRed"/>
@@ -64,19 +57,7 @@
 		<!-- Footer - command input row -->
 		<Border DockPanel.Dock="Bottom" CornerRadius="5"
 		        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0 10 0 0">
-			<DockPanel>
-				<TextBox Name="CommandTextBox" VerticalContentAlignment="Center">
-					<TextBox.InnerLeftContent>
-						<Label VerticalAlignment="Center" Content=">" Margin="10 0 0 0"
-						       Foreground="{DynamicResource TextControlPlaceholderForeground}"/>
-					</TextBox.InnerLeftContent>
-					<TextBox.InnerRightContent>
-						<Button DockPanel.Dock="Right" Content="Submit" Name="SubmitButton" Classes="accent"
-						        Click="SubmitButton_OnClick" HotKey="Enter"
-						        CornerRadius="0 4 4 0" Focusable="False"/>
-					</TextBox.InnerRightContent>
-				</TextBox>
-			</DockPanel>
+				<controls:ConsoleCommandTextBox Name="CommandTextBox" CommandSubmitted="OnCommandSubmit"/>
 		</Border>
 		
 		<!-- Console -->

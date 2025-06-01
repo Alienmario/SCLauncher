@@ -1,0 +1,29 @@
+<TextBox xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800"
+             x:Class="SCLauncher.ui.controls.ConsoleCommandTextBox"
+             VerticalContentAlignment="Center">
+	
+	<TextBox.Styles>
+		<Style Selector="TextBox">
+			<Setter Property="BorderThickness" Value="0"/>
+			<Style Selector="^:focus-within /template/ Border">
+				<Setter Property="BorderThickness" Value="0"/>
+			</Style>
+		</Style>
+	</TextBox.Styles>
+	
+	<TextBox.InnerLeftContent>
+		<Label VerticalAlignment="Center" Content=">" Margin="10 0 0 0"
+		       Foreground="{DynamicResource TextControlPlaceholderForeground}"/>
+	</TextBox.InnerLeftContent>
+	
+	<TextBox.InnerRightContent>
+		<Button Content="Submit" Name="SubmitButton" Classes="accent"
+		        Click="SubmitClicked" HotKey="Enter"
+		        CornerRadius="0 4 4 0" Focusable="False"/>
+	</TextBox.InnerRightContent>
+	
+</TextBox>

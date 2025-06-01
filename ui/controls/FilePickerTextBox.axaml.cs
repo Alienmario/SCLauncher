@@ -1,7 +1,6 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using SCLauncher.ui.util;
 
 namespace SCLauncher.ui.controls;
@@ -22,7 +21,7 @@ public partial class FilePickerTextBox : TextBox
 
 	public FilePickerTextBox()
 	{
-		AvaloniaXamlLoader.Load(this);
+		InitializeComponent();
 	}
 
 	private async void BrowseClicked(object? sender, RoutedEventArgs args)

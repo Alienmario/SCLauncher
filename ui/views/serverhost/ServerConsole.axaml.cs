@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.model;
@@ -58,14 +57,16 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		});
 	}
 
-	private void SubmitButton_OnClick(object? sender, RoutedEventArgs e)
+	private void OnCommandSubmit(object? sender, string? text)
 	{
-		if (!string.IsNullOrWhiteSpace(CommandTextBox.Text))
+		if (string.IsNullOrWhiteSpace(text))
 		{
-			serverController.Command(CommandTextBox.Text);
+			ConsoleViewer.AddMessage(new StatusMessage(string.Empty));
 		}
-
-		CommandTextBox.Text = null;
+		else
+		{
+			serverController.Command(text);
+		}
 	}
 
 	private void AppendMessage(StatusMessage msg)

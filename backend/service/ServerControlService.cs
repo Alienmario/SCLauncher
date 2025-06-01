@@ -89,8 +89,6 @@ public class ServerControlService
 		
 		try
 		{
-			// Windows srcds-fix errors in "CTextConsoleWin32::GetLine: !GetNumberOfConsoleInputEvents",
-			// but this disappears in published app !?
 			serverProcess = new Process
 			{
 				EnableRaisingEvents = true,
@@ -120,20 +118,21 @@ public class ServerControlService
 			serverProcess.OutputDataReceived += (s, e) => OutputReceived?.Invoke(s, e);
 			serverProcess.ErrorDataReceived += (s, e) => ErrorReceived?.Invoke(s, e);
 			serverProcess.Start();
+			
 			if (IsRunning)
 			{
 				StateChanged?.Invoke(this, true);
 				serverProcess.Exited += (sender, args) => StateChanged?.Invoke(sender, false);
 				serverProcess.BeginOutputReadLine();
 				serverProcess.BeginErrorReadLine();
+				
 				return true;
 			}
 		}
 		catch (Exception e)
 		{
 			e.Log();
-			serverProcess?.Dispose();
-			serverProcess = null;
+			Stop();
 		}
 
 		return false;
@@ -147,7 +146,15 @@ public class ServerControlService
 		try
 		{
 			Process process = serverProcess;
-			process.Kill(true);
+			try
+			{
+				process.Kill(true);
+			}
+			catch (Exception e)
+			{
+				e.Log();
+			}
+
 			Task.Run(() =>
 			{
 				process.WaitForExit();
