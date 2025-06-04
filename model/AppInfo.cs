@@ -1,27 +1,22 @@
 using System;
+using System.Collections.Generic;
 
 namespace SCLauncher.model;
 
 public class AppInfo
 {
-	public AppInfo(int gameAppId, int serverAppId, string gameInstallFolder, string serverInstallFolder, string modFolder)
-	{
-		GameAppId = gameAppId;
-		ServerAppId = serverAppId;
-		GameInstallFolder = gameInstallFolder;
-		ServerInstallFolder = serverInstallFolder;
-		ModFolder = modFolder;
-	}
-
-	public int GameAppId { get; }
 	
-	public int ServerAppId { get; }
+	public required int GameAppId { get; init; }
 	
-	public string GameInstallFolder { get; }
+	public required int ServerAppId { get; init; }
 	
-	public string ServerInstallFolder { get; }
+	public required string GameInstallFolder { get; init; }
 	
-	public string ModFolder { get; }
+	public required string ServerInstallFolder { get; init; }
+	
+	public required string ModFolder { get; init; }
+	
+	public required IDictionary<PlatformID, string> GameExecutable { get; init; }
 
 	public Func<ServerConfiguration> DefaultServerConfigProvider { init; private get; } = () => new ServerConfiguration();
 

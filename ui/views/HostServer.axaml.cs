@@ -21,6 +21,16 @@ public partial class HostServer : UserControl
 		ServerInstallWizard.OnExit += OnServerInstallWizardExit;
 	}
 
+	public void GoToServerInstallWizard()
+	{
+		SwitchContent(ServerInstallWizard);
+		ServerInstallWizard.Reset();
+		ServerInstallWizard.SetContent(new MethodSelect());
+
+		var installService = App.GetService<ServerInstallService>();
+		ServerInstallWizard.DataContext = installService.NewInstallParams();
+	}
+
 	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
 	{
 		Control? content = GetContent();
@@ -43,12 +53,7 @@ public partial class HostServer : UserControl
 
 	private void OnInstallServerClicked(object? sender, RoutedEventArgs e)
 	{
-		SwitchContent(ServerInstallWizard);
-		ServerInstallWizard.Reset();
-		ServerInstallWizard.SetContent(new MethodSelect());
-
-		var installService = App.GetService<ServerInstallService>();
-		ServerInstallWizard.DataContext = installService.NewInstallParams();
+		GoToServerInstallWizard();
 	}
 
 	private void OnRecheckAvailabilityClicked(object? sender, RoutedEventArgs e)

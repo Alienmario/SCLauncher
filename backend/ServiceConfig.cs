@@ -19,8 +19,10 @@ public static class ServiceConfig
 		collection.AddSingleton<BackendService>();
 		collection.AddSingleton<ServerInstallService>();
 		collection.AddSingleton<ServerControlService>();
+		collection.AddSingleton<ServerMessageAnalyzerService>();
+		collection.AddSingleton<ClientControlService>();
 		collection.AddSingleton<PersistenceService>();
-		
+
 		// Server install
 		collection.AddSingleton<ServerInstallRunner>();
 		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, DedicatedServerInstaller>();

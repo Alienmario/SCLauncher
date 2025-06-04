@@ -20,32 +20,57 @@
 			</Style>
 		</Style>
 		
+		<Style Selector="Button#StartButton">
+			<Setter Property="Background">
+				<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+					<GradientStop Color="#006400" Offset="0.0"/>
+					<GradientStop Color="#004500" Offset="1.0"/>
+				</LinearGradientBrush>
+			</Setter>
+		</Style>
+		
+		<Style Selector="Button#StopButton">
+			<Setter Property="Background">
+				<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+					<GradientStop Color="#8B0000" Offset="0.0"/>
+					<GradientStop Color="#4E000B" Offset="1.0"/>
+				</LinearGradientBrush>
+			</Setter>
+		</Style>
+		
+		<Style Selector="Button#StopButton, Button#StartButton">
+			<Setter Property="Padding" Value="50 2"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="CornerRadius" Value="10 0"/>
+		</Style>
+
 	</UserControl.Styles>
 	
 	<DockPanel>
 		
-		<!-- Header - status row -->
-		<DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0 0 10 0">
+		<!-- Header - status/action row -->
+		<DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0 0 5 0">
+			
+			<!-- Aligned right -->
 			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
-				<Button Padding="50 2" CornerRadius="10 0 0 0"
-				        Content="Start" Name="StartButton">
-					<Button.Background>
-						<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-							<GradientStop Color="#006400" Offset="0.0"/>
-							<GradientStop Color="#004500" Offset="1.0"/>
-						</LinearGradientBrush>
-					</Button.Background>
-				</Button>
-				<Button Padding="50 2" CornerRadius="0 10 0 0"
-				        Content="Stop" Name="StopButton">
-			        <Button.Background>
-				        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-					        <GradientStop Color="#8B0000" Offset="0.0"/>
-					        <GradientStop Color="#4E000B" Offset="1.0"/>
-				        </LinearGradientBrush>
-			        </Button.Background>
+				<Button Name="StartButton" Content="Start"/>
+				<Button Name="StopButton" Content="Stop"/>
+				<Button Margin="15 0 0 0" Background="Transparent">
+					<PathIcon Data="{StaticResource more_regular}" Height="10" Width="15"/>
+					<Button.Flyout>
+						<MenuFlyout Placement="BottomEdgeAlignedRight" VerticalOffset="3" HorizontalOffset="4">
+							<MenuItem Header="Join now" Click="OnMenuJoinClicked"/>
+							<MenuItem Header="Copy join link" Click="OnMenuCopyLinkClicked"/>
+							<MenuItem Header="Copy server IP" Click="OnMenuCopyIpClicked"/>
+							<MenuItem Header="-"/>
+							<MenuItem Header="Installer" Click="OnMenuInstallerClicked"/>        
+						</MenuFlyout>
+					</Button.Flyout>
 				</Button>
 			</StackPanel>
+			
+			<!-- Aligned left -->
 			<StackPanel DockPanel.Dock="Left" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
 				<Viewbox Stretch="Uniform" Height="25">
 					<li:LoadingIndicator Name="StatusIndicator" Mode="DoubleBounce"/>

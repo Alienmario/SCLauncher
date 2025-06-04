@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using SCLauncher.backend.util;
@@ -15,8 +17,15 @@ public class BackendService(GlobalConfiguration config, PersistenceService persi
 	{
 		persistence.Bind("config", config, JsonSourceGenerationContext.Default);
 		
-		activeApp = new AppInfo(362890, 346680, "Black Mesa", "Black Mesa Dedicated Server", "bms")
+		activeApp = new AppInfo
 		{
+			GameAppId = 362890, ServerAppId = 346680,
+			GameInstallFolder = "Black Mesa", ServerInstallFolder = "Black Mesa Dedicated Server",
+			ModFolder = "bms",
+			GameExecutable = new Dictionary<PlatformID, string>
+			{
+				{ PlatformID.Win32NT, "bms.exe" }, { PlatformID.Unix, "bms.sh" }
+			},
 			DefaultServerConfigProvider = () => new ServerConfiguration
 			{
 				Teamplay = true,

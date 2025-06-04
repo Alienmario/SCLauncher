@@ -33,6 +33,20 @@ public static class SteamUtils
 			Verb = "open"
 		});
 	}
+
+	public static void ConnectToServer(string address, int appId)
+	{
+		Process.Start(new ProcessStartInfo(GetConnectLink(address, appId))
+		{
+			UseShellExecute = true,
+			Verb = "open"
+		});
+	}
+
+	public static string GetConnectLink(string address, int appId)
+	{
+		return $"steam://connect/{address}?appid={appId}";
+	}
 	
 	public static async Task<SteamAppManifest?> FindAppManifestAsync(string steamDir, int appId, CancellationToken ct = default)
 	{
