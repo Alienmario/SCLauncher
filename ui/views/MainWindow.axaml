@@ -59,7 +59,7 @@
 			</Label>
 		</StackPanel>
 
-		<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="5">
+		<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="0 5">
 			
 			<TabControl.ItemsPanel>
 				<ItemsPanelTemplate>

@@ -9,7 +9,8 @@
 	
 	<Grid ColumnDefinitions="* *" RowDefinitions="*">
 		<Panel Grid.Row="0" Grid.Column="0">
-			<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="SteamClicked">
+			<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="SteamClicked"
+			        CornerRadius="4 0 0 4">
 				<Panel>
 					<Svg Path="/ui/assets/logo-steam.svg" Width="150" Height="150"/>
 					<Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10">
@@ -19,7 +20,8 @@
 			</Button>
 		</Panel>
 		<Panel Grid.Row="0" Grid.Column="1">
-			<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="ExternalClicked">
+			<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="ExternalClicked"
+			        CornerRadius="0 4 4 0">
 				<Panel>
 					<PathIcon Width="150" Height="150" Data="{StaticResource arrow_download_regular}"/>
 					<Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10">

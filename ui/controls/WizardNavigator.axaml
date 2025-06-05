@@ -6,7 +6,7 @@
              x:Class="SCLauncher.ui.controls.WizardNavigator">
 	
 	<DockPanel>
-		<Border Name="NavBar" Padding="0 10" DockPanel.Dock="Bottom">
+		<Border Name="NavBar" Padding="0 10 0 0" DockPanel.Dock="Bottom">
 			<DockPanel>
 				<Button Name="BackButton" DockPanel.Dock="Left" Margin="0 0 10 0">
 					<PathIcon Name="BackButtonIcon" Data="{StaticResource chevron_left_regular}"/>
@@ -14,10 +14,18 @@
 				<Button Name="ForwardButton" DockPanel.Dock="Right" Margin="10 0 0 0">
 					<PathIcon Name="ForwardButtonIcon" Data="{StaticResource chevron_right_regular}"/>
 				</Button>
-				<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-				        VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-				        Name="CancelButton" CornerRadius="0">
-					Cancel
+				
+				<Button Name="CancelButton"
+				        HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+				        VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
+				        CornerRadius="0" Padding="-0.5">
+					<Panel>
+						<ProgressBar Name="ProgressBar" IsIndeterminate="True"
+						             CornerRadius="0" Background="Transparent" Opacity="0.75"
+						             VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+						<Label Name="CancelLabel" Content="Cancel"
+						       VerticalAlignment="Center" HorizontalAlignment="Center"/>
+					</Panel>
 				</Button>
 			</DockPanel>
 		</Border>

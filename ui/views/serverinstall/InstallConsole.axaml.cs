@@ -40,6 +40,8 @@ public partial class InstallConsole : UserControl, WizardNavigator.IWizardConten
 			
 			try
 			{
+				wizard.ShowProgressBar = true;
+				
 				var installService = App.GetService<ServerInstallService>();
 				await foreach (var msg in installService.GetInstaller(data).WithCancellation(cancellation.Token))
 				{
@@ -66,6 +68,7 @@ public partial class InstallConsole : UserControl, WizardNavigator.IWizardConten
 				if (!postDetach)
 				{
 					wizard.Completed = true;
+					wizard.ShowProgressBar = false;
 				}
 			}
 		}

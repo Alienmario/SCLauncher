@@ -35,15 +35,22 @@ public partial class WizardNavigator : UserControl
 		get => NavBar.IsVisible;
 		set => NavBar.IsVisible = value;
 	}
+
+	public bool ShowProgressBar
+	{
+	    get => ProgressBar.IsVisible;
+	    set => ProgressBar.IsVisible = value;
+	}
 	
 	public bool ForwardButtonRunsAction
 	{
 		set => ForwardButtonIcon.Data = (Geometry?)App.GetResource(value ? "rocket_regular" : "chevron_right_regular");
 	}
+	
 	public bool Completed
 	{
-		set => CancelButton.Content = value ? "Close" : "Cancel";
-		get => (string)CancelButton.Content! == "Close";
+		set => CancelLabel.Content = value ? "Close" : "Cancel";
+		get => (string)CancelLabel.Content! == "Close";
 	}
 
 	private new object? Content
@@ -89,6 +96,7 @@ public partial class WizardNavigator : UserControl
 	public void ResetControls()
 	{
 		ForwardButtonRunsAction = false;
+		ShowProgressBar = Design.IsDesignMode;
 		SetControls(true, true, true);
 	}
 

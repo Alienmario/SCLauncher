@@ -4,7 +4,7 @@
 	<Styles.Resources>
 		<SolidColorBrush x:Key="Highlight">Orange</SolidColorBrush>
 		
-		<LinearGradientBrush x:Key="DashedLineBrush" SpreadMethod="Repeat" StartPoint="2,4" EndPoint="4,6">
+		<LinearGradientBrush x:Key="DashedLineBrush" SpreadMethod="Repeat" StartPoint="4,4" EndPoint="8,4">
 			<GradientStop Offset="0" Color="Gray" />
 			<GradientStop Offset="0.5" Color="Gray" />
 			<GradientStop Offset="0.501" Color="Transparent" />
@@ -20,7 +20,7 @@
 	</Style>
 	
 	<Style Selector="Border.DashedUnderline">
-		<Setter Property="BorderThickness" Value="0 0 0 0.5"/>
+		<Setter Property="BorderThickness" Value="0 0 0 0.75"/>
 		<Setter Property="BorderBrush" Value="{StaticResource DashedLineBrush}"/>
 		<Setter Property="Margin" Value="6 0 6 10"/>
 		<Setter Property="VerticalAlignment" Value="Bottom"/>
