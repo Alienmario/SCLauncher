@@ -64,7 +64,8 @@
 							<MenuItem Header="Copy join link" Click="OnMenuCopyLinkClicked"/>
 							<MenuItem Header="Copy server IP" Click="OnMenuCopyIpClicked"/>
 							<MenuItem Header="-"/>
-							<MenuItem Header="Installer" Click="OnMenuInstallerClicked"/>        
+							<MenuItem Header="Browse server files" Click="OnMenuBrowseServerFolderClicked"/>
+							<MenuItem Header="Installer" Click="OnMenuInstallerClicked"/>
 						</MenuFlyout>
 					</Button.Flyout>
 				</Button>

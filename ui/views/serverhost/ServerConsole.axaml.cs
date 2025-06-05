@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -8,10 +9,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.backend.util;
 using SCLauncher.model;
+using SCLauncher.model.exception;
 using SCLauncher.ui.controls;
 
 namespace SCLauncher.ui.views.serverhost;
@@ -22,6 +25,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	private readonly ClientControlService clController;
 	private readonly ServerMessageAnalyzerService analyzer;
 	private readonly BackendService backend;
+	private readonly GlobalConfiguration config;
 	private WindowNotificationManager? notificationMgr;
 	
 	public ServerConsole()
@@ -32,6 +36,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		clController = App.GetService<ClientControlService>();
 		analyzer = App.GetService<ServerMessageAnalyzerService>();
 		backend = App.GetService<BackendService>();
+		config = App.GetService<GlobalConfiguration>();
 
 		StartButton.Click += (sender, args) =>
 		{
@@ -96,7 +101,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		}
 	}
 
-	private void OnMenuJoinClicked(object? sender, RoutedEventArgs e)
+	private void OnMenuJoinClicked(object? sender, RoutedEventArgs args)
 	{
 		if (!svController.IsRunning)
 		{
@@ -117,13 +122,20 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 			return;
 		}
 
-		if (clController.ConnectToServer(localIp + ":" + analyzer.ServerPort))
+		try
 		{
-			ShowSuccess("Joining local server...");
+			if (clController.ConnectToServer(localIp + ":" + analyzer.ServerPort))
+			{
+				ShowSuccess("Joining local server...");
+			}
+			else
+			{
+				ShowFailure("Unable to launch the game.");
+			}
 		}
-		else
+		catch (InvalidGamePathException)
 		{
-			ShowFailure("Unable to launch the game.");
+			ShowFailure("Configured game path is invalid.");
 		}
 	}
 
@@ -168,8 +180,26 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 			e.Log();
 		}
 	}
+
+	private async void OnMenuBrowseServerFolderClicked(object? sender, RoutedEventArgs args)
+	{
+		try
+		{
+			if (config.ServerPath == null)
+				return;
+		
+			if (!await TopLevel.GetTopLevel(this)!.Launcher.LaunchDirectoryInfoAsync(new DirectoryInfo(config.ServerPath)))
+			{
+				ShowFailure("Unable to open server directory.");
+			}
+		}
+		catch (Exception e)
+		{
+			e.Log();
+		}
+	}
 	
-	private void OnMenuInstallerClicked(object? sender, RoutedEventArgs e)
+	private void OnMenuInstallerClicked(object? sender, RoutedEventArgs args)
 	{
 		if (svController.IsRunning)
 		{
