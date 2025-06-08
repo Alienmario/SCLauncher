@@ -36,6 +36,7 @@ public partial class ServerConfigurator : UserControl
 			this.GetVisualDescendants().OfType<TextBox>()
 				.LastOrDefault(x => x.Classes.Contains("CustomParamKey"))
 				?.Focus();
+			Scroller.ScrollToEnd();
 		}
 	}
 

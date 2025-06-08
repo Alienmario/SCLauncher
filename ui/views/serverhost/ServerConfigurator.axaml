@@ -24,13 +24,11 @@
 	
 	<DockPanel>
 		<StackPanel DockPanel.Dock="Top">
-			<TextBlock Text="Server options" FontSize="14" LetterSpacing="1"
-			           Margin="8 0 8 0"
-			           Foreground="{DynamicResource ButtonForeground}"/>
+			<TextBlock Text="Server options" FontSize="14" LetterSpacing="1" Margin="8 0 8 0"/>
 			<Border Opacity="0.5" BorderBrush="{DynamicResource ButtonBackground}" BorderThickness=".5" Margin="0 4 0 0"/>
 		</StackPanel>
 		
-		<ScrollViewer AllowAutoHide="False">
+		<ScrollViewer AllowAutoHide="False" Name="Scroller">
 			<StackPanel Margin="8 8 8 0">
 				<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*" ColumnDefinitions="Auto,*"
 				      RowSpacing="5" ColumnSpacing="8">

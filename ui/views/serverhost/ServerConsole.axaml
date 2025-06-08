@@ -5,7 +5,7 @@
              xmlns:controls="clr-namespace:SCLauncher.ui.controls"
              xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
              xmlns:serverhost="clr-namespace:SCLauncher.ui.views.serverhost"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="300"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="300"
              x:Class="SCLauncher.ui.views.serverhost.ServerConsole">
 	
 	<UserControl.Styles>
@@ -40,7 +40,7 @@
 		</Style>
 		
 		<Style Selector="Button#StopButton, Button#StartButton">
-			<Setter Property="Padding" Value="50 2"/>
+			<Setter Property="Padding" Value="30 2"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
 			<Setter Property="HorizontalContentAlignment" Value="Center"/>
 			<Setter Property="CornerRadius" Value="10 0"/>
@@ -48,10 +48,12 @@
 
 	</UserControl.Styles>
 	
-	<SplitView Name="ConfiguratorView"
+	<SplitView Name="ConfiguratorSplitView"
 	           IsPaneOpen="False"
 	           PanePlacement="Right" DisplayMode="Inline"
 	           OpenPaneLength="300" PaneBackground="Transparent">
+		
+		<!--ServerConfigurator pane -->
 		<SplitView.Pane>
 			<ThemeVariantScope RequestedThemeVariant="Light">
 				<Border Background="#9BFFFFFF"
@@ -73,13 +75,19 @@
 			</ThemeVariantScope>
 		</SplitView.Pane>
 		
+		<!-- Main content -->
 		<DockPanel>
 			
 			<!-- Header - status/actions row -->
-			<DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0 0 5 0">
-				
+			<Grid DockPanel.Dock="Top" Margin="0 0 5 0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+				<!-- Aligned left -->
+				<Viewbox Stretch="UniformToFill" Height="25">
+					<li:LoadingIndicator Name="StatusIndicator" Mode="DoubleBounce"/>
+				</Viewbox>
+				<TextBlock Grid.Column="1" Name="StatusIndicatorLabel" VerticalAlignment="Center"
+				           TextTrimming="{x:Static TextTrimming.CharacterEllipsis}"/>
 				<!-- Aligned right -->
-				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+				<StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
 					<Button Name="StartButton" Content="Start"/>
 					<Button Name="StopButton" Content="Stop"/>
 					<Button Margin="15 0 0 0" Background="Transparent">
@@ -98,15 +106,7 @@
 						</Button.Flyout>
 					</Button>
 				</StackPanel>
-				
-				<!-- Aligned left -->
-				<StackPanel DockPanel.Dock="Left" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-					<Viewbox Stretch="Uniform" Height="25">
-						<li:LoadingIndicator Name="StatusIndicator" Mode="DoubleBounce"/>
-					</Viewbox>
-					<Label VerticalAlignment="Center" Name="StatusIndicatorLabel"/>
-				</StackPanel>
-			</DockPanel>
+			</Grid>
 			
 			<!-- Footer - command input row -->
 			<Border DockPanel.Dock="Bottom" CornerRadius="5"

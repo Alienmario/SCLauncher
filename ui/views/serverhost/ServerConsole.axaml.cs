@@ -83,7 +83,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		var hostname = backend.GetServerConfig().Hostname;
 		Dispatcher.UIThread.Post(() =>
 		{
-			StatusIndicatorLabel.Content = running ? "Online - " + hostname : "Offline";
+			StatusIndicatorLabel.Text = running ? "Online - " + hostname : "Offline";
 			StatusIndicator.Classes.Replace([running ? "online" : "offline"]);
 			StartButton.IsVisible = !running;
 			StopButton.IsVisible = running;
@@ -217,12 +217,12 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 
 	private void OnMenuConfigureServerClicked(object? sender, RoutedEventArgs args)
 	{
-		ConfiguratorView.IsPaneOpen = !ConfiguratorView.IsPaneOpen;
+		ConfiguratorSplitView.IsPaneOpen = !ConfiguratorSplitView.IsPaneOpen;
 	}
 	
 	private void OnConfiguratorCloseClicked(object? sender, RoutedEventArgs e)
 	{
-		ConfiguratorView.IsPaneOpen = false;
+		ConfiguratorSplitView.IsPaneOpen = false;
 	}
 	
 	private void OnConfiguratorResetClicked(object? sender, RoutedEventArgs e)
