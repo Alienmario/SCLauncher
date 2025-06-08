@@ -55,8 +55,8 @@ public partial class WizardNavigator : UserControl
 
 	private new object? Content
 	{
-		get => ContentArea.Child;
-		set => ContentArea.Child = (Control?)value;
+		get => ContentArea.Content;
+		set => ContentArea.Content = (Control?)value;
 	}
 
 	private readonly Stack<object> navStack = new();

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:SCLauncher.ui.controls"
              xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
+             xmlns:serverhost="clr-namespace:SCLauncher.ui.views.serverhost"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="300"
              x:Class="SCLauncher.ui.views.serverhost.ServerConsole">
 	
@@ -47,51 +48,80 @@
 
 	</UserControl.Styles>
 	
-	<DockPanel>
+	<SplitView Name="ConfiguratorView"
+	           IsPaneOpen="False"
+	           PanePlacement="Right" DisplayMode="Inline"
+	           OpenPaneLength="300" PaneBackground="Transparent">
+		<SplitView.Pane>
+			<ThemeVariantScope RequestedThemeVariant="Light">
+				<Border Background="#9BFFFFFF"
+				        BorderBrush="{StaticResource SystemAccentColor}" Margin="10 0 0 0" 
+				        BorderThickness="1" CornerRadius="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+					<Panel>
+						<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+							<Button Classes="Transparent Grow" ZIndex="1" Click="OnConfiguratorResetClicked">
+								<PathIcon Data="{StaticResource arrow_undo_regular}" Height="10" Width="10"
+								           Foreground="Firebrick"/>
+							</Button>
+							<Button Classes="Transparent Grow" ZIndex="1" Click="OnConfiguratorCloseClicked">
+								<PathIcon Data="{StaticResource dismiss_regular}" Height="10" Width="10"/>
+							</Button>
+						</StackPanel>
+						<serverhost:ServerConfigurator Name="ServerConfigurator"/>
+					</Panel>
+				</Border>
+			</ThemeVariantScope>
+		</SplitView.Pane>
 		
-		<!-- Header - status/action row -->
-		<DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0 0 5 0">
+		<DockPanel>
 			
-			<!-- Aligned right -->
-			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
-				<Button Name="StartButton" Content="Start"/>
-				<Button Name="StopButton" Content="Stop"/>
-				<Button Margin="15 0 0 0" Background="Transparent">
-					<PathIcon Data="{StaticResource more_regular}" Height="10" Width="15"/>
-					<Button.Flyout>
-						<MenuFlyout Placement="BottomEdgeAlignedRight" VerticalOffset="3" HorizontalOffset="4">
-							<MenuItem Header="Join now" Click="OnMenuJoinClicked"/>
-							<MenuItem Header="Copy join link" Click="OnMenuCopyLinkClicked"/>
-							<MenuItem Header="Copy server IP" Click="OnMenuCopyIpClicked"/>
-							<MenuItem Header="-"/>
-							<MenuItem Header="Browse server files" Click="OnMenuBrowseServerFolderClicked"/>
-							<MenuItem Header="Installer" Click="OnMenuInstallerClicked"/>
-						</MenuFlyout>
-					</Button.Flyout>
-				</Button>
-			</StackPanel>
+			<!-- Header - status/actions row -->
+			<DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0 0 5 0">
+				
+				<!-- Aligned right -->
+				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+					<Button Name="StartButton" Content="Start"/>
+					<Button Name="StopButton" Content="Stop"/>
+					<Button Margin="15 0 0 0" Background="Transparent">
+						<PathIcon Data="{StaticResource more_regular}" Height="10" Width="15"/>
+						<Button.Flyout>
+							<MenuFlyout Placement="BottomEdgeAlignedRight" VerticalOffset="3" HorizontalOffset="4">
+								<MenuItem Header="Join now" Click="OnMenuJoinClicked"/>
+								<MenuItem Header="Copy join link" Click="OnMenuCopyLinkClicked"/>
+								<MenuItem Header="Copy server IP" Click="OnMenuCopyIpClicked"/>
+								<MenuItem Header="-"/>
+								<MenuItem Header="Configure server" Click="OnMenuConfigureServerClicked"/>
+								<MenuItem Header="-"/>
+								<MenuItem Header="Browse server files" Click="OnMenuBrowseServerFolderClicked"/>
+								<MenuItem Header="Installer" Click="OnMenuInstallerClicked"/>
+							</MenuFlyout>
+						</Button.Flyout>
+					</Button>
+				</StackPanel>
+				
+				<!-- Aligned left -->
+				<StackPanel DockPanel.Dock="Left" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+					<Viewbox Stretch="Uniform" Height="25">
+						<li:LoadingIndicator Name="StatusIndicator" Mode="DoubleBounce"/>
+					</Viewbox>
+					<Label VerticalAlignment="Center" Name="StatusIndicatorLabel"/>
+				</StackPanel>
+			</DockPanel>
 			
-			<!-- Aligned left -->
-			<StackPanel DockPanel.Dock="Left" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-				<Viewbox Stretch="Uniform" Height="25">
-					<li:LoadingIndicator Name="StatusIndicator" Mode="DoubleBounce"/>
-				</Viewbox>
-				<Label VerticalAlignment="Center" Name="StatusIndicatorLabel"/>
-			</StackPanel>
+			<!-- Footer - command input row -->
+			<Border DockPanel.Dock="Bottom" CornerRadius="5"
+			        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0 10 0 0">
+					<controls:CommandTextBox Name="CommandTextBox" CommandSubmitted="OnCommandSubmit"/>
+			</Border>
+			
+			<!-- Console -->
+			<Border Background="Black" BorderBrush="{StaticResource SystemAccentColor}"
+			        BorderThickness="1" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+				<controls:StatusMessageViewer Name="ConsoleViewer" Limit="1000"/>
+			</Border>
+			
 		</DockPanel>
 		
-		<!-- Footer - command input row -->
-		<Border DockPanel.Dock="Bottom" CornerRadius="5"
-		        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0 10 0 0">
-				<controls:ConsoleCommandTextBox Name="CommandTextBox" CommandSubmitted="OnCommandSubmit"/>
-		</Border>
-		
-		<!-- Console -->
-		<Border Background="Black" BorderBrush="{StaticResource SystemAccentColor}"
-		        BorderThickness="1" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-			<controls:StatusMessageViewer Name="ConsoleViewer" Limit="1000"/>
-		</Border>
-		
-	</DockPanel>
+	</SplitView>
 	
 </UserControl>

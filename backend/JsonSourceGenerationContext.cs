@@ -5,6 +5,7 @@ namespace SCLauncher.backend;
 
 [JsonSourceGenerationOptions(UseStringEnumConverter = true)]
 [JsonSerializable(typeof(GlobalConfiguration))]
+[JsonSerializable(typeof(ServerConfiguration))]
 internal partial class JsonSourceGenerationContext : JsonSerializerContext
 {
 	

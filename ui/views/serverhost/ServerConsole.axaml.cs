@@ -80,9 +80,10 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 
 	private void OnServerStateChanged(object? sender, bool running)
 	{
+		var hostname = backend.GetServerConfig().Hostname;
 		Dispatcher.UIThread.Post(() =>
 		{
-			StatusIndicatorLabel.Content = running ? "Online" : "Offline";
+			StatusIndicatorLabel.Content = running ? "Online - " + hostname : "Offline";
 			StatusIndicator.Classes.Replace([running ? "online" : "offline"]);
 			StartButton.IsVisible = !running;
 			StopButton.IsVisible = running;
@@ -93,11 +94,12 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	{
 		if (string.IsNullOrWhiteSpace(text))
 		{
-			ConsoleViewer.AddMessage(new StatusMessage(string.Empty));
+			ConsoleViewer.AddMessage(new StatusMessage(string.Empty), jumpScroll: true);
 		}
 		else
 		{
 			svController.Command(text);
+			ConsoleViewer.ScrollToEnd();
 		}
 	}
 
@@ -124,7 +126,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 
 		try
 		{
-			if (clController.ConnectToServer(localIp + ":" + analyzer.ServerPort))
+			if (clController.ConnectToServer(localIp + ":" + analyzer.ServerPort, backend.GetServerConfig().Password))
 			{
 				ShowSuccess("Joining local server...");
 			}
@@ -150,7 +152,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 			}
 
 			var link = SteamUtils.GetConnectLink(analyzer.PublicIp + ":" + analyzer.ServerPort,
-				backend.ActiveApp.GameAppId);
+				backend.ActiveApp.GameAppId, backend.GetServerConfig().Password);
 		
 			await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(link);
 			ShowSuccess("Public join link copied to clipboard.");
@@ -211,6 +213,21 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		{
 			hs.GoToServerInstallWizard();
 		}
+	}
+
+	private void OnMenuConfigureServerClicked(object? sender, RoutedEventArgs args)
+	{
+		ConfiguratorView.IsPaneOpen = !ConfiguratorView.IsPaneOpen;
+	}
+	
+	private void OnConfiguratorCloseClicked(object? sender, RoutedEventArgs e)
+	{
+		ConfiguratorView.IsPaneOpen = false;
+	}
+	
+	private void OnConfiguratorResetClicked(object? sender, RoutedEventArgs e)
+	{
+		ServerConfigurator.ResetToDefaults();
 	}
 
 	private void ShowSuccess(string msg)

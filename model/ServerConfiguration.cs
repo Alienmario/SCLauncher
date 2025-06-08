@@ -1,10 +1,18 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace SCLauncher.model;
 
 public partial class ServerConfiguration : INotifyPropertyChanged
 {
+
+	public string? ServerCfgFile { get; set; } = "coop.cfg";
+
+	public string? Hostname { get; set; } = "SourceCoop #" + Random.Shared.Next(1000, 9999);
+	
+	public string? Password { get; set; }
 	
 	public string? StartMap { get; set; }
 
@@ -20,7 +28,13 @@ public partial class ServerConfiguration : INotifyPropertyChanged
 	
 	public bool? Teamplay { get; set; }
 
-	public Dictionary<string, string> ExtraParams { get; set; } = [];
+	public record CustomParam
+	{
+		public string Key { get; set; } = string.Empty;
+		public string Value { get; set; } = string.Empty;
+	}
+
+	public ObservableCollection<CustomParam> CustomParams { get; set; } = [];
 
 	public List<string> ToLaunchParams()
 	{
@@ -37,29 +51,42 @@ public partial class ServerConfiguration : INotifyPropertyChanged
 		if (StrictPortBind)
 			list.Add("-strictportbind");
 		
-		foreach ((string key, string value) in ExtraParams)
+		foreach (CustomParam p in CustomParams)
 		{
-			if (!key.StartsWith('+'))
-				list.AddRange([key, value]);
+			if (!p.Key.StartsWith('+'))
+			{
+				list.Add(p.Key);
+				if (!string.IsNullOrWhiteSpace(p.Value))
+					list.Add(p.Value);
+			}
 		}
 		
 		// + params now
 		
-		if (Teamplay != null)
-			list.AddRange(["+mp_teamplay", Teamplay.Value ? "1" : "0"]);
+		if (ServerCfgFile != null)
+			list.AddRange(["+servercfgfile", ServerCfgFile]);
+		
+		if (Hostname != null)
+			list.AddRange(["+hostname", Hostname]);
+		
+		if (Password != null)
+			list.AddRange(["+sv_password", Password]);
 		
 		if (Lan)
 			list.AddRange(["+sv_lan", "1"]);
 		
 		list.AddRange(["+maxplayers", Maxplayers.ToString()]);
 
+		if (Teamplay != null)
+			list.AddRange(["+mp_teamplay", Teamplay.Value ? "1" : "0"]);
+
 		if (StartMap != null)
 			list.AddRange(["+map", StartMap]);
 		
-		foreach ((string key, string value) in ExtraParams)
+		foreach (CustomParam p in CustomParams)
 		{
-			if (key.StartsWith('+'))
-				list.AddRange([key, value]);
+			if (p.Key.StartsWith('+'))
+				list.AddRange([p.Key, p.Value]);
 		}
 		
 		return list;

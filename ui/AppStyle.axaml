@@ -12,6 +12,7 @@
 	</Styles.Resources>
 	
 	<!-- Fix icon buttons -->
+	
 	<Style Selector="Button:disabled PathIcon">
 		<Setter Property="Foreground" Value="{DynamicResource ButtonForegroundDisabled}"/>
 	</Style>
@@ -19,11 +20,52 @@
 		<Setter Property="Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselectedPointerOver}"/>
 	</Style>
 	
+	<!-- Utility classes -->
+	
 	<Style Selector="Border.DashedUnderline">
 		<Setter Property="BorderThickness" Value="0 0 0 0.75"/>
 		<Setter Property="BorderBrush" Value="{StaticResource DashedLineBrush}"/>
 		<Setter Property="Margin" Value="6 0 6 10"/>
 		<Setter Property="VerticalAlignment" Value="Bottom"/>
+	</Style>
+	
+	<Style Selector="Button.Transparent">
+		<Setter Property="Background" Value="Transparent"/>
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="^:pressed /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+	</Style>
+	
+	<Style Selector="Button.Grow">
+		<Style Selector="^ > :is(Control) > :is(Control)">
+			<Setter Property="Transitions">
+				<Transitions>
+					<TransformOperationsTransition Easing="CubicEaseOut" Property="RenderTransform" Duration="0.3"/>
+				</Transitions>
+			</Setter>
+		</Style>
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="RenderTransform" Value="scale(1.2)"/>
+		</Style>
+	</Style>
+	
+	<Style Selector="Button.Skew">
+		<Style Selector="^ > :is(Control) > :is(Control)">
+			<Setter Property="Transitions">
+				<Transitions>
+					<TransformOperationsTransition Easing="CubicEaseOut" Property="RenderTransform" Duration="0.3"/>
+				</Transitions>
+			</Setter>
+		</Style>
+		<Style Selector="^:pointerover > :is(Control) > :is(Control)">
+			<Setter Property="RenderTransform" Value="skew(-25deg)"/>
+		</Style>
+		<Style Selector="^:pressed > :is(Control) > :is(Control)">
+			<Setter Property="RenderTransform" Value="scale(0.6) skew(-25deg)"/>
+		</Style>
 	</Style>
 	
 </Styles>

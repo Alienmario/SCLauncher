@@ -7,15 +7,25 @@ using SCLauncher.model;
 
 namespace SCLauncher.backend.service;
 
-public class BackendService(GlobalConfiguration config, PersistenceService persistence)
+public class BackendService
 {
-	private AppInfo? activeApp;
-
 	public AppInfo ActiveApp => activeApp!;
 
-	public void Initialize()
+	private AppInfo? activeApp;
+	private readonly GlobalConfiguration globalConfig;
+	private readonly PersistenceService persistence;
+	private ServerConfiguration? serverConfig;
+
+	public BackendService(GlobalConfiguration globalConfig, PersistenceService persistence)
 	{
-		persistence.Bind("config", config, JsonSourceGenerationContext.Default);
+		this.globalConfig = globalConfig;
+		this.persistence = persistence;
+		Initialize();
+	}
+
+	private void Initialize()
+	{
+		persistence.Bind("config", globalConfig, JsonSourceGenerationContext.Default);
 		
 		activeApp = new AppInfo
 		{
@@ -38,17 +48,27 @@ public class BackendService(GlobalConfiguration config, PersistenceService persi
 			var steamDir = SteamUtils.FindSteamInstallDir();
 			if (steamDir != null)
 			{
-				config.SteamPath = steamDir;
+				globalConfig.SteamPath = steamDir;
 
-				if (!Directory.Exists(config.GamePath))
-					config.GamePath = await SteamUtils.FindAppPathAsync(steamDir, ActiveApp.GameAppId)
-					                  ?? config.GamePath;
+				if (!Directory.Exists(globalConfig.GamePath))
+					globalConfig.GamePath = await SteamUtils.FindAppPathAsync(steamDir, ActiveApp.GameAppId)
+					                  ?? globalConfig.GamePath;
 
-				if (!Directory.Exists(config.ServerPath))
-					config.ServerPath = await SteamUtils.FindAppPathAsync(steamDir, ActiveApp.ServerAppId)
-					                    ?? config.ServerPath;
+				if (!Directory.Exists(globalConfig.ServerPath))
+					globalConfig.ServerPath = await SteamUtils.FindAppPathAsync(steamDir, ActiveApp.ServerAppId)
+					                    ?? globalConfig.ServerPath;
 			}
 		}).Wait();
+	}
+
+	public ServerConfiguration GetServerConfig(bool reset = false)
+	{
+		if (serverConfig != null && !reset)
+			return serverConfig;
+		
+		serverConfig = ActiveApp.NewServerConfig();
+		persistence.Bind("server_" + ActiveApp.ModFolder, serverConfig, JsonSourceGenerationContext.Default, !reset);
+		return serverConfig;
 	}
 
 }

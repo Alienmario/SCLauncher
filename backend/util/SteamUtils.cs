@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Gameloop.Vdf;
@@ -34,18 +35,23 @@ public static class SteamUtils
 		});
 	}
 
-	public static void ConnectToServer(string address, int appId)
+	public static void ConnectToServer(string address, int appId, string? password = null)
 	{
-		Process.Start(new ProcessStartInfo(GetConnectLink(address, appId))
+		Process.Start(new ProcessStartInfo(GetConnectLink(address, appId, password))
 		{
 			UseShellExecute = true,
 			Verb = "open"
 		});
 	}
 
-	public static string GetConnectLink(string address, int appId)
+	public static string GetConnectLink(string address, int appId, string? password = null)
 	{
-		return $"steam://connect/{address}?appid={appId}";
+		return new StringBuilder()
+			.Append("steam://connect/")
+			.Append(address)
+			.Append(!string.IsNullOrEmpty(password) ? "/" + password : null)
+			.Append("?appid=").Append(appId)
+			.ToString();
 	}
 	
 	public static async Task<SteamAppManifest?> FindAppManifestAsync(string steamDir, int appId, CancellationToken ct = default)

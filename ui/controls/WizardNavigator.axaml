@@ -29,7 +29,11 @@
 				</Button>
 			</DockPanel>
 		</Border>
-		<Border Name="ContentArea"/>
+		<TransitioningContentControl Name="ContentArea">
+			<TransitioningContentControl.PageTransition>
+				<CrossFade Duration="0:00:00.150" />
+			</TransitioningContentControl.PageTransition>
+		</TransitioningContentControl>
 	</DockPanel>
 	
 </UserControl>

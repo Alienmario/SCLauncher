@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -33,7 +32,7 @@ public class PersistenceService
 		}
 		catch (Exception e)
 		{
-			Debug.WriteLine(e);
+			e.Log();
 		}
 		
 		if (string.IsNullOrWhiteSpace(dir))
@@ -49,7 +48,7 @@ public class PersistenceService
 		}
 		catch (Exception e)
 		{
-			Debug.WriteLine(e);
+			e.Log();
 		}
 		
 		AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
@@ -62,7 +61,7 @@ public class PersistenceService
 
 	public void Bind(string name, object instance, JsonSerializerContext? context = null, bool loadNow = true)
 	{
-	    persistedObjects.Add(name, (instance, context));
+	    persistedObjects[name] = (instance, context);
 		if (loadNow)
 		{
 	        LoadAndMerge(name, instance, context);
@@ -108,7 +107,7 @@ public class PersistenceService
 		}
 		catch (Exception e)
 		{
-			Debug.WriteLine(e);
+			e.Log();
 			return false;
 		}
 	}
@@ -138,7 +137,7 @@ public class PersistenceService
 		}
 		catch (Exception e)
 		{
-			Debug.WriteLine(e);
+			e.Log();
 			return null;
 		}
 	}

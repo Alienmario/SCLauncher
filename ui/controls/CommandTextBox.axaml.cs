@@ -8,7 +8,7 @@ using SCLauncher.ui.util;
 
 namespace SCLauncher.ui.controls;
 
-public partial class ConsoleCommandTextBox : TextBox
+public partial class CommandTextBox : TextBox
 {
 	protected override Type StyleKeyOverride => typeof(TextBox);
 	
@@ -17,7 +17,7 @@ public partial class ConsoleCommandTextBox : TextBox
     
 	public event EventHandler<string?>? CommandSubmitted;
 
-	public ConsoleCommandTextBox()
+	public CommandTextBox()
 	{
 		InitializeComponent();
 		KeyBindings.Add(new KeyBinding { Gesture = new KeyGesture(Key.Up), Command = MoveToPreviousCommand });

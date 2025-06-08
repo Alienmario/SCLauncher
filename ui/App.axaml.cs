@@ -3,7 +3,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using SCLauncher.backend;
-using SCLauncher.backend.service;
 using SCLauncher.ui.views;
 
 namespace SCLauncher.ui;
@@ -24,8 +23,6 @@ public partial class App : Application
 		services.AddBackendServices();
 		services.AddUIServices();
 		this.services = services.BuildServiceProvider();
-		
-		GetService<BackendService>().Initialize();
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{

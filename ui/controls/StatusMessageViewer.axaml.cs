@@ -24,8 +24,10 @@ public partial class StatusMessageViewer : UserControl
 			DataContext = [];
 	}
 
-	public void AddMessage(StatusMessage message, bool scroll = true)
+	public void AddMessage(StatusMessage message, bool scroll = true, bool jumpScroll = false)
 	{
+		bool wasScrolledToMax = Scroller.Offset.NearlyEquals(Scroller.ScrollBarMaximum);
+		
 		if (DataContext != null)
 		{
 			DataContext.Add(message);
@@ -34,13 +36,17 @@ public partial class StatusMessageViewer : UserControl
 				DataContext.RemoveAt(0);
 			}
 		}
-		if (scroll && Scroller.Offset.NearlyEquals(Scroller.ScrollBarMaximum))
+		
+		if (scroll && (jumpScroll || wasScrolledToMax))
 		{
-			Scroller.ScrollToEnd();
+			UpdateLayout();
+			ScrollToEnd();
 		}
 	}
 
 	public void Clear() => DataContext?.Clear();
+	
+	public void ScrollToEnd() => Scroller.ScrollToEnd();
 
 	private void Message_PointerTapped(object? sender, TappedEventArgs args)
 	{

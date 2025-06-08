@@ -15,6 +15,17 @@ public class DServerInstallParams : ServerInstallParams
 	}
 }
 
+public class DServerConfiguration : ServerConfiguration
+{
+	public DServerConfiguration()
+	{
+		Teamplay = true;
+		StartMap = "bm_c0a0a";
+		CustomParams.Add(new CustomParam { Key = "key1", Value = "value1" });
+		CustomParams.Add(new CustomParam { Key = "key2", Value = "value2" });
+	}
+}
+
 public class DAppInfo : AppInfo
 {
 	public static readonly DAppInfo Instance = new()
@@ -24,6 +35,7 @@ public class DAppInfo : AppInfo
 		GameInstallFolder = "Black Mesa",
 		ServerInstallFolder = "Black Mesa Dedicated Server",
 		ModFolder = "bms",
-		GameExecutable = new Dictionary<PlatformID, string>()
+		GameExecutable = new Dictionary<PlatformID, string>(),
+		DefaultServerConfigProvider = () => new DServerConfiguration()
 	};
 }

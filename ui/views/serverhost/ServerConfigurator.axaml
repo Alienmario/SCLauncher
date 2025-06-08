@@ -1,0 +1,105 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:model="clr-namespace:SCLauncher.model"
+             xmlns:design="clr-namespace:SCLauncher.ui.design"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300"
+             x:Class="SCLauncher.ui.views.serverhost.ServerConfigurator"
+             x:DataType="model:ServerConfiguration"
+             Margin="0 2">
+
+	<Design.DataContext>
+		<design:DServerConfiguration/>
+	</Design.DataContext>
+	
+	<UserControl.Styles>
+		<Style Selector="TextBlock">
+			<Setter Property="TextTrimming" Value="{x:Static TextTrimming.CharacterEllipsis}"/>
+		</Style>
+		<Style Selector="TextBox">
+			<Setter Property="TextWrapping" Value="Wrap"/>
+		</Style>
+	</UserControl.Styles>
+	
+	<DockPanel>
+		<StackPanel DockPanel.Dock="Top">
+			<TextBlock Text="Server options" FontSize="14" LetterSpacing="1"
+			           Margin="8 0 8 0"
+			           Foreground="{DynamicResource ButtonForeground}"/>
+			<Border Opacity="0.5" BorderBrush="{DynamicResource ButtonBackground}" BorderThickness=".5" Margin="0 4 0 0"/>
+		</StackPanel>
+		
+		<ScrollViewer AllowAutoHide="False">
+			<StackPanel Margin="8 8 8 0">
+				<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*" ColumnDefinitions="Auto,*"
+				      RowSpacing="5" ColumnSpacing="8">
+					
+					<TextBlock Grid.Row="0" Grid.Column="0" Text="Hostname:" VerticalAlignment="Center"/>
+					<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Hostname}"/>
+					
+					<TextBlock Grid.Row="1" Grid.Column="0" Text="Password:" VerticalAlignment="Center"/>
+					<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Password}"/>
+					
+					<TextBlock Grid.Row="2" Grid.Column="0" Text="Start Map:" VerticalAlignment="Center"/>
+					<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding StartMap}"/>
+					
+					<TextBlock Grid.Row="3" Grid.Column="0" Text="Max Players:" VerticalAlignment="Center"/>
+					<NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding Maxplayers}" Minimum="2" Maximum="255" FormatString="0"/>
+				    
+					<TextBlock Grid.Row="4" Grid.Column="0" Text="Config file:" VerticalAlignment="Center"/>
+					<TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ServerCfgFile}"/>
+					
+				    <TextBlock Grid.Row="5" Grid.Column="0" Text="Local IP:" VerticalAlignment="Center"/>
+				    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Ip}"/>
+				    
+				    <TextBlock Grid.Row="6" Grid.Column="0" Text="Port:" VerticalAlignment="Center"/>
+				    <NumericUpDown Grid.Row="6" Grid.Column="1" Value="{Binding Port}" Minimum="1" Maximum="65535" FormatString="0"/>
+				    
+				    <TextBlock Grid.Row="7" Grid.Column="0" Text="Strict Port Bind:" VerticalAlignment="Center"/>
+				    <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding StrictPortBind}"/>
+				    
+				    <TextBlock Grid.Row="8" Grid.Column="0" Text="LAN Mode:" VerticalAlignment="Center"/>
+				    <CheckBox Grid.Row="8" Grid.Column="1" IsChecked="{Binding Lan}"/>
+				    
+				    <TextBlock Grid.Row="9" Grid.Column="0" Text="Team Play:" VerticalAlignment="Center"/>
+				    <CheckBox Grid.Row="9" Grid.Column="1" IsChecked="{Binding Teamplay}"/>
+				
+				    <StackPanel Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Spacing="4">
+					    <TextBlock Text="╭ Custom Parameters ╮" HorizontalAlignment="Center" Margin="0 8 0 0"
+					               IsVisible="{Binding CustomParams.Count}"/>
+					    <ItemsControl ItemsSource="{Binding CustomParams}">
+						    <ItemsControl.ItemsPanel>
+							    <ItemsPanelTemplate>
+								    <StackPanel Spacing="4"/>
+							    </ItemsPanelTemplate>
+						    </ItemsControl.ItemsPanel>
+						    <ItemsControl.ItemTemplate>
+					            <DataTemplate>
+					                <Grid ColumnDefinitions="*,Auto,*">
+					                    <TextBox Text="{Binding Key}" Grid.Column="0" Classes="CustomParamKey"
+					                             Watermark="Parameter"
+					                             LostFocus="OnCustomParamTextLostFocus"/>
+					                    <TextBlock Text=" = " Grid.Column="1" VerticalAlignment="Center"/>
+					                    <TextBox Text="{Binding Value}" Grid.Column="2" Classes="CustomParamVal"
+					                             Watermark="Value"
+					                             LostFocus="OnCustomParamTextLostFocus"/>
+					                </Grid>
+					            </DataTemplate>
+					        </ItemsControl.ItemTemplate>
+					    </ItemsControl>
+					    <TextBlock FontSize="12" xml:space="preserve" HorizontalAlignment="Center"
+					               IsVisible="{Binding CustomParams.Count}"
+					               Foreground="{DynamicResource TextControlForegroundFocused}">
+Start with - (dash) for launch parameters
+Start with + (plus) for console commands
+						</TextBlock>
+					    <Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Focusable="False"
+					            Content="Add new parameter" Click="AddNewParameterClicked" Name="AddParameterButton"/>
+				    </StackPanel>
+					
+				</Grid>
+			</StackPanel>
+		</ScrollViewer>
+	</DockPanel>
+</UserControl>
