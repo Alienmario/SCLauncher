@@ -16,6 +16,7 @@
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.3.0" />
 		<PackageReference Include="Avalonia.Desktop" Version="11.3.0" />
+		<PackageReference Include="Avalonia.Svg.Skia" Version="11.2.7" />
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0" />
 		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0" />
 		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
@@ -33,9 +34,7 @@
 		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" PrivateAssets="All" />
 		<PackageReference Include="Gameloop.Vdf" Version="0.6.2" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
-		<PackageReference Include="SkiaSharp" Version="3.116.1" />
-		<PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.116.1" />
-		<PackageReference Include="Svg.Controls.Skia.Avalonia" Version="11.3.0.1" />
+		<PackageReference Include="SkiaSharp" Version="2.88.9" />
 	</ItemGroup>
 
 	<ItemGroup>
