@@ -228,6 +228,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	private void OnConfiguratorResetClicked(object? sender, RoutedEventArgs e)
 	{
 		ServerConfigurator.ResetToDefaults();
+		ResetServerConfigButton?.Flyout?.Hide();
 	}
 
 	private void ShowSuccess(string msg)

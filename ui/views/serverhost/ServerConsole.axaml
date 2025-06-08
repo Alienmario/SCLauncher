@@ -61,9 +61,18 @@
 				        BorderThickness="1" CornerRadius="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 					<Panel>
 						<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-							<Button Classes="Transparent Grow" ZIndex="1" Click="OnConfiguratorResetClicked">
-								<PathIcon Data="{StaticResource arrow_undo_regular}" Height="10" Width="10"
-								           Foreground="Firebrick"/>
+							<Button Classes="Transparent Grow" ZIndex="1" Name="ResetServerConfigButton">
+								<PathIcon Data="{StaticResource arrow_undo_regular}"
+								          Height="10" Width="10" Foreground="Firebrick"/>
+								<Button.Flyout>
+									<Flyout Placement="BottomEdgeAlignedRight" HorizontalOffset="12">
+										<StackPanel>
+											<Label>Do you want to reset all options?</Label>
+											<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+											        Content="OK" Click="OnConfiguratorResetClicked"/>
+										</StackPanel>
+									</Flyout>
+								</Button.Flyout>
 							</Button>
 							<Button Classes="Transparent Grow" ZIndex="1" Click="OnConfiguratorCloseClicked">
 								<PathIcon Data="{StaticResource dismiss_regular}" Height="10" Width="10"/>
