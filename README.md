@@ -5,13 +5,11 @@
 > Currently supports Black Mesa only.
 
 ## Features
-### Install game server - including necessary dependencies
+### Install game server - Including necessary dependencies
 <img src=".github/img/scl-installserver.png" width="700">
 
-### Host game server
+### Host & configure game server
 <img src=".github/img/scl-hostserver.png" width="700">
-
-### Configure game server
 
 ## Planned features
 - Built-in tunneling (playit.gg or alternatives)
