@@ -20,6 +20,12 @@ jobs:
       artifact: SCLauncher-${{ github.event.release.tag_name }}-${{ matrix.platform }}${{ contains(matrix.platform, 'linux') && '.tar.gz' || '.zip' }}
 
     steps:
+    - name: Process version
+      id: get_version
+      env:
+          TAG: ${{ github.event.release.tag_name }}
+      run: echo "version=${TAG#v}" >> $GITHUB_OUTPUT
+        
     - name: Checkout
       uses: actions/checkout@v4
     
@@ -29,7 +35,7 @@ jobs:
         dotnet-version: 9.0.x
     
     - name: Build
-      run: dotnet publish -c ${{ matrix.configuration }} -r ${{ matrix.platform }} -o out -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true
+      run: dotnet publish -c ${{ matrix.configuration }} -r ${{ matrix.platform }} -o out --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true -p:AssemblyVersion=${{ steps.get_version.outputs.version }} -p:Version=${{ steps.get_version.outputs.version }}
     
     - name: Create archive (windows)
       if: contains(matrix.platform, 'win')
