@@ -5,6 +5,7 @@
              xmlns:model="clr-namespace:SCLauncher.model"
              xmlns:converters="clr-namespace:SCLauncher.ui.converters"
              xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
+             xmlns:controls="clr-namespace:SCLauncher.ui.controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="150"
              x:Class="SCLauncher.ui.controls.StatusMessageViewer"
              x:DataType="{x:Type objectModel:ObservableCollection, x:TypeArguments=model:StatusMessage}">
@@ -82,8 +83,9 @@
 				<DataTemplate x:DataType="model:StatusMessage">
 					<DockPanel>
 						<TextBlock Text="{Binding Time, StringFormat='HH:mm:ss'}"
+						           IsVisible="{Binding $parent[controls:StatusMessageViewer].DisplayTime}"
 						           Margin="0 0 5 0"
-						           Foreground="LightGray" 
+						           Foreground="LightGray"
 						           FontFamily="Consolas, Courier New, monospace"/>
 						
 						<SelectableTextBlock

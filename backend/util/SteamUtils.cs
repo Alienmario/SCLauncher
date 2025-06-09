@@ -35,6 +35,15 @@ public static class SteamUtils
 		});
 	}
 
+	public static void UninstallApp(int appId)
+	{
+		Process.Start(new ProcessStartInfo("steam://uninstall/" + appId)
+		{
+			UseShellExecute = true,
+			Verb = "open"
+		});
+	}
+
 	public static void ConnectToServer(string address, int appId, string? password = null)
 	{
 		Process.Start(new ProcessStartInfo(GetConnectLink(address, appId, password))

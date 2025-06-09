@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -8,10 +9,19 @@ namespace SCLauncher.ui.controls;
 
 public partial class StatusMessageViewer : UserControl
 {
+	public static readonly StyledProperty<bool> DisplayTimeProperty =
+		AvaloniaProperty.Register<StatusMessageViewer, bool>(nameof(DisplayTime), defaultValue: true);
+	
 	public new ObservableCollection<StatusMessage>? DataContext
 	{
 		get => (ObservableCollection<StatusMessage>?) base.DataContext;
 		set => base.DataContext = value;
+	}
+
+	public bool DisplayTime
+	{
+		get => GetValue(DisplayTimeProperty);
+		set => SetValue(DisplayTimeProperty, value);
 	}
 
 	public int Limit { get; set; } = int.MaxValue;

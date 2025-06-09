@@ -215,6 +215,11 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		}
 	}
 
+	private void OnMenuToggleTimeDisplayClicked(object? sender, RoutedEventArgs args)
+	{
+		ConsoleViewer.DisplayTime = !ConsoleViewer.DisplayTime;
+	}
+	
 	private void OnMenuConfigureServerClicked(object? sender, RoutedEventArgs args)
 	{
 		ConfiguratorSplitView.IsPaneOpen = !ConfiguratorSplitView.IsPaneOpen;

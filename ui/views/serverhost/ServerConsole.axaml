@@ -109,6 +109,9 @@
 								<MenuItem Header="-"/>
 								<MenuItem Header="Configure server" Click="OnMenuConfigureServerClicked"/>
 								<MenuItem Header="-"/>
+								<MenuItem Header="Show time in console" ToggleType="CheckBox" StaysOpenOnClick="True"
+								          Click="OnMenuToggleTimeDisplayClicked"
+								          IsChecked="{Binding #ConsoleViewer.DisplayTime}"/>
 								<MenuItem Header="Browse server files" Click="OnMenuBrowseServerFolderClicked"/>
 								<MenuItem Header="Installer" Click="OnMenuInstallerClicked"/>
 							</MenuFlyout>
@@ -126,7 +129,7 @@
 			<!-- Console -->
 			<Border Background="Black" BorderBrush="{StaticResource SystemAccentColor}"
 			        BorderThickness="1" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-				<controls:StatusMessageViewer Name="ConsoleViewer" Limit="1000"/>
+				<controls:StatusMessageViewer Name="ConsoleViewer" Limit="1000" DisplayTime="False"/>
 			</Border>
 			
 		</DockPanel>
