@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Octokit;
 using SCLauncher.backend.install;
+using SCLauncher.backend.util;
 using SCLauncher.model;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
@@ -63,36 +64,51 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 		}
 	}
 	
-	public Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
+	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
 		CancellationToken cancellationToken = default)
 	{
 		string scPlugin = Path.Join(ctx.AddonsDir, "sourcemod", "plugins", "srccoop.smx");
 		if (!File.Exists(scPlugin))
 		{
-			return Task.FromResult(ComponentInfo.ReadyToInstall);
+			return ComponentInfo.ReadyToInstall;
 		}
 
+		string? localVersion = null;
 		string? upgradeVersion = null;
 		if (checkForUpgrades)
 		{
 			try
 			{
-				// ToDo
-				// Release release = await GetLatestRelease();
-				// string releaseVersion = release.TagName;
+				var pluginInfo = SourcemodPluginAnalyzer.Analyze(scPlugin);
+				localVersion = pluginInfo.MyInfo.Version;
+				if (localVersion != null)
+				{
+					if (!localVersion.StartsWith('v'))
+						localVersion = "v" + localVersion;
+					
+					Release release = await GetLatestRelease();
+					string releaseVersion = release.TagName;
+					
+					Trace.WriteLine($"Checking SourceCoop version [Local: {localVersion}, Release: {releaseVersion}]");
+					if (VersionUtils.SmartCompare(localVersion, releaseVersion) < 0)
+					{
+						upgradeVersion = releaseVersion;
+					}
+				}
 			}
-			catch (ApiException e)
+			catch (Exception e)
 			{
-				Trace.WriteLine(e);
+				e.Log();
 			}
 		}
 
-		return Task.FromResult(new ComponentInfo
+		return new ComponentInfo
 		{
 			Path = scPlugin,
 			Upgradable = upgradeVersion != null,
-			UpgradeVersion = upgradeVersion
-		});
+			UpgradeVersion = upgradeVersion,
+			Version = localVersion
+		};
 	}
 
 	private Task<Release> GetLatestRelease()
