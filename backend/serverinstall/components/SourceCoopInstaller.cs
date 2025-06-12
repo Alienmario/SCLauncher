@@ -21,7 +21,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 	public ServerInstallComponent ComponentType => ServerInstallComponent.SourceCoop;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
-		[EnumeratorCancellation] CancellationToken cancellationToken)
+		[EnumeratorCancellation] CancellationToken ct)
 	{
 		Release release;
 		try
@@ -40,7 +40,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 		
 		try
 		{
-			await helper.DownloadAsync(dl.url, archivePath, cancellationToken);
+			await helper.DownloadAsync(dl.url, archivePath, ct);
 		}
 		catch (Exception e)
 		{
@@ -52,7 +52,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 		
 		try
 		{
-			await helper.ExtractAsync(archivePath, ctx.GameModDir, true, cancellationToken);
+			await helper.ExtractAsync(archivePath, ctx.GameModDir, true, ct);
 		}
 		catch (Exception e)
 		{
@@ -64,8 +64,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 		}
 	}
 	
-	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
-		CancellationToken cancellationToken = default)
+	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades, CancellationToken ct = default)
 	{
 		string scPlugin = Path.Join(ctx.AddonsDir, "sourcemod", "plugins", "srccoop.smx");
 		if (!File.Exists(scPlugin))
@@ -83,16 +82,16 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 				localVersion = pluginInfo.MyInfo.Version;
 				if (localVersion != null)
 				{
-					if (!localVersion.StartsWith('v'))
-						localVersion = "v" + localVersion;
-					
 					Release release = await GetLatestRelease();
-					string releaseVersion = release.TagName;
+					string latestVersion = release.TagName;
 					
-					Trace.WriteLine($"Checking SourceCoop version [Local: {localVersion}, Release: {releaseVersion}]");
-					if (VersionUtils.SmartCompare(localVersion, releaseVersion) < 0)
+					if (latestVersion.StartsWith('v'))
+						latestVersion = latestVersion[1..];
+					
+					Trace.WriteLine($"Checking SourceCoop version [Local: {localVersion}, Latest: {latestVersion}]");
+					if (VersionUtils.SmartCompare(localVersion, latestVersion) < 0)
 					{
-						upgradeVersion = releaseVersion;
+						upgradeVersion = latestVersion;
 					}
 				}
 			}

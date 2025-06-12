@@ -21,7 +21,7 @@ public class SrcdsFixInstaller : IServerComponentInstaller<ComponentInfo>
 	public ServerInstallComponent ComponentType => ServerInstallComponent.SrcdsFix;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
-		[EnumeratorCancellation] CancellationToken cancellationToken)
+		[EnumeratorCancellation] CancellationToken ct)
 	{
 		string executable = GetExecForCurrentPlatform();
 		await using Stream? stream = Assembly.GetExecutingAssembly()
@@ -33,12 +33,12 @@ public class SrcdsFixInstaller : IServerComponentInstaller<ComponentInfo>
 
 		string exePath = Path.Join(ctx.InstallDir, executable);
 		await using var fileStream = new FileStream(exePath, FileMode.OpenOrCreate);
-		await stream.CopyToAsync(fileStream, cancellationToken);
+		await stream.CopyToAsync(fileStream, ct);
 		yield break;
 	}
 
 	public Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
-		CancellationToken cancellationToken = default)
+		CancellationToken ct = default)
 	{
 		string execPath;
 		try

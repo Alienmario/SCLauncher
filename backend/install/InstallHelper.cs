@@ -64,8 +64,15 @@ public class InstallHelper(HttpClient httpClient)
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
-			var versionInfo = FileVersionInfo.GetVersionInfo(filename);
-			return versionInfo.ProductVersion;
+			try
+			{
+				var versionInfo = FileVersionInfo.GetVersionInfo(filename);
+				return versionInfo.ProductVersion;
+			}
+			catch (FileNotFoundException)
+			{
+				return null;
+			}
 		}
 		throw new PlatformNotSupportedException();
 	}

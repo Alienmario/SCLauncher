@@ -10,9 +10,9 @@ public interface IComponentInstaller<TComponentInfo, TInstallContext> where TCom
 {
 	
 	/// The async-enumerable component installer
-	public IAsyncEnumerable<StatusMessage> Install(TInstallContext ctx, CancellationToken cancellationToken);
+	public IAsyncEnumerable<StatusMessage> Install(TInstallContext ctx, CancellationToken ct);
 	
 	/// Returns information about current installation of the component and whether it can be installed/upgraded.
-	public Task<TComponentInfo> GatherInfoAsync(TInstallContext ctx, bool checkForUpgrades, CancellationToken cancellationToken = default);
+	public Task<TComponentInfo> GatherInfoAsync(TInstallContext ctx, bool checkForUpgrades, CancellationToken ct = default);
 	
 }

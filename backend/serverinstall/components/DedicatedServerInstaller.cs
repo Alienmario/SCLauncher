@@ -18,15 +18,15 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 	
 	public ServerInstallComponent ComponentType => ServerInstallComponent.Server;
 	
-	public IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx, CancellationToken cancellationToken = default)
+	public IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx, CancellationToken ct = default)
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
-			return InstallViaSteamClient(ctx, cancellationToken);
+			return InstallViaSteamClient(ctx, ct);
 		}
 		else
 		{
-			return InstallViaDepotDownloader(ctx, cancellationToken);
+			return InstallViaDepotDownloader(ctx, ct);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 	}
 	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
-		CancellationToken cancellationToken = default)
+		CancellationToken ct = default)
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
@@ -90,7 +90,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 			if (steamDir == null)
 				return ComponentInfo.ReadyToInstall;
 
-			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.AppInfo.ServerAppId, cancellationToken);
+			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.AppInfo.ServerAppId, ct);
 			if (manifest == null)
 				return ComponentInfo.ReadyToInstall;
 			
@@ -119,7 +119,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 					string steaminfPath = Path.Combine(dir, "steam.inf");
 					if (File.Exists(steaminfPath))
 					{
-						foreach (string line in await File.ReadAllLinesAsync(steaminfPath, cancellationToken))
+						foreach (string line in await File.ReadAllLinesAsync(steaminfPath, ct))
 						{
 							if (line.StartsWith("PatchVersion="))
 							{
