@@ -31,7 +31,7 @@ public class SteamAppManifest(VObject vObject, SteamLibrary library)
 		if (libraryPath == null || installDir == null)
 			return null;
 		
-		return Path.Combine(libraryPath, "steamapps", "common", installDir);
+		return Path.Join(libraryPath, "steamapps", "common", installDir);
 	}
 
 }

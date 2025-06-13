@@ -34,6 +34,15 @@ public static class SteamUtils
 			Verb = "open"
 		});
 	}
+	
+	public static void ValidateApp(int appId)
+	{
+		Process.Start(new ProcessStartInfo("steam://validate/" + appId)
+		{
+			UseShellExecute = true,
+			Verb = "open"
+		});
+	}
 
 	public static void UninstallApp(int appId)
 	{

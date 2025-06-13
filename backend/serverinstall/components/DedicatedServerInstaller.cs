@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -15,6 +16,10 @@ namespace SCLauncher.backend.serverinstall.components;
 
 public class DedicatedServerInstaller(GlobalConfiguration config) : IServerComponentInstaller<ComponentInfo>
 {
+	public class ServerComponentInfo : ComponentInfo
+	{
+		public bool Validate { get; init; }
+	}
 	
 	public ServerInstallComponent ComponentType => ServerInstallComponent.Server;
 	
@@ -31,7 +36,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 	}
 
 	public async IAsyncEnumerable<StatusMessage> InstallViaSteamClient(ServerInstallContext ctx,
-		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+		[EnumeratorCancellation] CancellationToken ct = default)
 	{
 		if (!SteamUtils.IsValidSteamInstallDir(config.SteamPath))
 		{
@@ -39,13 +44,19 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 		}
 
 		SteamUtils.InstallApp(ctx.Params.AppInfo.ServerAppId);
-		yield return new StatusMessage("Waiting for Steam to finish downloading");
+		yield return new StatusMessage($"Waiting for Steam to finish downloading \"{ctx.Params.AppInfo.ServerInstallFolder}\"");
 		
 		while (true)
 		{
-			await Task.Delay(1000, cancellationToken);
-			ComponentInfo info = await GatherInfoAsync(ctx, false, cancellationToken);
-			if (info.Installed)
+			await Task.Delay(1000, ct);
+			ComponentInfo info = await GatherInfoAsync(ctx, false, ct);
+			
+			if (info is ServerComponentInfo { Validate: true })
+			{
+				yield return new StatusMessage("Requesting Steam validation");
+				SteamUtils.ValidateApp(ctx.Params.AppInfo.ServerAppId);
+			}
+			else if (info.Installed)
 			{
 				config.ServerPath = info.Path;
 				break;
@@ -54,7 +65,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 	}
 
 	private async IAsyncEnumerable<StatusMessage> InstallViaDepotDownloader(ServerInstallContext ctx,
-		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+		[EnumeratorCancellation] CancellationToken ct = default)
 	{
 		var cfg = new AppDownloadConfig
 		{
@@ -67,7 +78,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 		await foreach ((string message, bool error) in SubProcess.AppDownload(cfg,
 			               i => exitCode = i,
 			               new UserConsoleAuthenticator(),
-			               cancellationToken))
+			               ct))
 		{
 			yield return new StatusMessage(message);
 		}
@@ -85,52 +96,47 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
-			// this is explicitly checked during install
 			string? steamDir = config.SteamPath;
-			if (steamDir == null)
+			if (steamDir == null) // this is explicitly handled during install
 				return ComponentInfo.ReadyToInstall;
 
 			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.AppInfo.ServerAppId, ct);
 			if (manifest == null)
 				return ComponentInfo.ReadyToInstall;
-			
-			// in-between states, passing ReadyToInstall is fine, nothing weird will happen
-			if (!manifest.StateFlags.HasFlag(SteamAppState.StateFullyInstalled))
-				return ComponentInfo.ReadyToInstall;
 
 			string? absInstallPath = manifest.GetAbsInstallPath();
 			if (absInstallPath == null)
 				return ComponentInfo.ReadyToInstall;
-
-			return new ComponentInfo
+			
+			bool fullyInstalled =
+				manifest.StateFlags.HasFlag(SteamAppState.StateFullyInstalled)
+				&& !manifest.StateFlags.HasFlag(SteamAppState.StateUpdateStarted);
+			
+			bool dirExists = Directory.Exists(absInstallPath);
+			
+			return new ServerComponentInfo
 			{
-				Path = absInstallPath
+				Installable = true,
+				Installed = fullyInstalled && dirExists,
+				Path = absInstallPath,
+				Validate = !dirExists
 			};
 		}
-		else
+		else // ServerInstallMethod.External
 		{
 			if (!Directory.Exists(ctx.InstallDir))
 				return ComponentInfo.ReadyToInstall;
 
 			string? version = null;
-			try {
-				foreach (string dir in Directory.EnumerateDirectories(ctx.InstallDir))
-				{
-					string steaminfPath = Path.Combine(dir, "steam.inf");
-					if (File.Exists(steaminfPath))
-					{
-						foreach (string line in await File.ReadAllLinesAsync(steaminfPath, ct))
-						{
-							if (line.StartsWith("PatchVersion="))
-							{
-								version = line["PatchVersion=".Length..];
-								break;
-							}
-						}
-					}
-				}
+			try
+			{
+				version = await GetLocalPatchVersionAsync(ctx.InstallDir, ct);
+				// int? latestBuildNumber = await GetLatestBuildNumberAsync(ctx.Params.AppInfo.ServerAppId, ct);
 			}
-			catch (IOException) {}
+			catch (Exception e)
+			{
+				e.Log();
+			}
 
 			// if we didn't find the version, installation may be incomplete
 			if (version == null)
@@ -144,4 +150,34 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 		}
 	}
 
+	private static async Task<string?> GetLocalPatchVersionAsync(string installDir, CancellationToken ct = default)
+	{
+		foreach (string dir in Directory.EnumerateDirectories(installDir))
+		{
+			string steaminfPath = Path.Combine(dir, "steam.inf");
+			if (File.Exists(steaminfPath))
+			{
+				foreach (string line in await File.ReadAllLinesAsync(steaminfPath, ct))
+				{
+					if (line.StartsWith("PatchVersion="))
+					{
+						return line["PatchVersion=".Length..];
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/*
+	private static async Task<int?> GetLatestBuildNumberAsync(int appId, CancellationToken ct = default)
+	{
+		int buildNumber = await SubProcess.GetAppBuildNumber(new GetAppBuildNumberConfig { AppId = (uint)appId },
+			cancellationToken: ct);
+		if (buildNumber <= 0)
+			return null;
+		return buildNumber;
+	}
+	*/
 }
