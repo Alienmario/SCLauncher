@@ -11,7 +11,16 @@ public class DServerInstallParams : ServerInstallParams
 	{
 		AppInfo = DAppInfo.Instance;
 		Method = ServerInstallMethod.External;
-		Path = @"C:\Program Files\Program Files\Program Files\Program Files\Program Files\Program Files";
+		Path = @"C:\Program Files\Program Files\Program Files\Program Files\Program Files\Program Files\Server";
+	}
+}
+
+public class DServerUninstallParams : ServerUninstallParams
+{
+	public DServerUninstallParams()
+	{
+		AppInfo = DAppInfo.Instance;
+		Path = @"C:\Program Files\Program Files\Program Files\Program Files\Program Files\Program Files\Server";
 	}
 }
 

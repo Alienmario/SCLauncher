@@ -20,14 +20,14 @@ public class OverviewComponentEntry
 	public bool InstallEditable { get; set; }
 }
 
-public partial class Overview : UserControl, WizardNavigator.IWizardContent
+public partial class InstallOverview : UserControl, WizardNavigator.IWizardContent
 {
 	
 	private WizardNavigator? Wizard { get; set; }
 	private CancellationTokenSource? PreparationCancelSrc { get; set; }
 	private ObservableCollection<OverviewComponentEntry> ComponentEntries { get; } = [];
 	
-	public Overview()
+	public InstallOverview()
 	{
 		InitializeComponent();
 

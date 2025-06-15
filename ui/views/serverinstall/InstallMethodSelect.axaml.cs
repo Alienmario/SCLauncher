@@ -5,11 +5,11 @@ using SCLauncher.ui.controls;
 
 namespace SCLauncher.ui.views.serverinstall;
 
-public partial class MethodSelect : UserControl, WizardNavigator.IWizardContent
+public partial class InstallMethodSelect : UserControl, WizardNavigator.IWizardContent
 {
 	public WizardNavigator? Wizard { get; set; }
 
-	public MethodSelect()
+	public InstallMethodSelect()
 	{
 		InitializeComponent();
 	}
@@ -39,11 +39,11 @@ public partial class MethodSelect : UserControl, WizardNavigator.IWizardContent
 
 		if (method == ServerInstallMethod.Steam)
 		{
-			Wizard?.SetContent(new Overview());
+			Wizard?.SetContent(new InstallOverview());
 		}
 		else
 		{
-			Wizard?.SetContent(new PathSelect());
+			Wizard?.SetContent(new InstallPathSelect());
 		}
 	}
 }

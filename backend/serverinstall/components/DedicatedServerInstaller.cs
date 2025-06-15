@@ -150,6 +150,50 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 		}
 	}
 
+	public async IAsyncEnumerable<StatusMessage> Uninstall(ServerUninstallContext ctx,
+		[EnumeratorCancellation] CancellationToken ct = default)
+	{
+		bool steamRequestDispatched = false;
+		
+		do
+		{
+			string? steamDir = config.SteamPath;
+			if (steamDir == null)
+				yield break;
+			
+			var manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.AppInfo.ServerAppId, ct);
+			if (manifest == null)
+				yield break;
+
+			string? absInstallPath = manifest.GetAbsInstallPath();
+			if (absInstallPath == null)
+				yield break;
+
+			try
+			{
+				if (!Path.GetFullPath(absInstallPath).Equals(Path.GetFullPath(ctx.Params.Path), StringComparison.OrdinalIgnoreCase))
+					yield break;
+			}
+			catch (Exception e)
+			{
+				e.Log();
+				yield break;
+			}
+
+			// we've determined that this is a steam installation, issue the uninstall command and wait
+
+			if (!steamRequestDispatched)
+			{
+				SteamUtils.UninstallApp(ctx.Params.AppInfo.ServerAppId);
+				yield return new StatusMessage("Waiting for Steam uninstaller to finish");
+				steamRequestDispatched = true;
+			}
+
+			await Task.Delay(1000, ct);
+		}
+		while (true);
+	}
+	
 	private static async Task<string?> GetLocalPatchVersionAsync(string installDir, CancellationToken ct = default)
 	{
 		foreach (string dir in Directory.EnumerateDirectories(installDir))

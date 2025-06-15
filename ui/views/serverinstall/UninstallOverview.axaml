@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:serverinstall="clr-namespace:SCLauncher.model.serverinstall"
+             xmlns:design="clr-namespace:SCLauncher.ui.design"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
+             x:Class="SCLauncher.ui.views.serverinstall.UninstallOverview"
+             x:DataType="serverinstall:ServerUninstallParams">
+	
+	<Design.DataContext>
+		<design:DServerUninstallParams/>
+	</Design.DataContext>
+	
+	<StackPanel Margin="0 10 0 5" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+		<TextBlock TextWrapping="Wrap" Foreground="DarkGray" HorizontalAlignment="Center">
+			You are about to delete a server located at:
+		</TextBlock>
+		
+		<Border Background="#37000000" CornerRadius="4" Padding="10" Margin="10 0 0 0">
+			<SelectableTextBlock Text="{Binding Path}"
+			                     TextWrapping="Wrap"
+			                     Foreground="{StaticResource Highlight}"
+			                     FontSize="16"/>
+		</Border>
+		
+		<TextBlock TextWrapping="Wrap" Margin="0 10 0 0" HorizontalAlignment="Center">
+			<Run Foreground="OrangeRed" FontSize="16">All files contained in this folder will be deleted (!)</Run>
+		</TextBlock>
+	</StackPanel>
+	
+</UserControl>

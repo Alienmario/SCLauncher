@@ -7,9 +7,9 @@ using SCLauncher.ui.controls;
 
 namespace SCLauncher.ui.views.serverinstall;
 
-public partial class PathSelect : UserControl, WizardNavigator.IWizardContent
+public partial class InstallPathSelect : UserControl, WizardNavigator.IWizardContent
 {
-	public PathSelect()
+	public InstallPathSelect()
 	{
 		InitializeComponent();
 		
@@ -60,7 +60,7 @@ public partial class PathSelect : UserControl, WizardNavigator.IWizardContent
 
 	public void OnNextPageRequest(WizardNavigator wizard)
 	{
-		wizard.SetContent(new Overview());
+		wizard.SetContent(new InstallOverview());
 	}
 
 }

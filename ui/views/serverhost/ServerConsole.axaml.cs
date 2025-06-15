@@ -201,7 +201,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		}
 	}
 	
-	private void OnMenuInstallerClicked(object? sender, RoutedEventArgs args)
+	private void OnMenuInstallClicked(object? sender, RoutedEventArgs args)
 	{
 		if (svController.IsRunning)
 		{
@@ -212,6 +212,20 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		if (App.GetService<MainWindow>().HostServerTab.Content is HostServer hs)
 		{
 			hs.GoToServerInstallWizard();
+		}
+	}
+
+	private void OnMenuUninstallClicked(object? sender, RoutedEventArgs args)
+	{
+		if (svController.IsRunning)
+		{
+			ShowFailure("Server has to be stopped first.");
+			return;
+		}
+		
+		if (App.GetService<MainWindow>().HostServerTab.Content is HostServer hs)
+		{
+			hs.GoToServerUninstallWizard();
 		}
 	}
 

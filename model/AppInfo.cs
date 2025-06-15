@@ -20,6 +20,6 @@ public class AppInfo
 
 	public Func<ServerConfiguration> DefaultServerConfigProvider { init; private get; } = () => new ServerConfiguration();
 
-	public ServerConfiguration NewServerConfig() => DefaultServerConfigProvider.Invoke();
+	public ServerConfiguration NewServerConfig() => DefaultServerConfigProvider();
 	
 }

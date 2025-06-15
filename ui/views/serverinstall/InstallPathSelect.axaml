@@ -5,7 +5,7 @@
              xmlns:custom="clr-namespace:SCLauncher.ui.controls"
              xmlns:serverinstall="clr-namespace:SCLauncher.model.serverinstall"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="300"
-             x:Class="SCLauncher.ui.views.serverinstall.PathSelect"
+             x:Class="SCLauncher.ui.views.serverinstall.InstallPathSelect"
              x:DataType="serverinstall:ServerInstallParams">
 	
 	<Design.DataContext>

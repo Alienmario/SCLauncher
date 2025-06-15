@@ -28,6 +28,7 @@
 		</StackPanel>
 		
 		<controls:WizardNavigator Name="ServerInstallWizard" IsVisible="False"/>
+		<controls:WizardNavigator Name="ServerUninstallWizard" IsVisible="False"/>
 		
 		<serverhost:ServerConsole Name="ServerConsole" IsVisible="False"/>
 		

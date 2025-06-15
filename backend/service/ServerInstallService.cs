@@ -12,6 +12,7 @@ namespace SCLauncher.backend.service;
 
 public class ServerInstallService(
 	BackendService backend,
+	GlobalConfiguration globalConfig,
 	ServerInstallRunner serverInstallRunner,
 	IEnumerable<IServerComponentInstaller<ComponentInfo>> componentInstallers)
 {
@@ -24,9 +25,23 @@ public class ServerInstallService(
 		};
 	}
 
+	public ServerUninstallParams NewUninstallParams()
+	{
+		return new ServerUninstallParams
+		{
+			AppInfo = backend.ActiveApp,
+			Path = globalConfig.ServerPath ?? string.Empty
+		};
+	}
+
 	public IAsyncEnumerable<StatusMessage> GetInstaller(ServerInstallParams installParams)
 	{
-		return serverInstallRunner.Get(installParams);
+		return serverInstallRunner.Installer(installParams);
+	}
+	
+	public IAsyncEnumerable<StatusMessage> GetUninstaller(ServerUninstallParams uninstallParams)
+	{
+		return serverInstallRunner.Uninstaller(uninstallParams);
 	}
 
 	public async Task<IDictionary<ServerInstallComponent, ComponentInfo>> GatherComponentInfoAsync(

@@ -4,7 +4,7 @@ using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.serverinstall;
 
-public interface IServerComponentInstaller<TComponentInfo> : IComponentInstaller<TComponentInfo, ServerInstallContext> 
+public interface IServerComponentInstaller<TComponentInfo> : IComponentInstaller<TComponentInfo, ServerInstallContext, ServerUninstallContext> 
 					where TComponentInfo : ComponentInfo
 {
 

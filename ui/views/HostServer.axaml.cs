@@ -19,16 +19,23 @@ public partial class HostServer : UserControl
 	{
 		InitializeComponent();
 		ServerInstallWizard.OnExit += OnServerInstallWizardExit;
+		ServerUninstallWizard.OnExit += OnServerInstallWizardExit;
 	}
 
 	public void GoToServerInstallWizard()
 	{
 		SwitchContent(ServerInstallWizard);
 		ServerInstallWizard.Reset();
-		ServerInstallWizard.SetContent(new MethodSelect());
-
-		var installService = App.GetService<ServerInstallService>();
-		ServerInstallWizard.DataContext = installService.NewInstallParams();
+		ServerInstallWizard.SetContent(new InstallMethodSelect());
+		ServerInstallWizard.DataContext = App.GetService<ServerInstallService>().NewInstallParams();
+	}
+	
+	public void GoToServerUninstallWizard()
+	{
+		SwitchContent(ServerUninstallWizard);
+		ServerUninstallWizard.Reset();
+		ServerUninstallWizard.SetContent(new UninstallOverview());
+		ServerUninstallWizard.DataContext = App.GetService<ServerInstallService>().NewUninstallParams();
 	}
 
 	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)

@@ -108,12 +108,13 @@
 								<MenuItem Header="Copy server IP" Click="OnMenuCopyIpClicked"/>
 								<MenuItem Header="-"/>
 								<MenuItem Header="Configure server" Click="OnMenuConfigureServerClicked"/>
-								<MenuItem Header="-"/>
+								<MenuItem Header="Browse server files" Click="OnMenuBrowseServerFolderClicked"/>
 								<MenuItem Header="Show time in console" ToggleType="CheckBox" StaysOpenOnClick="True"
 								          Click="OnMenuToggleTimeDisplayClicked"
 								          IsChecked="{Binding #ConsoleViewer.DisplayTime}"/>
-								<MenuItem Header="Browse server files" Click="OnMenuBrowseServerFolderClicked"/>
-								<MenuItem Header="Installer" Click="OnMenuInstallerClicked"/>
+								<MenuItem Header="-"/>
+								<MenuItem Header="Reinstall or Update" Click="OnMenuInstallClicked"/>
+								<MenuItem Header="Uninstall" Click="OnMenuUninstallClicked"/>
 							</MenuFlyout>
 						</Button.Flyout>
 					</Button>
