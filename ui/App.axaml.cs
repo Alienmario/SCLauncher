@@ -1,3 +1,4 @@
+using System.Reflection;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -43,5 +44,7 @@ public partial class App : Application
 		Current!.TryGetResource(name, Current.ActualThemeVariant, out object? res);
 		return res;
 	}
+
+	public static string Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString(2) ?? string.Empty;
 	
 }
