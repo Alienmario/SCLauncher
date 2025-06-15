@@ -24,8 +24,14 @@
 	
 	<DockPanel>
 		<StackPanel DockPanel.Dock="Top">
-			<TextBlock Text="Server options" FontSize="14" LetterSpacing="1" Margin="8 0 8 0"/>
-			<Border Opacity="0.5" BorderBrush="{DynamicResource ButtonBackground}" BorderThickness=".5" Margin="0 4 0 0"/>
+			<TextBlock Text="Server options" FontSize="15" LetterSpacing="2" Margin="8 0 8 0"
+			           FontWeight="Regular" Foreground="{DynamicResource TextControlPlaceholderForeground}">
+				<TextBlock.Effect>
+					<DropShadowEffect Color="Gray" BlurRadius=".5" OffsetX="0" OffsetY="0"/>
+				</TextBlock.Effect>
+			</TextBlock>
+			<Border Opacity="0.75" Margin="0 4 0 0"
+			        BorderBrush="{DynamicResource ButtonBackground}" BorderThickness=".5"/>
 		</StackPanel>
 		
 		<ScrollViewer AllowAutoHide="False" Name="Scroller">

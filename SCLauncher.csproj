@@ -5,6 +5,7 @@
 		<Nullable>enable</Nullable>
 		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<ApplicationIcon>ui\assets\logo-sc.ico</ApplicationIcon>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
 		<DebugType>embedded</DebugType>
@@ -35,17 +36,6 @@
 		<PackageReference Include="Gameloop.Vdf" Version="0.6.2" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
 		<PackageReference Include="SkiaSharp" Version="2.88.9" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Update="ui\views\MainWindow.axaml.cs">
-			<DependentUpon>MainWindow.axaml</DependentUpon>
-			<SubType>Code</SubType>
-		</Compile>
-		<Compile Update="ui\App.axaml.cs">
-			<DependentUpon>App.axaml</DependentUpon>
-			<SubType>Code</SubType>
-		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>

@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         x:Class="SCLauncher.ui.views.MainWindow"
         Title="SCLauncher"
-        Icon="/ui/assets/logo-sc.png"
+        Icon="/ui/assets/logo-sc.ico"
         ExtendClientAreaToDecorationsHint="{OnPlatform Windows=True, Default=False}"
         TransparencyLevelHint="{OnPlatform Windows='Mica,Blur', Default='None'}"
         WindowStartupLocation="CenterScreen"
@@ -51,7 +51,7 @@
 		<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5 0 0 0" Spacing="5"
 		            IsHitTestVisible="False" IsVisible="{OnPlatform Windows=True, Default=False}">
 			<Border CornerRadius="4" ClipToBounds="True">
-				<Image Source="/ui/assets/logo-sc.png" Width="20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+				<Image Source="/ui/assets/logo-sc.ico" Width="20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
 			</Border>
 			<Label VerticalAlignment="Center" FontSize="14" Foreground="#EFEFEF">
 				Launcher
