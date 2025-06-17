@@ -8,7 +8,7 @@
         Title="SCLauncher"
         Icon="/ui/assets/logo-sc.ico"
         ExtendClientAreaToDecorationsHint="{OnPlatform Windows=True, Default=False}"
-        TransparencyLevelHint="{OnPlatform Windows='Mica,Blur', Default='None'}"
+        TransparencyLevelHint="{OnPlatform Windows='Mica,AcrylicBlur', Default='None'}"
         WindowStartupLocation="CenterScreen"
         Width="700" Height="450"
         MinWidth="600" MinHeight="200">
@@ -47,50 +47,69 @@
 		</Style>
 	</Window.Styles>
 	
-	<DockPanel Margin="0 5 0 5">
-		<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5 0 0 0" Spacing="5"
-		            IsHitTestVisible="False" IsVisible="{OnPlatform Windows=True, Default=False}">
-			<Border CornerRadius="4" ClipToBounds="True">
-				<Image Source="/ui/assets/logo-sc.ico" Width="20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
-			</Border>
-			<Label VerticalAlignment="Center" FontSize="14" Foreground="#EFEFEF">
-				Launcher
-			</Label>
-		</StackPanel>
+	<Panel>
+		
+		<!-- W10 fallback (AcrylicBlur) -->
+		<ExperimentalAcrylicBorder IsHitTestVisible="False" IsVisible="{Binding 
+						Path=$parent[Window].ActualTransparencyLevel,
+						Converter={x:Static ObjectConverters.Equal},
+						ConverterParameter={x:Static WindowTransparencyLevel.AcrylicBlur}}">
+			<ExperimentalAcrylicBorder.Material>
+				<ExperimentalAcrylicMaterial
+					BackgroundSource="Digger"
+					TintColor="Black"
+					TintOpacity="0.7"
+					MaterialOpacity="0.9"/>
+			</ExperimentalAcrylicBorder.Material>
+		</ExperimentalAcrylicBorder>
+		
+		<DockPanel Margin="0 5 0 5">
+			
+			<!-- Custom titlebar (Windows only) -->
+			<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5 0 0 0" Spacing="5"
+			            IsHitTestVisible="False" IsVisible="{OnPlatform Windows=True, Default=False}">
+				<Border CornerRadius="4" ClipToBounds="True">
+					<Image Source="/ui/assets/logo-sc.ico" Width="20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+				</Border>
+				<Label VerticalAlignment="Center" FontSize="14" Foreground="#EFEFEF">
+					Launcher
+				</Label>
+			</StackPanel>
 
-		<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="0 5">
-			
-			<TabControl.ItemsPanel>
-				<ItemsPanelTemplate>
-					<DockPanel LastChildFill="True"/>
-				</ItemsPanelTemplate>
-			</TabControl.ItemsPanel>
-			
-			<TabItem Name="HostServerTab" Header="Host server">
-				<views:HostServer/>
-			</TabItem>
-			
-			<TabItem Name="JoinServerTab" Header="Join server">
-				<views:JoinServer/>
-			</TabItem>
-			
-			<TabItem Name="SingleplayerTab" Header="Singleplayer">
-				<views:SinglePlayer/>
-			</TabItem>
-			
-			<TabItem Name="ModsTab" Header="Mods">
-				<views:Mods/>
-			</TabItem>
-			
-			<TabItem Name="SettingsTab" HorizontalAlignment="Right">
-				<TabItem.Header>
-					<Panel Classes="TabItemHeader">
-						<PathIcon Name="SettingsCog" Data="{StaticResource settings_regular}"/>
-					</Panel>
-				</TabItem.Header>
-				<views:Settings/>
-			</TabItem>
-		</TabControl>
-	</DockPanel>
+			<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="0 5">
+				
+				<TabControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<DockPanel LastChildFill="True"/>
+					</ItemsPanelTemplate>
+				</TabControl.ItemsPanel>
+				
+				<TabItem Name="HostServerTab" Header="Host server">
+					<views:HostServer/>
+				</TabItem>
+				
+				<TabItem Name="JoinServerTab" Header="Join server">
+					<views:JoinServer/>
+				</TabItem>
+				
+				<TabItem Name="SingleplayerTab" Header="Singleplayer">
+					<views:SinglePlayer/>
+				</TabItem>
+				
+				<TabItem Name="ModsTab" Header="Mods">
+					<views:Mods/>
+				</TabItem>
+				
+				<TabItem Name="SettingsTab" HorizontalAlignment="Right">
+					<TabItem.Header>
+						<Panel Classes="TabItemHeader">
+							<PathIcon Name="SettingsCog" Data="{StaticResource settings_regular}"/>
+						</Panel>
+					</TabItem.Header>
+					<views:Settings/>
+				</TabItem>
+			</TabControl>
+		</DockPanel>
+	</Panel>
 	
 </Window>
