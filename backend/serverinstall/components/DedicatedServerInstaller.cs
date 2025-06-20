@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DepotDownloader;
+using SCLauncher.backend.install;
 using SCLauncher.backend.steam;
 using SCLauncher.backend.util;
 using SCLauncher.model;
@@ -14,7 +17,8 @@ using SteamKit2.Authentication;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public class DedicatedServerInstaller(GlobalConfiguration config) : IServerComponentInstaller<ComponentInfo>
+public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallHelper installHelper)
+	: IServerComponentInstaller<ComponentInfo>
 {
 	public class ServerComponentInfo : ComponentInfo
 	{
@@ -38,7 +42,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 	public async IAsyncEnumerable<StatusMessage> InstallViaSteamClient(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
-		if (!SteamUtils.IsValidSteamInstallDir(config.SteamPath))
+		if (!SteamUtils.IsValidSteamInstallDir(globalConfig.SteamPath))
 		{
 			throw new InstallException("Steam not found! Install it or specify Steam path in settings, then retry.");
 		}
@@ -58,7 +62,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 			}
 			else if (info.Installed)
 			{
-				config.ServerPath = info.Path;
+				globalConfig.ServerPath = info.Path;
 				break;
 			}
 		}
@@ -88,7 +92,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 			throw new InstallException("Dedicated server download failed");
 		}
 
-		config.ServerPath = ctx.InstallDir;
+		globalConfig.ServerPath = ctx.InstallDir;
 	}
 	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
@@ -96,7 +100,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
-			string? steamDir = config.SteamPath;
+			string? steamDir = globalConfig.SteamPath;
 			if (steamDir == null) // this is explicitly handled during install
 				return ComponentInfo.ReadyToInstall;
 
@@ -131,21 +135,38 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 			try
 			{
 				version = await GetLocalPatchVersionAsync(ctx.InstallDir, ct);
-				// int? latestBuildNumber = await GetLatestBuildNumberAsync(ctx.Params.AppInfo.ServerAppId, ct);
 			}
 			catch (Exception e)
 			{
 				e.Log();
 			}
 
-			// if we didn't find the version, installation may be incomplete
 			if (version == null)
+			{
+				Trace.WriteLine("Failed to find server patch version, considering installation as incomplete");
 				return ComponentInfo.ReadyToInstall;
+			}
+
+			string? upgradeVersion = null;
+			if (checkForUpgrades)
+			{
+				try
+				{
+					var uintVersion = Convert.ToUInt32(version);
+					upgradeVersion = await SteamUpToDateCheckAsync(ctx.Params.AppInfo.ServerAppId, uintVersion, ct);
+				}
+				catch (Exception e)
+				{
+					e.Log();
+				}
+			}
 
 			return new ComponentInfo
 			{
 				Path = ctx.InstallDir,
-				Version = version
+				Version = version,
+				UpgradeVersion = upgradeVersion,
+				Upgradable = upgradeVersion != null
 			};
 		}
 	}
@@ -157,7 +178,7 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 		
 		do
 		{
-			string? steamDir = config.SteamPath;
+			string? steamDir = globalConfig.SteamPath;
 			if (steamDir == null)
 				yield break;
 			
@@ -214,14 +235,19 @@ public class DedicatedServerInstaller(GlobalConfiguration config) : IServerCompo
 		return null;
 	}
 
-	/*
-	private static async Task<int?> GetLatestBuildNumberAsync(int appId, CancellationToken ct = default)
+	public async Task<string?> SteamUpToDateCheckAsync(uint appId, uint version, CancellationToken cancellationToken = default)
 	{
-		int buildNumber = await SubProcess.GetAppBuildNumber(new GetAppBuildNumberConfig { AppId = (uint)appId },
-			cancellationToken: ct);
-		if (buildNumber <= 0)
-			return null;
-		return buildNumber;
+		var url = $"https://api.steampowered.com/ISteamApps/UpToDateCheck/v1/?appid={appId}&version={version}";
+		var json = await installHelper.HttpClient.GetStringAsync(url, cancellationToken);
+
+		// Parse JSON for required_version
+		var doc = JsonDocument.Parse(json);
+		if (doc.RootElement.TryGetProperty("response", out var respElem) &&
+		    respElem.TryGetProperty("required_version", out var reqVerElem))
+		{
+			return reqVerElem.ToString();
+		}
+		return null;
 	}
-	*/
+	
 }

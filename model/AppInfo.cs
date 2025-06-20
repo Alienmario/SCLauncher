@@ -6,9 +6,9 @@ namespace SCLauncher.model;
 public class AppInfo
 {
 	
-	public required int GameAppId { get; init; }
+	public required uint GameAppId { get; init; }
 	
-	public required int ServerAppId { get; init; }
+	public required uint ServerAppId { get; init; }
 	
 	public required string GameInstallFolder { get; init; }
 	

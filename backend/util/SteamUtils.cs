@@ -12,12 +12,10 @@ using SCLauncher.backend.steam;
 
 namespace SCLauncher.backend.util;
 
-// Credits to DasDarki/JBPPP2
-
 public static class SteamUtils
 {
 	
-	public static void LaunchApp(int appId)
+	public static void LaunchApp(uint appId)
 	{
 		Process.Start(new ProcessStartInfo("steam://launch/" + appId + "/dialog")
 		{
@@ -26,7 +24,7 @@ public static class SteamUtils
 		});
 	}
 
-	public static void InstallApp(int appId)
+	public static void InstallApp(uint appId)
 	{
 		Process.Start(new ProcessStartInfo("steam://install/" + appId)
 		{
@@ -35,7 +33,7 @@ public static class SteamUtils
 		});
 	}
 	
-	public static void ValidateApp(int appId)
+	public static void ValidateApp(uint appId)
 	{
 		Process.Start(new ProcessStartInfo("steam://validate/" + appId)
 		{
@@ -44,7 +42,7 @@ public static class SteamUtils
 		});
 	}
 
-	public static void UninstallApp(int appId)
+	public static void UninstallApp(uint appId)
 	{
 		Process.Start(new ProcessStartInfo("steam://uninstall/" + appId)
 		{
@@ -53,7 +51,7 @@ public static class SteamUtils
 		});
 	}
 
-	public static void ConnectToServer(string address, int appId, string? password = null)
+	public static void ConnectToServer(string address, uint appId, string? password = null)
 	{
 		Process.Start(new ProcessStartInfo(GetConnectLink(address, appId, password))
 		{
@@ -62,7 +60,7 @@ public static class SteamUtils
 		});
 	}
 
-	public static string GetConnectLink(string address, int appId, string? password = null)
+	public static string GetConnectLink(string address, uint appId, string? password = null)
 	{
 		return new StringBuilder()
 			.Append("steam://connect/")
@@ -72,7 +70,8 @@ public static class SteamUtils
 			.ToString();
 	}
 	
-	public static async Task<SteamAppManifest?> FindAppManifestAsync(string steamDir, int appId, CancellationToken ct = default)
+	// Credits to DasDarki/JBPPP2
+	public static async Task<SteamAppManifest?> FindAppManifestAsync(string steamDir, uint appId, CancellationToken ct = default)
 	{
 		if (string.IsNullOrEmpty(steamDir))
 		{
@@ -125,7 +124,7 @@ public static class SteamUtils
 		return null;
 	}
 
-	public static async Task<string?> FindAppPathAsync(string steamDir, int appId, CancellationToken ct = default)
+	public static async Task<string?> FindAppPathAsync(string steamDir, uint appId, CancellationToken ct = default)
 	{
 		var manifest = await FindAppManifestAsync(steamDir, appId, ct);
 		return manifest?.GetAbsInstallPath();
