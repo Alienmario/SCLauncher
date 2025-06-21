@@ -19,18 +19,18 @@ public class InstallHelper(HttpClient httpClient)
 	public GitHubClient GithubClient => new GitHubClient(new ProductHeaderValue("SourceCoopLauncher"));
 
 	public async Task ExtractAsync(string archive, string destination, bool overwriteFiles,
-		CancellationToken cancellationToken = default)
+		CancellationToken ct = default)
 	{
 		if (archive.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
 		{
-			ZipFile.ExtractToDirectory(archive, destination, overwriteFiles);
+			await Task.Run(() => ZipFile.ExtractToDirectory(archive, destination, overwriteFiles), ct);
 		}
 		else if (archive.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase)
 		         || archive.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase))
 		{
 			await using var fileStream = new FileStream(archive, FileMode.Open, FileAccess.Read);
 			await using var decompressedStream = new GZipStream(fileStream, CompressionMode.Decompress);
-			await TarFile.ExtractToDirectoryAsync(decompressedStream, destination, overwriteFiles, cancellationToken);
+			await TarFile.ExtractToDirectoryAsync(decompressedStream, destination, overwriteFiles, ct);
 		}
 		else
 		{
@@ -38,26 +38,31 @@ public class InstallHelper(HttpClient httpClient)
 		}
 	}
 	
-	public async Task DownloadAsync(string url, string destination, CancellationToken cancellationToken = default)
+	public async Task DownloadAsync(string url, string destination, CancellationToken ct = default)
 	{
-		await using Stream stream = await httpClient.GetStreamAsync(url, cancellationToken);
+		await using Stream stream = await httpClient.GetStreamAsync(url, ct);
 		await using var fileStream = new FileStream(destination, FileMode.OpenOrCreate);
-		await stream.CopyToAsync(fileStream, cancellationToken);
+		await stream.CopyToAsync(fileStream, ct);
 	}
 
-	public void SafeDelete(string path)
+	public bool SafeDelete(string? path)
 	{
+		if (path == null)
+			return false;
+		
 		try
 		{
 			if (File.Exists(path))
 			{
 				File.Delete(path);
+				return true;
 			}
 		}
 		catch (Exception e)
 		{
 			Trace.WriteLine($"Failed to delete file: {path}\nException: {e}");
 		}
+		return false;
 	}
 
 	public string? GetProductVersion(string filename)
