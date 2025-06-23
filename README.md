@@ -11,6 +11,8 @@
 ### Host & configure game server
 <img src=".github/img/scl-hostserver.png" width="700">
 
+### Launch & configure game client
+
 ## Planned features
 - Built-in tunneling (playit.gg or alternatives)
 - Join game servers
@@ -24,3 +26,5 @@
 - [srcds-pipe-passthrough-fix](https://github.com/tsuza/srcds-pipe-passthrough-fix)
 - [SourceLogger](https://github.com/LukWebsForge/SourceLogger)
 - [Gameloop.Vdf](https://github.com/shravan2x/Gameloop.Vdf)
+
+Special thanks to Removiekeen for initial concept and logo.

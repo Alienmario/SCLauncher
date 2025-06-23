@@ -63,7 +63,7 @@
 						<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
 							<Button Classes="Transparent Grow" ZIndex="1" Name="ResetServerConfigButton" HorizontalAlignment="Center">
 								<PathIcon Data="{StaticResource arrow_undo_regular}"
-								          Height="12" Width="12" Foreground="Firebrick"/>
+								          Height="10" Width="10" Foreground="Firebrick"/>
 								<Button.Flyout>
 									<Flyout Placement="BottomEdgeAlignedRight" HorizontalOffset="12">
 										<StackPanel>
@@ -75,7 +75,7 @@
 								</Button.Flyout>
 							</Button>
 							<Button Classes="Transparent Grow" ZIndex="1" Click="OnConfiguratorCloseClicked" HorizontalAlignment="Center">
-								<PathIcon Data="{StaticResource dismiss_regular}" Height="12" Width="12"
+								<PathIcon Data="{StaticResource dismiss_regular}" Height="10" Width="10"
 								          Foreground="{DynamicResource TextControlPlaceholderForeground}"/>
 							</Button>
 						</StackPanel>

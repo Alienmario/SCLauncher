@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace SCLauncher.model;
+namespace SCLauncher.model.config;
 
 public partial class GlobalConfiguration : INotifyPropertyChanged
 {

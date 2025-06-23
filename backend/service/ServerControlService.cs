@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using SCLauncher.backend.serverinstall.components;
-using SCLauncher.model;
+using SCLauncher.model.config;
 using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.service;

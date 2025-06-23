@@ -137,7 +137,11 @@ public class PersistenceService
 		}
 		catch (Exception e)
 		{
-			e.Log();
+			if (e is not FileNotFoundException)
+			{
+				e.Log();
+			}
+			
 			return null;
 		}
 	}

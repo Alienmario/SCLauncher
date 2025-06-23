@@ -2,7 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 	
 	<Styles.Resources>
-		<SolidColorBrush x:Key="Highlight">Orange</SolidColorBrush>
+		<Color x:Key="HighlightColor">Orange</Color>
+		<SolidColorBrush x:Key="Highlight" Color="{StaticResource HighlightColor}"/>
 		
 		<LinearGradientBrush x:Key="DashedLineBrush" SpreadMethod="Repeat" StartPoint="4,4" EndPoint="8,4">
 			<GradientStop Offset="0" Color="Gray" />

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace SCLauncher.model;
+namespace SCLauncher.model.config;
 
 public partial class ServerConfiguration : INotifyPropertyChanged
 {
@@ -28,15 +28,9 @@ public partial class ServerConfiguration : INotifyPropertyChanged
 	
 	public bool? Teamplay { get; set; }
 
-	public record CustomParam
-	{
-		public string Key { get; set; } = string.Empty;
-		public string Value { get; set; } = string.Empty;
-	}
-
 	public ObservableCollection<CustomParam> CustomParams { get; set; } = [];
 
-	public List<string> ToLaunchParams()
+	public virtual List<string> ToLaunchParams()
 	{
 		List<string> list = [];
 		

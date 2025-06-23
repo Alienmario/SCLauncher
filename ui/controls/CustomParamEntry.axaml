@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
+             xmlns:config="clr-namespace:SCLauncher.model.config"
+             xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SCLauncher.ui.controls.CustomParamEntry"
+             x:DataType="{x:Type objectModel:ObservableCollection, x:TypeArguments=config:CustomParam}">
+	
+	<Design.DataContext>
+		<objectModel:ObservableCollection x:TypeArguments="config:CustomParam">
+			<config:CustomParam Key="Key1" Value="Value1"/>
+			<config:CustomParam Key="Key2" Value="Value2"/>
+		</objectModel:ObservableCollection>
+	</Design.DataContext>
+	
+	<UserControl.Styles>
+		<Style Selector="Button#AddParameterButton">
+			<Setter Property="BorderBrush">
+				<SolidColorBrush Color="{DynamicResource SystemChromeHighColor}" Opacity="0.8"/>
+			</Setter>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Background">
+				<SolidColorBrush Color="{DynamicResource SystemBaseLowColor}" Opacity="0.2"/>
+			</Setter>
+			<Style Selector="^:pointerover /template/ ContentPresenter">
+				<Setter Property="BorderBrush">
+					<SolidColorBrush Color="{DynamicResource SystemChromeHighColor}" Opacity="1"/>
+				</Setter>
+				<Setter Property="Background">
+					<SolidColorBrush Color="{DynamicResource SystemBaseLowColor}" Opacity="0.8"/>
+				</Setter>
+			</Style>
+		</Style>
+	</UserControl.Styles>
+	
+	<StackPanel>
+		<ItemsControl ItemsSource="{Binding .}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<StackPanel Spacing="5"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Grid ColumnDefinitions="*,Auto,*">
+						<TextBox Text="{Binding Key}" Grid.Column="0" Classes="CustomParamKey"
+						         Watermark="Parameter"
+						         LostFocus="OnParamTextLostFocus"/>
+						<TextBlock Text=" = " Grid.Column="1" VerticalAlignment="Center"/>
+						<TextBox Text="{Binding Value}" Grid.Column="2" Classes="CustomParamVal"
+						         Watermark="Value"
+						         LostFocus="OnParamTextLostFocus"/>
+					</Grid>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+		
+		<ContentControl IsVisible="{Binding $parent[controls:CustomParamEntry].ShowHint}">
+			<TextBlock FontSize="12" HorizontalAlignment="Center"
+			           IsVisible="{Binding Count}"
+			           Margin="0 15 0 0"
+			           Foreground="{DynamicResource TextControlForegroundFocused}">
+				<Run>Start with - (dash) for launch parameters</Run>
+				<LineBreak/>
+				<Run>Start with + (plus) for console commands</Run>
+			</TextBlock>
+		</ContentControl>
+		
+		<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Focusable="False"
+		        Margin="0 10 0 0" Padding="55 5" CornerRadius="20"
+		        Content="Add new parameter" Click="AddNewParameterClicked" Name="AddParameterButton"/>
+	</StackPanel>
+</UserControl>

@@ -3,11 +3,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:custom="clr-namespace:SCLauncher.ui.controls"
-             xmlns:model="clr-namespace:SCLauncher.model"
              xmlns:ui="clr-namespace:SCLauncher.ui"
+             xmlns:config="clr-namespace:SCLauncher.model.config"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SCLauncher.ui.views.Settings"
-             x:DataType="model:GlobalConfiguration">
+             x:DataType="config:GlobalConfiguration">
 	
 	<DockPanel Margin="0 10 0 0">
 		

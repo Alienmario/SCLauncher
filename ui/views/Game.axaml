@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:config="clr-namespace:SCLauncher.model.config"
+             xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SCLauncher.ui.views.Game"
+             x:DataType="config:ClientConfiguration">
+
+	<DockPanel>
+		
+		<Button DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+		        Classes="accent" Content="Launch game" Click="OnLaunchGameClicked"/>
+		
+		<ScrollViewer>
+			<StackPanel>
+				<DockPanel>
+					<TextBlock Text="Launch options"
+					           FontSize="16" FontWeight="Bold" Margin="5 10 5 5"/>
+					<Button HorizontalAlignment="Right" VerticalAlignment="Bottom"
+					        Classes="Transparent Grow" Name="ResetConfigButton">
+						<PathIcon Data="{StaticResource arrow_undo_regular}"
+						          Height="12" Width="12" Foreground="Firebrick"/>
+						<Button.Flyout>
+							<Flyout Placement="BottomEdgeAlignedRight">
+								<StackPanel>
+									<Label>Do you want to reset all options?</Label>
+									<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+									        Name="ResetConfigConfirmButton" Content="OK" Click="OnConfiguratorResetClicked"/>
+								</StackPanel>
+							</Flyout>
+						</Button.Flyout>
+					</Button>
+				</DockPanel>
+		    
+				<Border BorderThickness="2" CornerRadius="10" Opacity="0.3">
+					<Border.Background>
+						<LinearGradientBrush>
+							<GradientStop Offset="0.0" Color="#00000000"/>
+							<GradientStop Offset="0.01" Color="{DynamicResource SystemChromeDisabledLowColor}"/>
+							<GradientStop Offset="0.15" Color="{DynamicResource SystemChromeDisabledLowColor}"/>
+							<GradientStop Offset="0.3" Color="#00000000"/>
+						</LinearGradientBrush>
+					</Border.Background>
+				</Border>
+				
+				<StackPanel Margin="10">
+		    
+					<TextBlock Text="Engine"/>
+					<UniformGrid VerticalAlignment="Top" Columns="3">
+						<CheckBox Content="Insecure (VAC off)" IsChecked="{Binding Insecure}"/>
+						<CheckBox Content="Dev mode" IsChecked="{Binding Dev}"/>
+						<CheckBox Content="Multiple instances" IsChecked="{Binding Multirun}"/>
+					</UniformGrid>
+		    
+					<!-- Game specific -->
+					<ContentControl Content="{Binding .}"/>
+					
+					<!-- Custom entry -->
+					<!-- <TextBlock Text="Custom" Margin="0 10 0 5"/> -->
+					<TextBlock Text="Custom Parameters" Margin="0 10 0 5"/>
+					<controls:CustomParamEntry DataContext="{Binding CustomParams}" ShowHint="False"
+					                           Margin="0 0 0 5"/>
+					
+				</StackPanel>
+			</StackPanel>
+		</ScrollViewer>
+    </DockPanel>
+	
+	<UserControl.DataTemplates>
+		<DataTemplate DataType="{x:Type config:ClientConfigurationBlackMesa}">
+			<StackPanel>
+				<TextBlock Text="Black Mesa" Margin="0 10 0 0"/>
+				<UniformGrid VerticalAlignment="Top" Columns="3" x:DataType="config:ClientConfigurationBlackMesa">
+					<CheckBox Content="Workshop" IsChecked="{Binding Workshop}"/>
+					<CheckBox Content="Force Direct3D 9" IsChecked="{Binding ForceUiD3D9}"/>
+					<CheckBox Content="DXVK" IsChecked="{Binding DXVK}"/>
+					<CheckBox Content="Old UI" IsChecked="{Binding OldUI}"/>
+				</UniformGrid>
+			</StackPanel>
+		</DataTemplate>
+	</UserControl.DataTemplates>
+	
+</UserControl>

@@ -14,6 +14,7 @@ using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.backend.util;
 using SCLauncher.model;
+using SCLauncher.model.config;
 using SCLauncher.model.exception;
 using SCLauncher.ui.controls;
 

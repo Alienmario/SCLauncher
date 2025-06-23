@@ -92,8 +92,8 @@
 					<views:JoinServer/>
 				</TabItem>
 				
-				<TabItem Name="SingleplayerTab" Header="Singleplayer">
-					<views:SinglePlayer/>
+				<TabItem Name="GameTab" Header="Game">
+					<views:Game/>
 				</TabItem>
 				
 				<TabItem Name="ModsTab" Header="Mods">

@@ -2,11 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:model="clr-namespace:SCLauncher.model"
              xmlns:design="clr-namespace:SCLauncher.ui.design"
+             xmlns:config="clr-namespace:SCLauncher.model.config"
+             xmlns:controls="clr-namespace:SCLauncher.ui.controls"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300"
              x:Class="SCLauncher.ui.views.serverhost.ServerConfigurator"
-             x:DataType="model:ServerConfiguration"
+             x:DataType="config:ServerConfiguration"
              Margin="0 2">
 
 	<Design.DataContext>
@@ -35,7 +36,7 @@
 		</StackPanel>
 		
 		<ScrollViewer AllowAutoHide="False" Name="Scroller">
-			<StackPanel Margin="8 8 8 0">
+			<StackPanel Margin="8">
 				<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*" ColumnDefinitions="Auto,*"
 				      RowSpacing="5" ColumnSpacing="8">
 					
@@ -72,34 +73,7 @@
 				    <StackPanel Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Spacing="4">
 					    <TextBlock Text="╭ Custom Parameters ╮" HorizontalAlignment="Center" Margin="0 8 0 0"
 					               IsVisible="{Binding CustomParams.Count}"/>
-					    <ItemsControl ItemsSource="{Binding CustomParams}">
-						    <ItemsControl.ItemsPanel>
-							    <ItemsPanelTemplate>
-								    <StackPanel Spacing="4"/>
-							    </ItemsPanelTemplate>
-						    </ItemsControl.ItemsPanel>
-						    <ItemsControl.ItemTemplate>
-					            <DataTemplate>
-					                <Grid ColumnDefinitions="*,Auto,*">
-					                    <TextBox Text="{Binding Key}" Grid.Column="0" Classes="CustomParamKey"
-					                             Watermark="Parameter"
-					                             LostFocus="OnCustomParamTextLostFocus"/>
-					                    <TextBlock Text=" = " Grid.Column="1" VerticalAlignment="Center"/>
-					                    <TextBox Text="{Binding Value}" Grid.Column="2" Classes="CustomParamVal"
-					                             Watermark="Value"
-					                             LostFocus="OnCustomParamTextLostFocus"/>
-					                </Grid>
-					            </DataTemplate>
-					        </ItemsControl.ItemTemplate>
-					    </ItemsControl>
-					    <TextBlock FontSize="12" xml:space="preserve" HorizontalAlignment="Center"
-					               IsVisible="{Binding CustomParams.Count}"
-					               Foreground="{DynamicResource TextControlForegroundFocused}">
-Start with - (dash) for launch parameters
-Start with + (plus) for console commands
-						</TextBlock>
-					    <Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Focusable="False"
-					            Content="Add new parameter" Click="AddNewParameterClicked" Name="AddParameterButton"/>
+					    <controls:CustomParamEntry DataContext="{Binding CustomParams}"/>
 				    </StackPanel>
 					
 				</Grid>

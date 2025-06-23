@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using SCLauncher.model;
+using SCLauncher.model.config;
 
 namespace SCLauncher.ui.views;
 
@@ -35,9 +35,9 @@ public partial class MainWindow : Window
 		SettingsTab.IsSelected = true;
 	}
 
-	public void GoToSingleplayer()
+	public void GoToGame()
 	{
-		SingleplayerTab.IsSelected = true;
+		GameTab.IsSelected = true;
 	}
 	
 	public void GoToMods()

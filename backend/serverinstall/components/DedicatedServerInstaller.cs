@@ -11,6 +11,7 @@ using SCLauncher.backend.install;
 using SCLauncher.backend.steam;
 using SCLauncher.backend.util;
 using SCLauncher.model;
+using SCLauncher.model.config;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
 using SteamKit2.Authentication;

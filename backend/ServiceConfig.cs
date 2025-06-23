@@ -4,7 +4,7 @@ using SCLauncher.backend.install;
 using SCLauncher.backend.serverinstall;
 using SCLauncher.backend.serverinstall.components;
 using SCLauncher.backend.service;
-using SCLauncher.model;
+using SCLauncher.model.config;
 using SCLauncher.model.install;
 
 namespace SCLauncher.backend;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SCLauncher.model.config;
 
 namespace SCLauncher.model;
 
@@ -21,5 +22,9 @@ public class AppInfo
 	public Func<ServerConfiguration> DefaultServerConfigProvider { init; private get; } = () => new ServerConfiguration();
 
 	public ServerConfiguration NewServerConfig() => DefaultServerConfigProvider();
+
+	public Func<ClientConfiguration> DefaultClientConfigProvider { init; private get; } = () => new ClientConfiguration();
+
+	public ClientConfiguration NewClientConfig() => DefaultClientConfigProvider();
 	
 }

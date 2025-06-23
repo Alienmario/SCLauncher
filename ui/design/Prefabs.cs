@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SCLauncher.model;
+using SCLauncher.model.config;
 using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.ui.design;

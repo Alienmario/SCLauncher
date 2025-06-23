@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Avalonia.Controls;
-using SCLauncher.model;
+using SCLauncher.model.config;
 using SCLauncher.model.serverinstall;
 using SCLauncher.ui.controls;
 

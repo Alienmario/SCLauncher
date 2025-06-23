@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using SCLauncher.model;
+using SCLauncher.model.config;
 
 namespace SCLauncher.ui.views;
 

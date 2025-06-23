@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SCLauncher.backend.serverinstall;
 using SCLauncher.model;
+using SCLauncher.model.config;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
 
