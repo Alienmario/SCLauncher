@@ -6,6 +6,17 @@ namespace SCLauncher.model.config;
 
 public partial class ClientConfiguration : INotifyPropertyChanged
 {
+    public enum WindowModeEnum
+    {
+	    [Description("Default display mode")]
+	    NoChange,
+	    [Description("Fullscreen mode")]
+        Fullscreen,
+	    [Description("Windowed mode")]
+        Windowed,
+	    [Description("Borderless mode")]
+        Borderless
+    }
 
 	public bool Steam { get; set; } = true;
 	
@@ -14,6 +25,8 @@ public partial class ClientConfiguration : INotifyPropertyChanged
 	public bool Dev { get; set; }
 	
 	public bool Multirun { get; set; }
+	
+	public WindowModeEnum WindowMode { get; set; } = WindowModeEnum.NoChange;
 
 	public ObservableCollection<CustomParam> CustomParams { get; set; } = [];
 
@@ -32,6 +45,20 @@ public partial class ClientConfiguration : INotifyPropertyChanged
 		
 		if (Multirun)
 			list.Add("-multirun");
+		
+		switch (WindowMode)
+		{
+			case WindowModeEnum.Windowed:
+				list.Add("-windowed");
+				break;
+			case WindowModeEnum.Borderless:
+				list.Add("-windowed");
+				list.Add("-noborder");
+				break;
+			case WindowModeEnum.Fullscreen:
+				list.Add("-fullscreen");
+				break;
+		}
 		
 		foreach (CustomParam p in CustomParams)
 		{

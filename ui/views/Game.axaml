@@ -48,10 +48,11 @@
 				<StackPanel Margin="10">
 		    
 					<TextBlock Text="Engine"/>
-					<UniformGrid VerticalAlignment="Top" Columns="3">
+					<UniformGrid VerticalAlignment="Top" Columns="3" RowSpacing="5">
 						<CheckBox Content="Insecure (VAC off)" IsChecked="{Binding Insecure}"/>
 						<CheckBox Content="Dev mode" IsChecked="{Binding Dev}"/>
 						<CheckBox Content="Multiple instances" IsChecked="{Binding Multirun}"/>
+						<ComboBox Name="WindowModeCombo" SelectedIndex="{Binding WindowMode}"/>
 					</UniformGrid>
 		    
 					<!-- Game specific -->
