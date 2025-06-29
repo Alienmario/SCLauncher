@@ -26,5 +26,6 @@
 - [srcds-pipe-passthrough-fix](https://github.com/tsuza/srcds-pipe-passthrough-fix)
 - [SourceLogger](https://github.com/LukWebsForge/SourceLogger)
 - [Gameloop.Vdf](https://github.com/shravan2x/Gameloop.Vdf)
+- [SteamQuery.NET](https://github.com/cemahseri/SteamQuery.NET)
 
 Special thanks to Removiekeen for initial concept and logo.

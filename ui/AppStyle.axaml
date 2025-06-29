@@ -4,6 +4,14 @@
 	<Styles.Resources>
 		<Color x:Key="HighlightColor">Orange</Color>
 		<SolidColorBrush x:Key="Highlight" Color="{StaticResource HighlightColor}"/>
+		<Color x:Key="BackgroundColor">#292929</Color>
+		
+		<LinearGradientBrush x:Key="WindowBackground" StartPoint="0%,0%" EndPoint="0%,100%">
+			<GradientStop Color="#1D1D1D" Offset="0.0"/>
+			<GradientStop Color="{StaticResource BackgroundColor}" Offset="0.2"/>
+			<GradientStop Color="{StaticResource BackgroundColor}" Offset="0.9"/>
+			<GradientStop Color="#1D1D1D" Offset="1.0"/>
+		</LinearGradientBrush>
 		
 		<LinearGradientBrush x:Key="DashedLineBrush" SpreadMethod="Repeat" StartPoint="4,4" EndPoint="8,4">
 			<GradientStop Offset="0" Color="Gray" />
@@ -66,6 +74,28 @@
 		</Style>
 		<Style Selector="^:pressed > :is(Control) > :is(Control)">
 			<Setter Property="RenderTransform" Value="scale(0.6) skew(-25deg)"/>
+		</Style>
+	</Style>
+	
+	<Style Selector="Button.Rotate">
+		<Style Selector="^ > :is(Control) > :is(Control)">
+			<Setter Property="Transitions">
+				<Transitions>
+					<TransformOperationsTransition Easing="CubicEaseOut" Property="RenderTransform" Duration="0.3"/>
+				</Transitions>
+			</Setter>
+		</Style>
+		<Style Selector="^:pointerover > :is(Control) > :is(Control)">
+			<Setter Property="RenderTransform" Value="rotate(180deg)"/>
+		</Style>
+		<Style Selector="^:pressed > :is(Control) > :is(Control)">
+			<Setter Property="RenderTransform" Value="rotate(360deg)"/>
+		</Style>
+	</Style>
+	
+	<Style Selector="Button.Highlight">
+		<Style Selector="^:pointerover > :is(TemplatedControl)">
+			<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
 		</Style>
 	</Style>
 	

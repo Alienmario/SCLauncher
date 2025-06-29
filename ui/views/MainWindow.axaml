@@ -20,14 +20,7 @@
 					<Setter Property="Background" Value="Transparent"/>
 				</OnPlatform.Windows>
 				<OnPlatform.Default>
-					<Setter Property="Background">
-						<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-							<GradientStop Color="#1D1D1D" Offset="0.0"/>
-							<GradientStop Color="#242424" Offset="0.3"/>
-							<GradientStop Color="#242424" Offset="0.9"/>
-							<GradientStop Color="#1D1D1D" Offset="1.0"/>
-						</LinearGradientBrush>
-					</Setter>
+					<Setter Property="Background" Value="{StaticResource WindowBackground}"/>
 				</OnPlatform.Default>
 			</OnPlatform>
 		</Style>

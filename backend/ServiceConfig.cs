@@ -25,6 +25,7 @@ public static class ServiceConfig
 		collection.AddSingleton<ServerMessageAnalyzerService>();
 		collection.AddSingleton<ClientControlService>();
 		collection.AddSingleton<PersistenceService>();
+		collection.AddSingleton<ServerBrowserService>();
 
 		// Server install
 		collection.AddSingleton<ServerInstallRunner>();
