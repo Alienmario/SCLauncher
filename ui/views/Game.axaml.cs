@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using SCLauncher.backend.service;
 using SCLauncher.model.config;
+using SCLauncher.model.exception;
 
 namespace SCLauncher.ui.views;
 
@@ -25,7 +26,21 @@ public partial class Game : UserControl
 
     private void OnLaunchGameClicked(object? sender, RoutedEventArgs e)
     {
-        clientController.RunClient();
+        try
+        {
+            if (clientController.RunClient())
+            {
+                App.ShowSuccess("Launching game...");
+            }
+            else
+            {
+                App.ShowFailure("Unable to launch the game.");
+            }
+        }
+        catch (InvalidGamePathException)
+        {
+            App.ShowFailure("Configured game path is invalid.");
+        }
     }
     
     private void OnConfiguratorResetClicked(object? sender, RoutedEventArgs e)
