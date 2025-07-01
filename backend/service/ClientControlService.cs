@@ -20,9 +20,6 @@ public class ClientControlService(BackendService backend, GlobalConfiguration gl
 	/// <exception cref="InvalidGamePathException">Thrown when the game executable cannot be found at configured path</exception>
 	public bool ConnectToServer(string address, string? password = null)
 	{
-		// Will not work if BM server already running:
-		// SteamUtils.ConnectToServer(address, backend.ActiveApp.GameAppId);
-		
 		List<string> args = ["-hijack", "-steam", "+connect", address];
 		if (!string.IsNullOrEmpty(password))
 		{

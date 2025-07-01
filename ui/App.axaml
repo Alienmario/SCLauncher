@@ -6,7 +6,7 @@
 
 	<Application.Styles>
 		<FluentTheme/>
-		<StyleInclude Source="Icons.axaml"/>
+		<StyleInclude Source="AppIcons.axaml"/>
 		<StyleInclude Source="AppStyle.axaml"/>
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
 	</Application.Styles>

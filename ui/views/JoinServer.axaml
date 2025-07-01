@@ -27,7 +27,7 @@
 	<DockPanel Margin="0 10 0 0" VerticalSpacing="10">
         
         <TextBox DockPanel.Dock="Top" Watermark="Filter" Padding="15 10" CornerRadius="20"
-                 Name="FilterTextBox" TextChanged="OnFilterChanged">
+                 Name="FilterTextBox" TextChanged="OnFilterTextChanged">
             <TextBox.InnerRightContent>
                 <Button Name="RefreshButton" Click="OnRefreshClicked" Classes="Transparent Highlight Rotate" Focusable="False">
                     <PathIcon Data="{StaticResource arrow_sync_circle_regular}"/>
@@ -35,14 +35,14 @@
             </TextBox.InnerRightContent>
         </TextBox>
         
-        <DataGrid Name="ServerListBox" DockPanel.Dock="Bottom" x:DataType="serverbrowser:Server"
+        <DataGrid Name="ServerGrid" DockPanel.Dock="Bottom" x:DataType="serverbrowser:Server"
                   IsReadOnly="True" GridLinesVisibility="None"
                   CanUserResizeColumns="True" CanUserSortColumns="True"
                   Background="{DynamicResource TextControlBackground}"
-                  CellPointerPressed="OnCellPointerPressed">
+                  CellPointerPressed="OnServerGridCellPointerPressed">
             
             <DataGrid.Columns>
-                <DataGridTemplateColumn SortMemberPath="Password">
+                <DataGridTemplateColumn SortMemberPath="Password" CanUserResize="False">
                     <DataGridTemplateColumn.Header>
                         <PathIcon Data="{StaticResource lock_regular}"/>
                     </DataGridTemplateColumn.Header>
@@ -53,7 +53,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 
-                <DataGridTemplateColumn SortMemberPath="VAC">
+                <DataGridTemplateColumn SortMemberPath="VAC" CanUserResize="False">
                     <DataGridTemplateColumn.Header>
                         <PathIcon Data="{StaticResource shield_regular}"/>
                     </DataGridTemplateColumn.Header>
@@ -65,8 +65,10 @@
                 </DataGridTemplateColumn>
                 
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
+                
                 <DataGridTextColumn Header="Map" Binding="{Binding Map}" Width="*"/>
-                <DataGridTextColumn Header="Players" SortMemberPath="NumRealPlayers" MinWidth="70">
+                
+                <DataGridTextColumn Header="Players" SortMemberPath="NumRealPlayers" MinWidth="70" CanUserResize="False">
                     <DataGridTextColumn.Binding>
                         <MultiBinding StringFormat="{}{0}/{1}">
                             <Binding Path="NumRealPlayers"/>
@@ -74,24 +76,37 @@
                         </MultiBinding>
                     </DataGridTextColumn.Binding>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Ping" MinWidth="55"
+                
+                <DataGridTextColumn Header="Ping" MinWidth="55" CanUserResize="False"
                                     Binding="{Binding Ping.TotalMilliseconds, StringFormat='{}{0:0}'}"/>
             </DataGrid.Columns>
             
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate DataType="serverbrowser:Server">
                     <WrapPanel Classes="ServerDetails" Margin="5 0" ItemsAlignment="Center">
-                        <Button Content="{Binding Endpoint, StringFormat='IP {0}'}"/>
-                        <Button Content="{Binding NumBots, StringFormat='{}{0} Bot(s)'}" IsVisible="{Binding NumBots}"/>
-                        <Button Content="{Binding GameDescription, StringFormat='{}{0}'}"/>
-                        <Button Content="{Binding Type, StringFormat='{}{0}'}"/>
-                        <Button Content="{Binding Environment, StringFormat='{}{0}'}"/>
-                        <Button Content="{Binding Version, StringFormat='Version {0}'}"/>
+                        <Button Click="OnDetailBtnClicked" Content="{Binding Endpoint, StringFormat='IP {0}'}"/>
+                        <Button Click="OnDetailBtnClicked" Content="{Binding NumBots, StringFormat='{}{0} Bot(s)'}" IsVisible="{Binding NumBots}"/>
+                        <Button Click="OnDetailBtnClicked" Content="{Binding GameDescription, StringFormat='{}{0}'}"/>
+                        <Button Click="OnDetailBtnClicked" Content="{Binding Type, StringFormat='{}{0}'}"/>
+                        <Button Click="OnDetailBtnClicked" Content="{Binding Environment, StringFormat='{}{0}'}"/>
+                        <Button Click="OnDetailBtnClicked" Content="{Binding Version, StringFormat='Version {0}'}"/>
                         <!-- <Button Content="{Binding SteamId, StringFormat='SteamID {0}'}"/> -->
-                        <Button Content="{Binding Keywords, StringFormat='Tags: {0}'}"/>
+                        <Button Click="OnDetailBtnClicked" Content="{Binding Keywords, StringFormat='Tags: {0}'}"/>
                     </WrapPanel>
                 </DataTemplate>
             </DataGrid.RowDetailsTemplate>
+            
+            <DataGrid.Styles>
+                <Style Selector="DataGridRow">
+                    <Setter Property="ContextMenu">
+                        <ContextMenu Placement="Pointer" Opening="ContextMenu_OnOpening">
+                            <MenuItem Header="View details" Click="ContextMenu_OnViewDetails"/>
+                            <MenuItem Header="Join now" Click="ContextMenu_OnJoinNow"/>
+                            <MenuItem Header="Copy IP" Click="ContextMenu_OnCopyIP"/>
+                        </ContextMenu>
+                    </Setter>
+                </Style>
+            </DataGrid.Styles>
         </DataGrid>
     </DockPanel>
 	

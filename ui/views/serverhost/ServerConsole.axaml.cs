@@ -7,7 +7,6 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Notifications;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -27,7 +26,6 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	private readonly ServerMessageAnalyzerService analyzer;
 	private readonly BackendService backend;
 	private readonly GlobalConfiguration config;
-	private WindowNotificationManager? notificationMgr;
 	
 	public ServerConsole()
 	{
@@ -57,10 +55,6 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs args)
 	{
 		base.OnAttachedToVisualTree(args);
-		notificationMgr ??= new WindowNotificationManager(TopLevel.GetTopLevel(this))
-		{
-			Position = NotificationPosition.BottomCenter
-		};
 	}
 
 	private void OnServerErrorReceived(object sender, DataReceivedEventArgs args)
@@ -108,20 +102,20 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	{
 		if (!svController.IsRunning)
 		{
-			ShowFailure("Server is not running.");
+			App.ShowFailure("Server is not running.");
 			return;
 		}
 		
 		if (analyzer.ServerPort == null)
 		{
-			ShowFailure("Server information is not available.");
+			App.ShowFailure("Server information is not available.");
 			return;
 		}
 
 		string? localIp = analyzer.LocalIp ?? FindLocalIp();
 		if (localIp == null)
 		{
-			ShowFailure("Server information is not available.");
+			App.ShowFailure("Server information is not available.");
 			return;
 		}
 
@@ -129,16 +123,16 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		{
 			if (clController.ConnectToServer(localIp + ":" + analyzer.ServerPort, backend.GetServerConfig().Password))
 			{
-				ShowSuccess("Joining local server...");
+				App.ShowSuccess("Joining local server...");
 			}
 			else
 			{
-				ShowFailure("Unable to launch the game.");
+				App.ShowFailure("Unable to launch the game.");
 			}
 		}
 		catch (InvalidGamePathException)
 		{
-			ShowFailure("Configured game path is invalid.");
+			App.ShowFailure("Configured game path is invalid.");
 		}
 	}
 
@@ -148,7 +142,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		{
 			if (analyzer.PublicIp == null || analyzer.ServerPort == null)
 			{
-				ShowFailure("Server information is not available.");
+				App.ShowFailure("Server information is not available.");
 				return;
 			}
 
@@ -156,7 +150,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 				backend.ActiveApp.GameAppId, backend.GetServerConfig().Password);
 		
 			await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(link);
-			ShowSuccess("Public join link copied to clipboard.");
+			App.ShowSuccess("Public join link copied to clipboard.");
 		}
 		catch (Exception e)
 		{
@@ -170,13 +164,13 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		{
 			if (analyzer.PublicIp == null || analyzer.ServerPort == null)
 			{
-				ShowFailure("Server information is not available.");
+				App.ShowFailure("Server information is not available.");
 				return;
 			}
 
 			var ip = analyzer.PublicIp + ":" + analyzer.ServerPort;
 			await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(ip);
-			ShowSuccess("Public IP copied to clipboard.");
+			App.ShowSuccess("Public IP copied to clipboard.");
 		}
 		catch (Exception e)
 		{
@@ -193,7 +187,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		
 			if (!await TopLevel.GetTopLevel(this)!.Launcher.LaunchDirectoryInfoAsync(new DirectoryInfo(config.ServerPath)))
 			{
-				ShowFailure("Unable to open server directory.");
+				App.ShowFailure("Unable to open server directory.");
 			}
 		}
 		catch (Exception e)
@@ -206,7 +200,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	{
 		if (svController.IsRunning)
 		{
-			ShowFailure("Server has to be stopped first.");
+			App.ShowFailure("Server has to be stopped first.");
 			return;
 		}
 		
@@ -220,7 +214,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	{
 		if (svController.IsRunning)
 		{
-			ShowFailure("Server has to be stopped first.");
+			App.ShowFailure("Server has to be stopped first.");
 			return;
 		}
 		
@@ -249,20 +243,6 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	{
 		ServerConfigurator.ResetToDefaults();
 		ResetServerConfigButton?.Flyout?.Hide();
-	}
-
-	private void ShowSuccess(string msg)
-	{
-		notificationMgr?.Show(new Notification(
-			"Success", msg, NotificationType.Information, TimeSpan.FromSeconds(3))
-		);
-	}
-
-	private void ShowFailure(string msg)
-	{
-		notificationMgr?.Show(new Notification(
-			"Failed", msg, NotificationType.Error, TimeSpan.FromSeconds(4))
-		);
 	}
 
 	private void AppendMessage(StatusMessage msg)

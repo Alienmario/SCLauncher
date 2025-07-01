@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:serverbrowser="clr-namespace:SCLauncher.model.serverbrowser"
+        xmlns:design="clr-namespace:SCLauncher.ui.design"
+        mc:Ignorable="d"
+        x:Class="SCLauncher.ui.views.serverbrowser.ServerDetailsDialog"
+        x:DataType="serverbrowser:Server"
+        Width="700" Height="1" SizeToContent="Height"
+        CanResize="False" WindowStartupLocation="CenterScreen" ShowInTaskbar="True"
+        Background="{StaticResource WindowBackground}">
+	
+	<Window.Title>
+		<Binding Path="Name" StringFormat="Server details: {0}"/>
+	</Window.Title>
+	
+	<Design.DataContext>
+		<x:Static Member="design:DServer.Instance"/>
+	</Design.DataContext>
+	
+	<Window.Resources>
+		<SolidColorBrush x:Key="DataGridCellFocusVisualPrimaryBrush" Color="Transparent" />
+		<SolidColorBrush x:Key="DataGridCellFocusVisualSecondaryBrush" Color="Transparent" />
+	</Window.Resources>
+	
+	<Window.Styles>
+		<Style Selector="TextBlock.SectionHeader">
+			<Setter Property="FontSize" Value="18"/>
+			<Setter Property="Margin" Value="0 0 0 10"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextControlForegroundDisabled}"/>
+		</Style>
+		<Style Selector="Expander">
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="VerticalAlignment" Value="Stretch"/>
+			<Setter Property="Padding" Value="0"/>
+		</Style>
+		<Style Selector="DataGrid">
+			<Setter Property="MaxHeight" Value="200"/>
+		</Style>
+	</Window.Styles>
+	
+	<Grid Margin="10" RowSpacing="10" RowDefinitions="Auto, Auto">
+		<Expander Grid.Row="0" IsExpanded="True">
+			<Expander.Header>PLAYERS</Expander.Header>
+		
+			<DataGrid Name="PlayersGrid"
+			          ItemsSource="{Binding Players}" IsReadOnly="True"
+			          CanUserResizeColumns="False" CanUserSortColumns="True"
+			          Background="{DynamicResource TextControlBackground}">
+	            
+	            <DataGrid.Columns>
+	                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
+	                <DataGridTextColumn Header="Score" Binding="{Binding Score}"/>
+	                <DataGridTextColumn Header="Duration" Binding="{Binding DurationFormatted}" SortMemberPath="Duration"/>
+	            </DataGrid.Columns>
+	        </DataGrid>
+		</Expander>
+		
+		<Expander Grid.Row="1" IsExpanded="True">
+			<Expander.Header>RULES</Expander.Header>
+			
+	        <DataGrid Name="RulesGrid"
+	                  ItemsSource="{Binding Rules}" IsReadOnly="True"
+	                  CanUserResizeColumns="True" CanUserSortColumns="True"
+	                  Background="{DynamicResource TextControlBackground}">
+	            
+	            <DataGrid.Columns>
+	                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+	                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*"/>
+	            </DataGrid.Columns>
+	        </DataGrid>
+		</Expander>
+	</Grid>
+	
+</Window>

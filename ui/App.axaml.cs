@@ -1,6 +1,8 @@
+using System;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using SCLauncher.backend;
@@ -11,6 +13,7 @@ namespace SCLauncher.ui;
 public partial class App : Application
 {
 	private ServiceProvider? services;
+	private WindowNotificationManager? notificationMgr;
 
 	public override void Initialize()
 	{
@@ -29,6 +32,11 @@ public partial class App : Application
 		{
 			MainWindow mainWindow = GetService<MainWindow>();
 			desktop.MainWindow = mainWindow;
+			
+			notificationMgr = new WindowNotificationManager(mainWindow)
+			{
+				Position = NotificationPosition.BottomRight
+			};
 		}
 		
 		base.OnFrameworkInitializationCompleted();
@@ -45,6 +53,20 @@ public partial class App : Application
 		return res;
 	}
 
+	public static void ShowSuccess(string msg)
+	{
+		(Current as App)!.notificationMgr!.Show(new Notification(
+			"Success", msg, NotificationType.Information, TimeSpan.FromSeconds(2))
+		);
+	}
+
+	public static void ShowFailure(string msg)
+	{
+		(Current as App)!.notificationMgr!.Show(new Notification(
+			"Failed", msg, NotificationType.Error, TimeSpan.FromSeconds(4))
+		);
+	}
+	
 	public static string Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString(2) ?? string.Empty;
 	
 }

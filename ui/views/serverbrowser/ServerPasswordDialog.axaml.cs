@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
-namespace SCLauncher.ui.dialogs;
+namespace SCLauncher.ui.views.serverbrowser;
 
 public partial class ServerPasswordDialog : Window
 {
