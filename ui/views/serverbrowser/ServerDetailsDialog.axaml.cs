@@ -15,8 +15,11 @@ public partial class ServerDetailsDialog : Window
 		base.OnSizeChanged(e);
 		
 		// Recenter the window on each resize
-		
-		if (e.HeightChanged)
+
+		if (e.HeightChanged && Position is not { Y: 0, X: 0 })
+		{
 			Position = Position.WithY(Position.Y + (int)Math.Round((e.PreviousSize.Height - e.NewSize.Height) / 2));
+		}
+
 	}
 }

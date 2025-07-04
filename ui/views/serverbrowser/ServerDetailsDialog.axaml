@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         x:Class="SCLauncher.ui.views.serverbrowser.ServerDetailsDialog"
         x:DataType="serverbrowser:Server"
-        Width="700" Height="1" SizeToContent="Height"
+        Width="700" SizeToContent="Height"
         CanResize="False" WindowStartupLocation="CenterScreen" ShowInTaskbar="True"
         Background="{StaticResource WindowBackground}">
 	
