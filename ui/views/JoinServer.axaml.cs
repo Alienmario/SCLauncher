@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -17,12 +18,15 @@ namespace SCLauncher.ui.views;
 
 public partial class JoinServer : UserControl
 {
+	private const int DirectQueryInputDelay = 1000;
+
 	private readonly ServerBrowserService serverBrowserService;
 	private readonly ClientControlService clientControlService;
 	private readonly List<Server> servers = [];
 	private readonly ObservableCollection<Server> filteredServers = [];
 	private CancellationTokenSource? refreshCts;
 	private DateTime? lastRefresh;
+	private string? directQueryEndpoint;
 
 	public JoinServer()
 	{
@@ -32,26 +36,58 @@ public partial class JoinServer : UserControl
 		ServerGrid.ItemsSource = filteredServers;
 	}
 
-	public async Task RefreshAsync()
+	public async Task RefreshAsync(int msDelay = 0)
 	{
-		refreshCts?.Cancel();
-		refreshCts?.Dispose();
-		lastRefresh = DateTime.Now;
+		if (refreshCts != null)
+		{
+			await refreshCts.CancelAsync();
+			refreshCts.Dispose();
+		}
+
 		refreshCts = new CancellationTokenSource();
-		servers.Clear();
-		filteredServers.Clear();
+
 		try
 		{
-			await foreach (var server in serverBrowserService.GetServers(refreshCts.Token))
+			await Task.Delay(msDelay, refreshCts.Token);
+			lastRefresh = DateTime.Now;
+			if (directQueryEndpoint != null)
 			{
-				servers.Add(server);
-				if (PassesFilter(server))
-				{
-					filteredServers.Add(server);
-				}
+				await RefreshDirectAsync(refreshCts.Token);
+			}
+			else
+			{
+				await RefreshMasterAsync(refreshCts.Token);
 			}
 		}
-		catch (TaskCanceledException) {}
+		catch (OperationCanceledException) {}
+		catch (Exception e)
+		{
+			e.Log();
+		}
+	}
+
+	private async Task RefreshMasterAsync(CancellationToken ct)
+	{
+		servers.Clear();
+		filteredServers.Clear();
+		await foreach (var server in serverBrowserService.GetServers(ct))
+		{
+			servers.Add(server);
+			if (PassesFilter(server))
+			{
+				filteredServers.Add(server);
+			}
+		}
+	}
+	
+	private async Task RefreshDirectAsync(CancellationToken ct)
+	{
+		if (directQueryEndpoint == null)
+			return;
+		
+		filteredServers.Clear();
+		var server = await ServerBrowserService.QueryServer(directQueryEndpoint, ct);
+		if (server != null) filteredServers.Add(server);
 	}
 	
 	private bool PassesFilter(Server server)
@@ -75,6 +111,38 @@ public partial class JoinServer : UserControl
 			return true;
 
 		return false;
+	}
+	
+	private async void OnFilterTextChanged(object? sender, TextChangedEventArgs args)
+	{
+		try
+		{
+			// Check for IP:port or steam://connect/ pattern
+			string? filterText = FilterTextBox.Text?.Trim();
+			if (!string.IsNullOrWhiteSpace(filterText))
+			{
+				if (TryParseEndpoint(filterText, out var ip, out var port))
+				{
+					directQueryEndpoint = ip + ':' + port;
+					await RefreshAsync(DirectQueryInputDelay);
+					return;
+				}
+			}
+
+			directQueryEndpoint = null;
+			filteredServers.Clear();
+			foreach (var server in servers)
+			{
+				if (PassesFilter(server))
+				{
+					filteredServers.Add(server);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			e.Log();
+		}
 	}
 
 	protected override async void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs args)
@@ -106,6 +174,18 @@ public partial class JoinServer : UserControl
 		HotKeyManager.SetHotKey(RefreshButton, null!);
 	}
 
+	private async void OnRefreshClicked(object? sender, RoutedEventArgs args)
+	{
+		try
+		{
+			await RefreshAsync();
+		}
+		catch (Exception e)
+		{
+			e.Log();
+		}
+	}
+
 	private async Task JoinAsync(Server server)
 	{
 		string? pw = null;
@@ -120,32 +200,7 @@ public partial class JoinServer : UserControl
 		clientControlService.ConnectToServer(server.Endpoint, pw);
 		App.ShowSuccess("Joining server...");
 	}
-
-	private async void OnRefreshClicked(object? sender, RoutedEventArgs args)
-	{
-		try
-		{
-			await RefreshAsync();
-		}
-		catch (Exception e)
-		{
-			e.Log();
-		}
-	}
-
-	private void OnFilterTextChanged(object? sender, TextChangedEventArgs args)
-	{
-		filteredServers.Clear();
-		
-		foreach (var server in servers)
-		{
-			if (PassesFilter(server))
-			{
-				filteredServers.Add(server);
-			}
-		}
-	}
-
+	
 	private async void OnServerGridCellPointerPressed(object? sender, DataGridCellPointerPressedEventArgs args)
 	{
 		try
@@ -191,7 +246,7 @@ public partial class JoinServer : UserControl
 		}
 	}
 
-	private async void ContextMenu_OnViewDetails(object? sender, RoutedEventArgs args)
+	private void ContextMenu_OnViewDetails(object? sender, RoutedEventArgs args)
 	{
 		if (ServerGrid.SelectedItem is Server server)
 		{
@@ -232,6 +287,29 @@ public partial class JoinServer : UserControl
 		{
 			e.Log();
 		}
+	}
+	
+	[GeneratedRegex(@"^steam://connect/(?<host>[^\.\s]+(?:\.[^\s\?/:]+)+)(?::(?<port>\d{1,5}))?", RegexOptions.IgnoreCase)]
+	private static partial Regex SteamConnectRegex();
+	
+	[GeneratedRegex(@"^(?<host>\d{1,3}(?:\.\d{1,3}){3})(?::(?<port>\d{1,5}))?", RegexOptions.IgnoreCase)]
+	private static partial Regex IpRegex();
+
+	private static bool TryParseEndpoint(string input, out string ip, out int port)
+	{
+		ip = string.Empty;
+		port = 0;
+		var match = SteamConnectRegex().Match(input);
+		if (!match.Success) match = IpRegex().Match(input);
+		
+		if (match.Success)
+		{
+			ip = match.Groups["host"].Value;
+			if (!int.TryParse(match.Groups["port"].Value, out port))
+				port = 27015;
+			return true;
+		}
+		return false;
 	}
 	
 }

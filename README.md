@@ -11,11 +11,14 @@
 ### Host & configure game server
 <img src=".github/img/scl-hostserver.png" width="700">
 
+### Join game servers
+<img src=".github/img/scl-joinserver.png" width="700">
+
 ### Launch & configure game client
+<img src=".github/img/scl-game.png" width="700">
 
 ## Planned features
 - Built-in tunneling (playit.gg or alternatives)
-- Join game servers
 - Install new campaign mods on server and client
 - Select active campaign mod on server and client
 

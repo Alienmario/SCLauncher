@@ -38,7 +38,7 @@ public partial class CustomParamEntry : UserControl
 			TextBox? textBox = this.GetVisualDescendants().OfType<TextBox>()
 				.LastOrDefault(x => x.Classes.Contains("CustomParamKey"));
 			textBox?.Focus();
-			textBox?.BringIntoView();
+			AddParameterButton.BringIntoView(AddParameterButton.Bounds);
 		}
 	}
 

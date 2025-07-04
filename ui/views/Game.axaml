@@ -4,22 +4,31 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:config="clr-namespace:SCLauncher.model.config"
              xmlns:controls="clr-namespace:SCLauncher.ui.controls"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="400"
              x:Class="SCLauncher.ui.views.Game"
              x:DataType="config:ClientConfiguration">
 
+	<UserControl.Styles>
+		<Style Selector="TextBlock.SectionHeader">
+			<Setter Property="FontSize" Value="15"/>
+			<Setter Property="FontWeight" Value="Medium"/>
+			<Setter Property="Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselected}"/>
+		</Style>
+	</UserControl.Styles>
+	
 	<DockPanel>
 		
 		<Button DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-		        Classes="accent" Content="Launch game" Click="OnLaunchGameClicked"/>
+		        Classes="accent"
+		        Content="Launch game"
+		        Click="OnLaunchGameClicked"/>
 		
 		<ScrollViewer>
 			<StackPanel>
 				<DockPanel>
-					<TextBlock Text="Launch options"
-					           FontSize="16" FontWeight="Bold" Margin="5 10 5 5"/>
-					<Button HorizontalAlignment="Right" VerticalAlignment="Bottom"
-					        Classes="Transparent Grow" Name="ResetConfigButton">
+					<TextBlock Text="Launch options" FontSize="16" FontWeight="Bold" Margin="5 10 5 5"/>
+					<Button Classes="Transparent Grow" Name="ResetConfigButton"
+					        HorizontalAlignment="Right" VerticalAlignment="Bottom">
 						<PathIcon Data="{StaticResource arrow_undo_regular}"
 						          Height="12" Width="12" Foreground="Firebrick"/>
 						<Button.Flyout>
@@ -47,8 +56,9 @@
 				
 				<StackPanel Margin="10">
 		    
-					<TextBlock Text="Engine"/>
-					<UniformGrid VerticalAlignment="Top" Columns="3" RowSpacing="5">
+					<!-- Common -->
+					<TextBlock Text="Engine" Classes="SectionHeader"/>
+					<UniformGrid VerticalAlignment="Top" Columns="4" RowSpacing="5">
 						<CheckBox Content="Insecure (VAC off)" IsChecked="{Binding Insecure}"/>
 						<CheckBox Content="Dev mode" IsChecked="{Binding Dev}"/>
 						<CheckBox Content="Multiple instances" IsChecked="{Binding Multirun}"/>
@@ -59,8 +69,7 @@
 					<ContentControl Content="{Binding .}"/>
 					
 					<!-- Custom entry -->
-					<!-- <TextBlock Text="Custom" Margin="0 10 0 5"/> -->
-					<TextBlock Text="Custom Parameters" Margin="0 10 0 5"/>
+					<TextBlock Text="Custom Parameters" Classes="SectionHeader" Margin="0 10 0 5"/>
 					<controls:CustomParamEntry DataContext="{Binding CustomParams}" ShowHint="False"
 					                           Margin="0 0 0 5"/>
 					
@@ -70,10 +79,10 @@
     </DockPanel>
 	
 	<UserControl.DataTemplates>
-		<DataTemplate DataType="{x:Type config:ClientConfigurationBlackMesa}">
+		<DataTemplate DataType="config:ClientConfigurationBlackMesa">
 			<StackPanel>
-				<TextBlock Text="Black Mesa" Margin="0 10 0 0"/>
-				<UniformGrid VerticalAlignment="Top" Columns="3" x:DataType="config:ClientConfigurationBlackMesa">
+				<TextBlock Text="Black Mesa" Classes="SectionHeader" Margin="0 10 0 0"/>
+				<UniformGrid VerticalAlignment="Top" Columns="4">
 					<CheckBox Content="Workshop" IsChecked="{Binding Workshop}"/>
 					<CheckBox Content="Force Direct3D 9" IsChecked="{Binding ForceUiD3D9}"/>
 					<CheckBox Content="DXVK" IsChecked="{Binding DXVK}"/>

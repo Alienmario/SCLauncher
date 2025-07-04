@@ -63,7 +63,7 @@ public record DServer : Server
 		GameDescription = "Black Mesa",
 		NumPlayers = 12,
 		MaxPlayers = 32,
-		NumBots = 3,
+		NumBots = 1,
 		Map = "bm_dm",
 		Type = "Dedicated",
 		VAC = true,

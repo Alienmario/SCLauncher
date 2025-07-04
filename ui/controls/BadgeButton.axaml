@@ -1,0 +1,22 @@
+<Button xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="SCLauncher.ui.controls.BadgeButton">
+	
+	<Design.DesignStyle>
+		<Style Selector="Button">
+			<Setter Property="Content" Value="Badge"/>
+		</Style>
+	</Design.DesignStyle>
+	
+	<Button.Styles>
+		<Style Selector="Button">
+			<Setter Property="Padding" Value="7 2"/>
+			<Setter Property="Margin" Value="5"/>
+			<Setter Property="CornerRadius" Value="10"/>
+			<Setter Property="FontSize" Value="13"/>
+		</Style>
+	</Button.Styles>
+</Button>

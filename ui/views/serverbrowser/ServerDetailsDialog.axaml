@@ -25,11 +25,6 @@
 	</Window.Resources>
 	
 	<Window.Styles>
-		<Style Selector="TextBlock.SectionHeader">
-			<Setter Property="FontSize" Value="18"/>
-			<Setter Property="Margin" Value="0 0 0 10"/>
-			<Setter Property="Foreground" Value="{DynamicResource TextControlForegroundDisabled}"/>
-		</Style>
 		<Style Selector="Expander">
 			<Setter Property="HorizontalAlignment" Value="Stretch"/>
 			<Setter Property="VerticalAlignment" Value="Stretch"/>
@@ -37,6 +32,8 @@
 		</Style>
 		<Style Selector="DataGrid">
 			<Setter Property="MaxHeight" Value="200"/>
+			<Setter Property="Background" Value="{DynamicResource TextControlBackground}"/>
+			<Setter Property="IsReadOnly" Value="True"/>
 		</Style>
 	</Window.Styles>
 	
@@ -44,11 +41,8 @@
 		<Expander Grid.Row="0" IsExpanded="True">
 			<Expander.Header>PLAYERS</Expander.Header>
 		
-			<DataGrid Name="PlayersGrid"
-			          ItemsSource="{Binding Players}" IsReadOnly="True"
-			          CanUserResizeColumns="False" CanUserSortColumns="True"
-			          Background="{DynamicResource TextControlBackground}">
-	            
+			<DataGrid Name="PlayersGrid" ItemsSource="{Binding Players}"
+			          CanUserResizeColumns="False" CanUserSortColumns="True">
 	            <DataGrid.Columns>
 	                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
 	                <DataGridTextColumn Header="Score" Binding="{Binding Score}"/>
@@ -60,11 +54,8 @@
 		<Expander Grid.Row="1" IsExpanded="True">
 			<Expander.Header>RULES</Expander.Header>
 			
-	        <DataGrid Name="RulesGrid"
-	                  ItemsSource="{Binding Rules}" IsReadOnly="True"
-	                  CanUserResizeColumns="True" CanUserSortColumns="True"
-	                  Background="{DynamicResource TextControlBackground}">
-	            
+	        <DataGrid Name="RulesGrid" ItemsSource="{Binding Rules}"
+	                  CanUserResizeColumns="True" CanUserSortColumns="True">
 	            <DataGrid.Columns>
 	                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
 	                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*"/>

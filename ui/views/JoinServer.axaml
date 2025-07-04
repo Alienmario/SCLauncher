@@ -3,6 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:serverbrowser="clr-namespace:SCLauncher.model.serverbrowser"
+             xmlns:converters="clr-namespace:SCLauncher.ui.converters"
+             xmlns:controls="clr-namespace:SCLauncher.ui.controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SCLauncher.ui.views.JoinServer">
 	
@@ -13,12 +15,6 @@
     </UserControl.Resources>
     
     <UserControl.Styles>
-        <Style Selector="WrapPanel.ServerDetails :is(Button)">
-            <Setter Property="Padding" Value="7 2"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="FontSize" Value="13"/>
-        </Style>
         <Style Selector="DataGridColumnHeader">
             <Setter Property="Padding" Value="5 0" />
         </Style>
@@ -26,7 +22,7 @@
     
 	<DockPanel Margin="0 10 0 0" VerticalSpacing="10">
         
-        <TextBox DockPanel.Dock="Top" Watermark="Filter" Padding="15 10" CornerRadius="20"
+        <TextBox DockPanel.Dock="Top" Watermark="Filter / IP / Join link" Padding="15 10" CornerRadius="20"
                  Name="FilterTextBox" TextChanged="OnFilterTextChanged">
             <TextBox.InnerRightContent>
                 <Button Name="RefreshButton" Click="OnRefreshClicked" Classes="Transparent Highlight Rotate" Focusable="False">
@@ -83,15 +79,18 @@
             
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate DataType="serverbrowser:Server">
-                    <WrapPanel Classes="ServerDetails" Margin="5 0" ItemsAlignment="Center">
-                        <Button Click="OnDetailBtnClicked" Content="{Binding Endpoint, StringFormat='IP {0}'}"/>
-                        <Button Click="OnDetailBtnClicked" Content="{Binding NumBots, StringFormat='{}{0} Bot(s)'}" IsVisible="{Binding NumBots}"/>
-                        <Button Click="OnDetailBtnClicked" Content="{Binding GameDescription, StringFormat='{}{0}'}"/>
-                        <Button Click="OnDetailBtnClicked" Content="{Binding Type, StringFormat='{}{0}'}"/>
-                        <Button Click="OnDetailBtnClicked" Content="{Binding Environment, StringFormat='{}{0}'}"/>
-                        <Button Click="OnDetailBtnClicked" Content="{Binding Version, StringFormat='Version {0}'}"/>
-                        <!-- <Button Content="{Binding SteamId, StringFormat='SteamID {0}'}"/> -->
-                        <Button Click="OnDetailBtnClicked" Content="{Binding Keywords, StringFormat='Tags: {0}'}"/>
+                    <WrapPanel Margin="5 0" ItemsAlignment="Center">
+                        <controls:BadgeButton Content="{Binding Endpoint, StringFormat='IP {0}'}"
+                                              CopySource="{Binding Endpoint}"/>
+                        <controls:BadgeButton IsVisible="{Binding NumBots}"
+                                              Content="{Binding NumBots, ConverterParameter='Bot',
+                                              Converter={x:Static converters:PluralizationConverter.Instance}}"/>
+                        <controls:BadgeButton Content="{Binding GameDescription}"/>
+                        <controls:BadgeButton Content="{Binding Type}"/>
+                        <controls:BadgeButton Content="{Binding Environment}"/>
+                        <controls:BadgeButton Content="{Binding Version, StringFormat='Version {0}'}"/>
+                        <controls:BadgeButton Content="{Binding Keywords, StringFormat='Tags: {0}'}"
+                                              CopySource="{Binding Keywords}"/>
                     </WrapPanel>
                 </DataTemplate>
             </DataGrid.RowDetailsTemplate>

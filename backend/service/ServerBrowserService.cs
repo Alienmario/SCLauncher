@@ -31,7 +31,7 @@ public class ServerBrowserService
 	{
 		var queryTasks = new List<Task<Server?>>();
 	
-		await foreach (var masterServerResponse in masterServer.GetServersAsync(filter).WithCancellation(ct))
+		await foreach (var masterServerResponse in masterServer.GetServersAsync(filter, cancellationToken: ct))
 		{
 			ct.ThrowIfCancellationRequested();
 			queryTasks.Add(QueryServer(masterServerResponse, ct));
@@ -48,6 +48,7 @@ public class ServerBrowserService
 			Server? server = await WaitForQueryResponses();
 			if (server != null) yield return server;
 		}
+		
 		async Task<Server?> WaitForQueryResponses()
 		{
 			var finished = await Task.WhenAny(queryTasks);
@@ -56,24 +57,42 @@ public class ServerBrowserService
 			return await finished;
 		}
 	}
+
+	public static async Task<Server?> QueryServer(string endpoint, CancellationToken ct = default)
+	{
+		try
+		{
+			using var gameServer = new GameServer(endpoint);
+			return await QueryServer(gameServer, ct);
+		}
+		catch (Exception)
+		{
+			return null;
+		}
+	}
 	
 	private static async Task<Server?> QueryServer(MasterServerResponse masterServerResponse, CancellationToken ct)
 	{
 		try
 		{
 			using var gameServer = new GameServer(masterServerResponse);
-			gameServer.SendTimeout = ServerQuerySendTimeout;
-			gameServer.ReceiveTimeout = ServerQueryReadTimeout;
-			
-			var stopwatch = Stopwatch.StartNew();
-			await gameServer.PerformQueryAsync(cancellationToken: ct);
-			stopwatch.Stop();
-			return TranslateServer(gameServer, stopwatch.Elapsed / 3); // did 3? queries
+			return await QueryServer(gameServer, ct);
 		}
 		catch (Exception)
 		{
 			return null;
 		}
+	}
+
+	private static async Task<Server?> QueryServer(GameServer gameServer, CancellationToken ct)
+	{
+		gameServer.SendTimeout = ServerQuerySendTimeout;
+		gameServer.ReceiveTimeout = ServerQueryReadTimeout;
+			
+		var stopwatch = Stopwatch.StartNew();
+		await gameServer.PerformQueryAsync(cancellationToken: ct);
+		stopwatch.Stop();
+		return TranslateServer(gameServer, stopwatch.Elapsed / 3); // did 3? queries
 	}
 
 	private static Server TranslateServer(GameServer src, TimeSpan ping)
