@@ -27,6 +27,7 @@ public partial class JoinServer : UserControl
 	private CancellationTokenSource? refreshCts;
 	private DateTime? lastRefresh;
 	private string? directQueryEndpoint;
+	private string? directQueryPassword;
 
 	public JoinServer()
 	{
@@ -121,15 +122,17 @@ public partial class JoinServer : UserControl
 			string? filterText = FilterTextBox.Text?.Trim();
 			if (!string.IsNullOrWhiteSpace(filterText))
 			{
-				if (TryParseEndpoint(filterText, out var ip, out var port))
+				if (TryParseEndpoint(filterText, out var ip, out var port, out var pw))
 				{
 					directQueryEndpoint = ip + ':' + port;
+					directQueryPassword = pw;
 					await RefreshAsync(DirectQueryInputDelay);
 					return;
 				}
 			}
 
 			directQueryEndpoint = null;
+			directQueryPassword = null;
 			filteredServers.Clear();
 			foreach (var server in servers)
 			{
@@ -191,10 +194,17 @@ public partial class JoinServer : UserControl
 		string? pw = null;
 		if (server.Password)
 		{
-			var passwordDialog = new ServerPasswordDialog();
-			pw = await passwordDialog.ShowDialog<string?>(App.GetService<MainWindow>());
-			if (string.IsNullOrEmpty(pw))
-				return;
+			if (directQueryPassword != null)
+			{
+				pw = directQueryPassword;
+			}
+			else
+			{
+				var passwordDialog = new ServerPasswordDialog();
+				pw = await passwordDialog.ShowDialog<string?>(App.GetService<MainWindow>());
+				if (string.IsNullOrEmpty(pw))
+					return;
+			}
 		}
 
 		clientControlService.ConnectToServer(server.Endpoint, pw);
@@ -289,27 +299,28 @@ public partial class JoinServer : UserControl
 		}
 	}
 	
-	[GeneratedRegex(@"^steam://connect/(?<host>[^\.\s]+(?:\.[^\s\?/:]+)+)(?::(?<port>\d{1,5}))?", RegexOptions.IgnoreCase)]
+	[GeneratedRegex(@"^steam://connect/(?<host>[^\.\s]+(?:\.[^\s\?/:]+)+)(?::(?<port>\d{1,5}))?(?:/(?<pw>[^\?]*))?", RegexOptions.IgnoreCase)]
 	private static partial Regex SteamConnectRegex();
 	
 	[GeneratedRegex(@"^(?<host>\d{1,3}(?:\.\d{1,3}){3})(?::(?<port>\d{1,5}))?", RegexOptions.IgnoreCase)]
 	private static partial Regex IpRegex();
 
-	private static bool TryParseEndpoint(string input, out string ip, out int port)
+	private static bool TryParseEndpoint(string input, out string ip, out int port, out string? pw)
 	{
-		ip = string.Empty;
-		port = 0;
-		var match = SteamConnectRegex().Match(input);
-		if (!match.Success) match = IpRegex().Match(input);
+		ip = string.Empty; port = 0; pw = null;
 		
-		if (match.Success)
-		{
-			ip = match.Groups["host"].Value;
-			if (!int.TryParse(match.Groups["port"].Value, out port))
-				port = 27015;
-			return true;
-		}
-		return false;
+		var match = SteamConnectRegex().Match(input);
+		if (!match.Success)
+			match = IpRegex().Match(input);
+		if (!match.Success)
+			return false;
+		
+		ip = match.Groups["host"].Value;
+		pw = match.Groups["pw"].Success ? match.Groups["pw"].Value : null;
+		if (!int.TryParse(match.Groups["port"].Value, out port))
+			port = 27015;
+		
+		return true;
 	}
 	
 }
