@@ -12,6 +12,8 @@ namespace SCLauncher.ui;
 
 public partial class App : Application
 {
+	public new static App Current => (App)Application.Current!;
+	
 	private ServiceProvider? services;
 	private WindowNotificationManager? notificationMgr;
 
@@ -44,25 +46,25 @@ public partial class App : Application
 
 	public static T GetService<T>() where T : class
 	{
-		return (Current as App)!.services!.GetRequiredService<T>();
+		return Current.services!.GetRequiredService<T>();
 	}
 	
 	public static object? GetResource(string name)
 	{
-		Current!.TryGetResource(name, Current.ActualThemeVariant, out object? res);
+		Current.TryGetResource(name, Current.ActualThemeVariant, out object? res);
 		return res;
 	}
 
 	public static void ShowSuccess(string msg)
 	{
-		(Current as App)!.notificationMgr!.Show(new Notification(
+		Current.notificationMgr!.Show(new Notification(
 			"Success", msg, NotificationType.Information, TimeSpan.FromSeconds(2))
 		);
 	}
 
 	public static void ShowFailure(string msg)
 	{
-		(Current as App)!.notificationMgr!.Show(new Notification(
+		Current.notificationMgr!.Show(new Notification(
 			"Failed", msg, NotificationType.Error, TimeSpan.FromSeconds(4))
 		);
 	}
