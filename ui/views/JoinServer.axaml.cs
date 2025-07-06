@@ -18,6 +18,7 @@ namespace SCLauncher.ui.views;
 
 public partial class JoinServer : UserControl
 {
+	
 	private const int DirectQueryInputDelay = 1000;
 
 	private readonly ServerBrowserService serverBrowserService;
@@ -26,8 +27,18 @@ public partial class JoinServer : UserControl
 	private readonly ObservableCollection<Server> filteredServers = [];
 	private CancellationTokenSource? refreshCts;
 	private DateTime? lastRefresh;
+	private bool isRefreshing;
 	private string? directQueryEndpoint;
 	private string? directQueryPassword;
+
+	public static readonly DirectProperty<JoinServer, bool> IsRefreshingProperty =
+		AvaloniaProperty.RegisterDirect<JoinServer, bool>(nameof(IsRefreshing), o => o.IsRefreshing);
+	
+	public bool IsRefreshing
+	{
+		get => isRefreshing;
+		private set => SetAndRaise(IsRefreshingProperty, ref isRefreshing, value);
+	}
 
 	public JoinServer()
 	{
@@ -46,24 +57,30 @@ public partial class JoinServer : UserControl
 		}
 
 		refreshCts = new CancellationTokenSource();
-
+		CancellationToken ct = refreshCts.Token;
+		IsRefreshing = true;
+		
 		try
 		{
-			await Task.Delay(msDelay, refreshCts.Token);
+			await Task.Delay(msDelay, ct);
 			lastRefresh = DateTime.Now;
 			if (directQueryEndpoint != null)
 			{
-				await RefreshDirectAsync(refreshCts.Token);
+				await RefreshDirectAsync(ct);
 			}
 			else
 			{
-				await RefreshMasterAsync(refreshCts.Token);
+				await RefreshMasterAsync(ct);
 			}
 		}
 		catch (OperationCanceledException) {}
 		catch (Exception e)
 		{
 			e.Log();
+		}
+		finally
+		{
+			IsRefreshing = false;
 		}
 	}
 
@@ -215,31 +232,15 @@ public partial class JoinServer : UserControl
 	{
 		try
 		{
-			var pointProperties = args.PointerPressedEventArgs.GetCurrentPoint(null).Properties;
-
-			if (args.PointerPressedEventArgs.ClickCount > 1 && pointProperties.IsLeftButtonPressed)
+			if (args.PointerPressedEventArgs.ClickCount > 1
+			    && args.PointerPressedEventArgs.GetCurrentPoint(null).Properties.IsLeftButtonPressed
+			    && args.PointerPressedEventArgs.KeyModifiers == KeyModifiers.None)
 			{
 				if (args.Row.DataContext is Server server)
 				{
 					args.PointerPressedEventArgs.Handled = true;
 					await JoinAsync(server);
 				}
-			}
-		}
-		catch (Exception e)
-		{
-			e.Log();
-		}
-	}
-	
-	private async void OnDetailBtnClicked(object? sender, RoutedEventArgs args)
-	{
-		try
-		{
-			if (sender is Button { Content: string content })
-			{
-				await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(content);
-				App.ShowSuccess("Copied to clipboard.");
 			}
 		}
 		catch (Exception e)

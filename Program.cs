@@ -40,7 +40,7 @@ static class Program
 		return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
 	}
 
-	// Extension method to log exceptions from tasks.
+	/// Extension method to log exceptions from tasks.
 	public static void LogExceptions(this Task task)
 	{
 		task.ContinueWith(t =>
@@ -54,13 +54,13 @@ static class Program
 		TaskContinuationOptions.OnlyOnFaulted);
 	}
 
-	// Extension method that logs an exception.
+	/// Extension method that logs an exception.
 	public static void Log(this Exception exception)
 	{
 		Trace.WriteLine(exception);
 	}
 
-	// Extension method for extracting all nested messages from exceptions.
+	/// Extension method for extracting all nested messages from exceptions.
 	public static string GetAllMessages(this Exception? e, string delimiter = " - ")
 	{
 		var messages = new List<string>();
@@ -74,6 +74,8 @@ static class Program
 		return string.Join(delimiter, messages);
 	}
 	
+	/// Extension method for extracting an enum value's description (DescriptionAttribute).
+	/// Fallbacks to definition string.
 	public static string GetDescription(this Enum enumValue)
 	{
 		var field = enumValue.GetType().GetField(enumValue.ToString());
