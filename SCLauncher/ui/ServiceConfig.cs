@@ -1,6 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using SCLauncher.backend.service;
-using SCLauncher.model;
 using SCLauncher.ui.views;
 
 namespace SCLauncher.ui;

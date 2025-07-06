@@ -4,5 +4,5 @@ obj/
 .idea
 riderModule.iml
 /_ReSharper.Caches/
-/FodyWeavers.xsd
+FodyWeavers.xsd
 /SCLauncher.sln.DotSettings.user
