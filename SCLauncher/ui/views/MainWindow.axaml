@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:SCLauncher.ui.views"
+        xmlns:controls="clr-namespace:SCLauncher.ui.controls"
         mc:Ignorable="d"
         x:Class="SCLauncher.ui.views.MainWindow"
         Title="SCLauncher"
@@ -56,7 +57,7 @@
 			</ExperimentalAcrylicBorder.Material>
 		</ExperimentalAcrylicBorder>
 		
-		<DockPanel Margin="0 5 0 5">
+		<DockPanel Margin="0 5 0 0">
 			
 			<!-- Custom titlebar (Windows only) -->
 			<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5 0 0 0" Spacing="5"
@@ -68,12 +69,14 @@
 					Launcher
 				</Label>
 			</StackPanel>
+			
+			<controls:UpdateNotification DockPanel.Dock="Bottom" Opacity="0.9"/>
 
-			<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="0 5">
+			<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="0 5 0 10">
 				
 				<TabControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<DockPanel LastChildFill="True"/>
+						<DockPanel/>
 					</ItemsPanelTemplate>
 				</TabControl.ItemsPanel>
 				
@@ -101,6 +104,7 @@
 					</TabItem.Header>
 					<views:Settings/>
 				</TabItem>
+				
 			</TabControl>
 		</DockPanel>
 	</Panel>

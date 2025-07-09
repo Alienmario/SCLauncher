@@ -121,7 +121,7 @@ public partial class MetaModInstaller(InstallHelper helper) : IServerComponentIn
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
 			string metamodDll = Path.Join(metamod, "bin", "server.dll");
-			string? productVersion = helper.GetProductVersion(metamodDll);
+			string? productVersion = helper.GetFileProductVersion(metamodDll);
 			if (productVersion != null)
 			{
 				Match match = ProductVersionRegex().Match(productVersion);

@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800"
+             x:Class="SCLauncher.ui.controls.UpdateNotification">
+
+	<TransitioningContentControl Name="ContentControl" IsTransitionReversed="True"
+	                             TransitionCompleted="OnTransitionCompleted">
+
+		<TransitioningContentControl.PageTransition>
+			<PageSlide Orientation="Vertical" Duration="1.0" SlideOutEasing="QuinticEaseOut"/>
+		</TransitioningContentControl.PageTransition>
+
+		<TransitioningContentControl.Content>
+			<Panel Background="#4F061D">
+
+				<Button Cursor="Hand"
+				        Padding="0"
+				        BorderThickness="0"
+				        Classes="Transparent"
+				        HorizontalAlignment="Stretch" VerticalContentAlignment="Center" VerticalAlignment="Center"
+				        Click="OnClick">
+
+						<TextBlock Padding="0 8" Text="SCLauncher update available!"
+						           TextAlignment="Center" VerticalAlignment="Center"
+						           FontSize="14" FontWeight="SemiBold">
+							<TextBlock.Effect>
+								<DropShadowEffect OffsetX="0" OffsetY="0" BlurRadius="3" Color="#D911AEC8"/>
+							</TextBlock.Effect>
+						</TextBlock>
+				</Button>
+				
+				<!-- Dismiss button -->
+				<Button HorizontalAlignment="Right" Padding="20 10" CornerRadius="0"
+				        Background="Transparent"
+				        Click="OnDismissClicked">
+					<PathIcon Data="{StaticResource dismiss_regular}" Height="10" Width="10"/>
+				</Button>
+				
+			</Panel>
+		</TransitioningContentControl.Content>
+
+	</TransitioningContentControl>
+
+</UserControl>

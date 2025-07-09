@@ -59,6 +59,11 @@ static class Program
 	{
 		Trace.WriteLine(exception);
 	}
+	public static void Log(this Exception exception, string message)
+	{
+		Trace.WriteLine(message);
+		Trace.WriteLine(exception);
+	}
 
 	/// Extension method for extracting all nested messages from exceptions.
 	public static string GetAllMessages(this Exception? e, string delimiter = " - ")

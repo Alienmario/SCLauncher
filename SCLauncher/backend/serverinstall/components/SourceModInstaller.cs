@@ -175,7 +175,7 @@ public partial class SourceModInstaller(InstallHelper helper) : IServerComponent
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
 			string sourcemodDll = Path.Join(sourcemod, "bin", "sourcemod.logic.dll");
-			string? productVersion = helper.GetProductVersion(sourcemodDll);
+			string? productVersion = helper.GetFileProductVersion(sourcemodDll);
 			if (productVersion != null)
 			{
 				Match match = ProductVersionRegex().Match(productVersion);

@@ -44,8 +44,8 @@
 			<Setter Property="Margin" Value="0 0" />
 			<Setter Property="Template">
 				<ControlTemplate>
-					<StackPanel Name="PART_Items" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
-						<StackPanel.DataTemplates>
+					<ReversibleStackPanel Name="PART_Items" HorizontalAlignment="Stretch">
+						<ReversibleStackPanel.DataTemplates>
 							<DataTemplate DataType="INotification">
 								<StackPanel Margin="12" Spacing="8"
 									TextElement.Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}">
@@ -54,10 +54,28 @@
 										Text="{Binding Message}" TextWrapping="Wrap" />
 								</StackPanel>
 							</DataTemplate>
-						</StackPanel.DataTemplates>
-					</StackPanel>
+						</ReversibleStackPanel.DataTemplates>
+					</ReversibleStackPanel>
 				</ControlTemplate>
 			</Setter>
+			<Style Selector="^:topright /template/ ReversibleStackPanel#PART_Items">
+				<Setter Property="Margin" Value="0 100 15 0" />
+				<Setter Property="VerticalAlignment" Value="Top" />
+				<Setter Property="HorizontalAlignment" Value="Right" />
+			</Style>
+			<Style Selector="^:topcenter /template/ ReversibleStackPanel#PART_Items">
+				<Setter Property="Margin" Value="0 20 0 0" />
+				<Setter Property="VerticalAlignment" Value="Top" />
+			</Style>
+			<Style Selector="^:bottomcenter /template/ ReversibleStackPanel#PART_Items">
+				<Setter Property="ReverseOrder" Value="True" />
+				<Setter Property="VerticalAlignment" Value="Bottom" />
+			</Style>
+			<Style Selector="^:bottomright /template/ ReversibleStackPanel#PART_Items">
+				<Setter Property="Margin" Value="0 0 15 0" />
+				<Setter Property="VerticalAlignment" Value="Bottom" />
+				<Setter Property="HorizontalAlignment" Value="Right" />
+			</Style>
 		</ControlTheme>
 	</Styles.Resources>
 	

@@ -65,7 +65,7 @@ public class InstallHelper(HttpClient httpClient)
 		return false;
 	}
 
-	public string? GetProductVersion(string filename)
+	public string? GetFileProductVersion(string filename)
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
