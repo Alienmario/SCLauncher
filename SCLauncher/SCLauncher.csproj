@@ -27,7 +27,7 @@
 			<PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="DepotDownloaderSubProcess" Version="3.3.0" />
-		<PackageReference Include="Fody" Version="6.9.1">
+		<PackageReference Include="Fody" Version="6.9.2">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -45,6 +45,10 @@
 		<EmbeddedResource Include="backend\serverinstall\components\srcds_sclauncher_x64.exe" />
 		<EmbeddedResource Include="backend\serverinstall\components\srcds_sclauncher_x86.exe" />
 		<EmbeddedResource Include="backend\serverinstall\components\srcds_sclauncher" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\ModSupportLib\ModSupportLib.csproj" />
 	</ItemGroup>
 	
 </Project>

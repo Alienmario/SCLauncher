@@ -1,0 +1,25 @@
+{
+    "supported": [
+        {
+            "name": "Blue Shift",
+            "short": "bshift",
+            "firstmap": "bs_c0m0a",
+            "workshop": 2424633574,
+            "type": "standalone",
+            "path": "bshift"
+        },
+        {
+            "name": "Stojkeholm",
+            "firstmap": "stojkeholm_01",
+            "workshop": 2320533262,
+            "type": "mount",
+            "path": "."
+        },
+        {
+            "name": "MyMod",
+            "firstmap": "mymod_01",
+            "type": "mount",
+            "path": "C:/SomePathWithVpks"
+        }
+    ]
+}
