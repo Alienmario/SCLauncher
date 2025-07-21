@@ -27,6 +27,11 @@
 		<SolidColorBrush x:Key="Highlight" Color="{StaticResource HighlightColor}"/>
 		<SolidColorBrush x:Key="NotificationCardBackgroundBrush" Color="#E9424242"/>
 		
+		<!-- Fix title bar buttons PointerOver bg -->
+		<SolidColorBrush x:Key="CaptionButtonBackground" Color="{DynamicResource SystemBaseLowColor}" />
+		<!-- Fix title bar buttons Pressed bg -->
+		<SolidColorBrush x:Key="CaptionButtonBorderBrush" Color="{DynamicResource SystemBaseMediumLowColor}" />
+		
 		<LinearGradientBrush x:Key="WindowBackground" StartPoint="0%,0%" EndPoint="0%,100%">
 			<GradientStop Color="#1D1D1D" Offset="0.0"/>
 			<GradientStop Color="{StaticResource BackgroundColor}" Offset="0.2"/>
