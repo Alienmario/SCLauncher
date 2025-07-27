@@ -21,5 +21,15 @@
             "type": "mount",
             "path": "C:/SomePathWithVpks"
         }
+    ],
+    "installed": [
+        {
+            "name": "Blue Shift",
+            "short": "bshift",
+            "firstmap": "bs_c0m0a",
+            "workshop": 2424633574,
+            "type": "standalone",
+            "path": "bshift"
+        }
     ]
 }

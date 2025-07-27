@@ -1,31 +1,13 @@
 ﻿using System.Text.Json;
-using ModSupportLib.Install;
+using ModSupportLib.Local;
 using ModSupportLib.Repository;
 
-namespace ModSupportLib;
+namespace ModSupportLib.Service;
 
 public static class ModSupportService
 {
 	private static readonly HttpClient HttpClient = new();
 	
-	public static async Task<List<ModRepository>> LoadRepositoriesAsync(CommonArgs commonArgs, CancellationToken ct = default)
-	{
-		List<ModRepository> repos = [];
-		
-		if (commonArgs.UserRepository != null)
-		{
-			ModRepository userRepo = await LoadRepositoryAsync(commonArgs.UserRepository, ct);
-			userRepo.Type = RepositoryType.User;
-			repos.Add(userRepo);
-		}
-		
-		ModRepository mainRepo = await LoadRepositoryAsync(commonArgs.MainRepository, ct);
-		mainRepo.Type = RepositoryType.Main;
-		repos.Add(mainRepo);
-		
-		return repos;
-	}
-
 	public static async Task<ModRepository> LoadRepositoryAsync(Uri uri, CancellationToken ct = default)
 	{
 		try
@@ -59,12 +41,11 @@ public static class ModSupportService
 		}
 	}
 
-	public static async Task<List<ModInfo>> QueryModsAsync(CommonArgs commonArgs, ModQuery query, CancellationToken ct = default)
+	public static List<ModInfo> QueryMods(List<ModRepository> repositories, ModQuery query)
 	{
 		List<ModInfo> mods = [];
-		foreach (var repository in await LoadRepositoriesAsync(commonArgs, ct))
+		foreach (var repository in repositories)
 		{
-			ct.ThrowIfCancellationRequested();
 			foreach (var modInfo in repository.Supported)
 			{
 				if (PassesQueryFilter(modInfo, query))
@@ -74,11 +55,10 @@ public static class ModSupportService
 		return mods;
 	}
 	
-	public static async Task<ModInfo?> QueryModAsync(CommonArgs commonArgs, ModQuery query, CancellationToken ct = default)
+	public static ModInfo? QueryMod(List<ModRepository> repositories, ModQuery query)
 	{
-		foreach (var repository in await LoadRepositoriesAsync(commonArgs, ct))
+		foreach (var repository in repositories)
 		{
-			ct.ThrowIfCancellationRequested();
 			foreach (var modInfo in repository.Supported)
 			{
 				if (PassesQueryFilter(modInfo, query))
@@ -101,9 +81,17 @@ public static class ModSupportService
 		};
 	}
 
-	public static async Task InstallMod(CommonArgs commonArgs, ModInfo modInfo, CancellationToken ct = default)
+	public static async Task<ModLocalState> InstallMod(CommonArgs commonArgs, ModInfo modInfo, CancellationToken ct = default)
 	{
-		
+		ModLocalState? state = await GetModLocalStateAsync(commonArgs, modInfo);
+		if (state == null)
+		{
+			state = new ModLocalState
+			{
+				AbsolutePath = ""
+			};
+		}
+		return state;
 	}
 	
 	public static async Task UninstallMod(CommonArgs commonArgs, ModInfo modInfo)
@@ -116,7 +104,7 @@ public static class ModSupportService
 		
 	}
 
-	private static string GetModAbsPath(CommonArgs commonArgs, ModInfo modInfo)
+	public static string GetModAbsPath(CommonArgs commonArgs, ModInfo modInfo)
 	{
 		return modInfo.GetPathType() switch
 		{
@@ -131,7 +119,7 @@ public static class ModSupportService
 		};
 	}
 	
-	private static bool PassesQueryFilter(ModInfo info, ModQuery query)
+	public static bool PassesQueryFilter(ModInfo info, ModQuery query)
 	{
 		if (query.Names.Count > 0)
 		{

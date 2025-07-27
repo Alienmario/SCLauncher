@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCLauncher", "SCLauncher\SC
 		{2B858524-E916-4777-866A-B229390F97CA} = {2B858524-E916-4777-866A-B229390F97CA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSupportAgent", "ModSupportAgent\ModSupportAgent.csproj", "{72812B10-17C2-41CF-9C07-50BDF5DB984C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSupportCli", "ModSupportCli\ModSupportCli.csproj", "{72812B10-17C2-41CF-9C07-50BDF5DB984C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2B858524-E916-4777-866A-B229390F97CA} = {2B858524-E916-4777-866A-B229390F97CA}
 	EndProjectSection

@@ -13,4 +13,8 @@
 	  <ProjectReference Include="..\ModSupportLib\ModSupportLib.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="DotMake.CommandLine" Version="2.6.7" />
+	</ItemGroup>
+
 </Project>

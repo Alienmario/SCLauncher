@@ -1,4 +1,4 @@
-namespace ModSupportLib.Install;
+namespace ModSupportLib.Local;
 
 public class ModLocalState
 {

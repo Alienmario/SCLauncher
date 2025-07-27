@@ -1,4 +1,4 @@
-namespace ModSupportLib;
+namespace ModSupportLib.Service;
 
 public class ModQuery
 {
