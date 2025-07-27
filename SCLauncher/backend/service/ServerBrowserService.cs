@@ -17,7 +17,8 @@ public class ServerBrowserService
 	private static readonly TimeSpan ServerQuerySendTimeout = TimeSpan.FromSeconds(5);
 	private static readonly TimeSpan ServerQueryReadTimeout = TimeSpan.FromSeconds(5);
 
-	private readonly MasterServer masterServer = new(MasterServerEndPoint.Source);
+	// This constructor creates connections
+	// private readonly MasterServer masterServer = new(MasterServerEndPoint.Source);
 	private readonly MasterServerQueryFilters filter;
 
 	public ServerBrowserService(BackendService backend)
@@ -31,6 +32,7 @@ public class ServerBrowserService
 	{
 		var queryTasks = new List<Task<Server?>>();
 	
+		using MasterServer masterServer = new(MasterServerEndPoint.Source);
 		await foreach (var masterServerResponse in masterServer.GetServersAsync(filter, cancellationToken: ct))
 		{
 			ct.ThrowIfCancellationRequested();
