@@ -22,6 +22,7 @@ public partial class Game : UserControl
         backend = App.GetService<BackendService>();
         clientController = App.GetService<ClientControlService>();
         DataContext = backend.GetClientConfig();
+        LaunchButton.Content = "Launch " + backend.ActiveApp.GameInstallFolder;
     }
 
     private void OnLaunchGameClicked(object? sender, RoutedEventArgs e)

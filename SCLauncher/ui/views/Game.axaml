@@ -12,23 +12,31 @@
 		<Style Selector="TextBlock.SectionHeader">
 			<Setter Property="FontSize" Value="15"/>
 			<Setter Property="FontWeight" Value="Medium"/>
-			<Setter Property="Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselected}"/>
+			<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
 		</Style>
 	</UserControl.Styles>
 	
-	<DockPanel>
+	<UserControl.Resources>
+		<Thickness x:Key="ExpanderContentPadding">0</Thickness>
+		<Thickness x:Key="ExpanderChevronMargin">5,0,8,0</Thickness>
+	</UserControl.Resources>
+	
+	
+	<DockPanel Margin="0 10 0 0" VerticalSpacing="10">
 		
 		<Button DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
 		        Classes="accent"
 		        Content="Launch game"
+		        Name="LaunchButton"
 		        Click="OnLaunchGameClicked"/>
 		
-		<ScrollViewer>
-			<StackPanel>
+		<Expander HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsExpanded="True"
+		          Background="{DynamicResource TextControlBackground}">
+			<Expander.Header>
 				<DockPanel>
-					<TextBlock Text="Launch options" FontSize="16" FontWeight="Bold" Margin="5 10 5 5"/>
+					<TextBlock Text="Launch options" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
 					<Button Classes="Transparent Grow" Name="ResetConfigButton"
-					        HorizontalAlignment="Right" VerticalAlignment="Bottom">
+					        HorizontalAlignment="Right" VerticalAlignment="Center">
 						<PathIcon Data="{StaticResource arrow_undo_regular}"
 						          Height="12" Width="12" Foreground="Firebrick"/>
 						<Button.Flyout>
@@ -42,20 +50,11 @@
 						</Button.Flyout>
 					</Button>
 				</DockPanel>
-		    
-				<Border BorderThickness="2" CornerRadius="10" Opacity="0.3">
-					<Border.Background>
-						<LinearGradientBrush>
-							<GradientStop Offset="0.0" Color="#00000000"/>
-							<GradientStop Offset="0.01" Color="{DynamicResource SystemChromeDisabledLowColor}"/>
-							<GradientStop Offset="0.15" Color="{DynamicResource SystemChromeDisabledLowColor}"/>
-							<GradientStop Offset="0.3" Color="#00000000"/>
-						</LinearGradientBrush>
-					</Border.Background>
-				</Border>
-				
+			</Expander.Header>
+			
+			<ScrollViewer>
 				<StackPanel Margin="10">
-		    
+	    
 					<!-- Common -->
 					<TextBlock Text="Engine" Classes="SectionHeader"/>
 					<UniformGrid VerticalAlignment="Top" Columns="4" RowSpacing="5">
@@ -64,18 +63,17 @@
 						<CheckBox Content="Multiple instances" IsChecked="{Binding Multirun}"/>
 						<ComboBox Name="WindowModeCombo" SelectedIndex="{Binding WindowMode}"/>
 					</UniformGrid>
-		    
+	    
 					<!-- Game specific -->
 					<ContentControl Content="{Binding .}"/>
-					
+				
 					<!-- Custom entry -->
 					<TextBlock Text="Custom Parameters" Classes="SectionHeader" Margin="0 10 0 5"/>
 					<controls:CustomParamEntry DataContext="{Binding CustomParams}" ShowHint="False"
 					                           Margin="0 0 0 5"/>
-					
 				</StackPanel>
-			</StackPanel>
-		</ScrollViewer>
+			</ScrollViewer>
+		</Expander>
     </DockPanel>
 	
 	<UserControl.DataTemplates>
