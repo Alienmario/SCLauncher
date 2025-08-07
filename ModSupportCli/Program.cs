@@ -2,21 +2,29 @@
 using ModSupportLib.Local;
 using ModSupportLib.Repository;
 using ModSupportLib.Service;
+using Tmds.Utils;
 
 namespace ModSupportCli;
 
 class Program
 {
-	private static void Main(string[] args)
+	private static int Main(string[] args)
 	{
+		// Starting a subprocess function? [Tmds.ExecFunction]
+		if (ExecFunction.IsExecFunctionCommand(args))
+		{
+			return ExecFunction.Program.Main(args);
+		}
+		
 		try
 		{
-			Cli.Run<RootCommand>(args);
+			return Cli.Run<RootCommand>(args);
 		}
 		catch (ArgumentException e)
 		{
 			Console.Error.WriteLine(e.GetAllMessages());
 		}
+		return 1;
 	}
 }
 
@@ -111,7 +119,7 @@ public abstract class BaseModQueryCommand : BaseCommand
 			}
 			else
 			{
-				throw new ArgumentException($"Mod not found: '{mod}'");
+				throw new ArgumentException($"Mod not found '{mod}'");
 			}
 		}
 		return modInfos;
@@ -158,7 +166,7 @@ public class RootCommand
 			}
 			else
 			{
-				Console.Error.WriteLine($"There was an issue loading main repository. ({mainRepo.LoadLocation})");
+				Console.Error.WriteLine($"There was an issue loading main repository. ({mainRepo.Location})");
 				Console.Error.WriteLine(mainRepo.LoadException.GetAllMessages());
 			}
 
@@ -175,9 +183,10 @@ public class RootCommand
 					}
 					else Console.Out.WriteLine("No mods found in the user repository.");
 				}
-				else
+				else if (userRepo.LoadException is not FileNotFoundException
+				         || !ReferenceEquals(UserRepo, CommonArgs.DefaultUserRepository))
 				{
-					Console.Error.WriteLine($"There was an issue loading user repository. ({userRepo.LoadLocation})");
+					Console.Error.WriteLine($"There was an issue loading user repository. ({userRepo.Location})");
 					Console.Error.WriteLine(userRepo.LoadException.GetAllMessages());
 				}
 			}
@@ -189,20 +198,23 @@ public class RootCommand
 	{
 		public async Task RunAsync()
 		{
-			CommonArgs args = GetCommonArgs().Build();
-			List<ModInfo> modList = await GetFilteredModsAsync(args);
+			CommonArgs commonArgs = GetCommonArgs().Build();
+			List<ModInfo> modList = await GetFilteredModsAsync(commonArgs);
 			
 			foreach (ModInfo modInfo in modList)
 			{
-				Console.Out.Write($"Installing mod \"{modInfo.Name}\"...");
+				Console.Out.WriteLine($"Installing mod '{modInfo.Name}'");
 				try
 				{
-					ModLocalState state = await ModSupportService.InstallMod(args, modInfo);
-					Console.Out.WriteLine($" OK @ \"{state.AbsolutePath}\"");
+					ModLocalState state = await ModSupportService.InstallMod(commonArgs, modInfo, (_, evArgs) =>
+					{
+						if (evArgs.Data != null) Console.Out.WriteLine("  " + evArgs.Data);
+					});
+					Console.Out.WriteLine($"Mod '{modInfo.Name}' successfully installed at '{state.AbsoluteInstallPath}'");
 				}
 				catch (Exception e)
 				{
-					Console.Out.WriteLine($" ERROR - {e.GetAllMessages()}");
+					Console.Out.WriteLine($"Install failed - {e.GetAllMessages()}");
 				}
 			}
 		}
@@ -213,20 +225,20 @@ public class RootCommand
 	{
 		public async Task RunAsync()
 		{
-			CommonArgs args = GetCommonArgs().Build();
-			List<ModInfo> modList = await GetFilteredModsAsync(args);
+			CommonArgs commonArgs = GetCommonArgs().Build();
+			List<ModInfo> modList = await GetFilteredModsAsync(commonArgs);
 			
 			foreach (ModInfo modInfo in modList)
 			{
-				Console.Out.Write($"Uninstalling mod \"{modInfo.Name}\"...");
+				Console.Out.Write($"Uninstalling mod '{modInfo.Name}'");
 				try
 				{
-					await ModSupportService.UninstallMod(args, modInfo);
-					Console.Out.WriteLine(" OK");
+					await ModSupportService.UninstallMod(commonArgs, modInfo);
+					Console.Out.WriteLine($"Mod '{modInfo.Name}' successfully uninstalled");
 				}
 				catch (Exception e)
 				{
-					Console.Out.WriteLine($" ERROR - {e.GetAllMessages()}");
+					Console.Out.WriteLine($"Uninstall failed - {e.GetAllMessages()}");
 				}
 			}
 		}

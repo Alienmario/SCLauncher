@@ -2,5 +2,5 @@ namespace ModSupportLib.Local;
 
 public class ModLocalState
 {
-	public required string AbsolutePath { get; init; }
+	public required string AbsoluteInstallPath { get; init; }
 }

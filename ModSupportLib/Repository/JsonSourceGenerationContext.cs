@@ -7,7 +7,8 @@ namespace ModSupportLib.Repository;
 	PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
 	PropertyNameCaseInsensitive = true,
 	AllowTrailingCommas = true,
-	WriteIndented = true)]
+	WriteIndented = true,
+	IndentSize = 4)]
 [JsonSerializable(typeof(ModRepository))]
 internal partial class JsonSourceGenerationContext : JsonSerializerContext
 {
