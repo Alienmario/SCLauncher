@@ -1,6 +1,6 @@
 namespace ModSupportLib.Repository;
 
-public class ModInfo
+public record ModInfo
 {
 	public required string Name { get; set; }
 	public string? Short { get; set; }

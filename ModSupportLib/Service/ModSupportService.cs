@@ -13,35 +13,59 @@ public static class ModSupportService
 	
 	public static async Task<ModRepository> LoadRepositoryAsync(Uri uri, CancellationToken ct = default)
 	{
+		ModRepository repository;
+		DateTime? lastChanged = null;
+		string? localPath = null;
+		
 		try
 		{
-			string json;
 			if (!uri.IsAbsoluteUri)
 			{
-				json = await File.ReadAllTextAsync(uri.OriginalString, ct);
+				localPath = uri.OriginalString;
 			}
 			else if (uri.IsFile)
 			{
-				json = await File.ReadAllTextAsync(uri.LocalPath, ct);
+				localPath = uri.LocalPath;
+			}
+
+			string json;
+			if (localPath != null)
+			{
+				json = await File.ReadAllTextAsync(localPath, ct);
+				lastChanged = File.GetLastWriteTime(localPath);
 			}
 			else
 			{
 				json = await HttpClient.GetStringAsync(uri, ct);
 			}
-
-			ModRepository repository = JsonSerializer.Deserialize(json, JsonSourceGenerationContext.Default.ModRepository)
-			                              ?? throw new InvalidOperationException("JSON equals to null");
-			repository.Location = uri;
-			return repository;
+			
+			repository = JsonSerializer.Deserialize(json, JsonSourceGenerationContext.Default.ModRepository)
+			             ?? throw new InvalidOperationException("JSON equals to null");
 		}
 		catch (Exception e)
 		{
-			return new ModRepository
-			{
-				Location = uri,
-				LoadException = e
-			};
+			repository = new ModRepository { LoadException = e };
 		}
+		repository.Location = uri;
+		repository.LocalPath = localPath;
+		repository.LoadTime = DateTime.Now;
+		repository.LastChanged = lastChanged;
+		return repository;
+	}
+
+	public static async Task<ModRepository> RefreshRepositoryAsync(ModRepository repository, CancellationToken ct = default)
+	{
+		try
+		{
+			if (repository is { LastChanged: not null, LocalPath: not null })
+			{
+				if (File.GetLastWriteTime(repository.LocalPath) <= repository.LastChanged)
+					return repository;
+			}
+		}
+		catch (Exception) {}
+		
+		return await LoadRepositoryAsync(repository.Location, ct);
 	}
 
 	internal static async Task SaveRepositoryAsync(ModRepository repository)
@@ -63,7 +87,7 @@ public static class ModSupportService
 		await File.WriteAllTextAsync(path, content);
 	}
 
-	/// <param name="installed">To search in installed mods. By default searches in supported mods.</param>
+	/// <param name="installed">To search in installed mods. By default, searches in supported mods.</param>
 	public static List<ModInfo> QueryMods(List<ModRepository> repositories, ModQuery query, bool installed = false)
 	{
 		List<ModInfo> mods = [];
@@ -94,67 +118,160 @@ public static class ModSupportService
 		return null;
 	}
 
+	/// Installs a mod to the install repository, potentially downloads it to WorkshopPath.
 	/// <exception cref="InstallException">for any issues</exception>
-	public static async Task<ModLocalState> InstallMod(CommonArgs commonArgs, ModInfo modInfo,
-		DataReceivedEventHandler? messageHandler, CancellationToken ct = default)
+	/// <exception cref="ArgumentException">if required arguments are invalid</exception>
+	public static async Task<ModLocalState> InstallModAsync(CommonArgs commonArgs, ModInfo modInfo,
+		DataReceivedEventHandler? messageHandler, bool updateIfInstalled = false, CancellationToken ct = default)
 	{
-		if (modInfo.Workshop == null)
-		{
-			throw new InstallException("Mod is missing Workshop ID");
-		}
-		if (commonArgs.WorkshopPath == null)
-		{
-			throw new InstallException("Workshop path is not provided");
-		}
-		
-		// check if already installed
+		// check for duplicates
 		
 		ModRepository installRepo = await LoadRepositoryAsync(commonArgs.InstallRepository, ct);
-		ModInfo? cachedModInfo = QueryMod([installRepo], ModQuery.ForWorkshopId(modInfo.Workshop.Value), true);
-		if (cachedModInfo != null)
-		{
-			// todo? check if cached and supplied modinfos differ and force uninstall first
-			
-			// it's cached in the install repository, verify if exists physically
-			ModLocalState? state = await GetModLocalStateAsync(commonArgs, cachedModInfo);
-			if (state != null)
-				return state;
-		}
-		
-		// download via DepotDownloader to the supplied WorkshopPath
-		
-		var installPath = Path.Join(commonArgs.WorkshopPath, modInfo.Workshop.ToString());
-		var dlConfig = new PubFileDownloadConfig
-		{
-			AppId = commonArgs.AppId,
-			PublishedFileId = modInfo.Workshop.Value,
-			InstallDirectory = installPath
-		};
-		
-		int dlStatus = await SubProcess
-			.PubFileDownload(dlConfig, messageHandler, messageHandler, null, ct);
-		if (dlStatus != SubProcess.Success)
-		{
-			throw new InstallException("Failed to download mod content from Steam Workshop");
-		}
-
-		// reload the install repository and append the mod
-		
-		installRepo = await LoadRepositoryAsync(commonArgs.InstallRepository);
 		if (installRepo.LoadException != null && installRepo.LoadException is not FileNotFoundException)
 		{
-			throw new InstallException("Failed to load install repository for update", installRepo.LoadException);
+			throw new InstallException("Unable to load install repository for update", installRepo.LoadException);
 		}
 		
-		installRepo.Installed.Add(modInfo);
-		await SaveRepositoryAsync(installRepo);
+		ModInfo? cachedModInfo = QueryMod([installRepo], ModQuery.ForName(modInfo.Name), true);
+		if (cachedModInfo != null && !cachedModInfo.Equals(modInfo))
+		{
+			throw new AlreadyInstalledException(
+				"A mod using this name is already installed with different configuration." +
+				$" If you want to install it, please uninstall '{cachedModInfo.Name}' first.");
+		}
 		
-		return await GetModLocalStateAsync(commonArgs, modInfo) ?? throw new InstallException("Failed to verify mod installation");
+		ct.ThrowIfCancellationRequested();
+		
+		if (modInfo.Workshop != null)
+		{
+			if (string.IsNullOrWhiteSpace(commonArgs.WorkshopPath))
+			{
+				throw new ArgumentException("Workshop path is not provided");
+			}
+		
+			// check if already installed
+		
+			cachedModInfo = QueryMod([installRepo], ModQuery.ForWorkshopId(modInfo.Workshop.Value), true);
+			if (cachedModInfo != null)
+			{
+				if (!cachedModInfo.Equals(modInfo))
+				{
+					throw new AlreadyInstalledException(
+						"A mod using this Workshop ID is already installed with different configuration." +
+						$" If you want to install it, please uninstall '{cachedModInfo.Name}' first.");
+				}
+				if (!updateIfInstalled)
+				{
+					// verify that mod exists physically and exit early if updates are not allowed
+					ModLocalState? state = await GetModLocalStateAsync(commonArgs, cachedModInfo);
+					if (state != null)
+						return state;
+				}
+			}
+		
+			// download via DepotDownloader to the supplied WorkshopPath
+		
+			var installPath = Path.Join(commonArgs.WorkshopPath, modInfo.Workshop.ToString());
+			var dlConfig = new PubFileDownloadConfig
+			{
+				AppId = commonArgs.AppId,
+				PublishedFileId = modInfo.Workshop.Value,
+				InstallDirectory = installPath
+			};
+		
+			ct.ThrowIfCancellationRequested();
+			
+			int dlStatus = await SubProcess.PubFileDownload(dlConfig, messageHandler, messageHandler, null, ct);
+			if (dlStatus != SubProcess.Success)
+			{
+				throw new InstallException("Failed to download mod content from Steam Workshop");
+			}
+		}
+		
+		// validate installation
+
+		ModLocalState localState = await GetModLocalStateAsync(commonArgs, modInfo)
+		    ?? throw new InstallException($"Failed to validate mod installation at '{GetModAbsPath(commonArgs, modInfo)}'");
+
+		// if new installation, append the mod
+
+		if (cachedModInfo == null)
+		{
+			installRepo = await RefreshRepositoryAsync(installRepo);
+			if (installRepo.LoadException != null && installRepo.LoadException is not FileNotFoundException)
+			{
+				throw new InstallException("Unable to load install repository for update", installRepo.LoadException);
+			}
+
+			try
+			{
+				installRepo.Installed.Add(modInfo);
+				await SaveRepositoryAsync(installRepo);
+			}
+			catch (Exception e)
+			{
+				throw new InstallException("Unable to update install repository", e);
+			}
+		}
+
+		return localState;
 	}
-	
-	public static async Task UninstallMod(CommonArgs commonArgs, ModInfo modInfo)
+
+	/// Updates a mod if it had been installed via Workshop.
+	/// <exception cref="InstallException">for any issues</exception>
+	/// <exception cref="ArgumentException">if required arguments are invalid</exception>
+	public static async Task<bool> UpdateModAsync(CommonArgs commonArgs, ModQuery query,
+		DataReceivedEventHandler? messageHandler, CancellationToken ct = default)
 	{
+		return false;
+	}
+
+	/// Uninstalls an installed mod.
+	/// <exception cref="UninstallException">for any issues</exception>
+	/// <exception cref="ArgumentException">if required arguments are invalid</exception>
+	public static async Task<bool> UninstallModAsync(CommonArgs commonArgs, ModQuery query)
+	{
+		ModRepository installRepo = await LoadRepositoryAsync(commonArgs.InstallRepository);
+		if (installRepo.LoadException != null && installRepo.LoadException is not FileNotFoundException)
+		{
+			throw new UninstallException("Unable to load install repository for update", installRepo.LoadException);
+		}
 		
+		ModInfo? cachedModInfo = QueryMod([installRepo], query, true);
+		if (cachedModInfo != null)
+		{
+			if (cachedModInfo.Workshop != null)
+			{
+				if (string.IsNullOrWhiteSpace(commonArgs.WorkshopPath))
+				{
+					throw new ArgumentException("Workshop path is not provided");
+				}
+				string wsModPath = Path.Join(commonArgs.WorkshopPath, cachedModInfo.Workshop.ToString());
+				if (Directory.Exists(wsModPath))
+				{
+					try
+					{
+						Directory.Delete(wsModPath, true);
+					}
+					catch (Exception e)
+					{
+						throw new UninstallException("Unable to delete mods's Workshop directory", e);
+					}
+				}
+			}
+
+			try
+			{
+				installRepo.Installed.Remove(cachedModInfo);
+				await SaveRepositoryAsync(installRepo);
+			}
+			catch (Exception e)
+			{
+				throw new UninstallException("Unable to update install repository", e);
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	public static async Task SetActiveMods(CommonArgs commonArgs, List<ModInfo> mods)

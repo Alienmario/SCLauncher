@@ -63,9 +63,9 @@ public abstract class BaseCommand
 		Description = "Steam AppId for workshop downloads. Also used to determine the main repository path.",
 		HelpName = "appid"
 	)]
-	public required uint AppId { get; set; }
+	public required uint AppId { get; set; } = 362890; // Black mesa
 
-	protected CommonArgsBuilder GetCommonArgs()
+	protected CommonArgsBuilder GetCommonArgsBuilder()
 	{
 		CommonArgsBuilder builder = new CommonArgsBuilder(AppId);
 		if (MainRepo != null)
@@ -86,7 +86,7 @@ public abstract class BaseModQueryCommand : BaseCommand
 	[CliOption(Description = "Indicates that mods are specified by their workshop ID rather than by name.")]
 	public bool WorkshopIds { get; set; }
 
-	protected async Task<List<ModInfo>> GetFilteredModsAsync(CommonArgs args)
+	protected async Task<List<ModInfo>> FilterSupportedModsAsync(CommonArgs args)
 	{
 		List<ModRepository> repos = [];
 		if (args.UserRepository != null)
@@ -95,10 +95,15 @@ public abstract class BaseModQueryCommand : BaseCommand
 		}
 		repos.Add(await ModSupportService.LoadRepositoryAsync(args.MainRepository));
 		
-		return GetFilteredMods(repos);
+		return FilterMods(repos, false);
+	}
+	
+	protected async Task<List<ModInfo>> FilterInstalledModsAsync(CommonArgs args)
+	{
+		return FilterMods([await ModSupportService.LoadRepositoryAsync(args.InstallRepository)], true);
 	}
 
-	protected List<ModInfo> GetFilteredMods(List<ModRepository> repos)
+	protected List<ModInfo> FilterMods(List<ModRepository> repos, bool installed)
 	{
 		List<ModInfo> modInfos = [];
 		foreach (string mod in Mods)
@@ -112,7 +117,7 @@ public abstract class BaseModQueryCommand : BaseCommand
 			{
 				throw new ArgumentException($"Invalid mod identifier '{mod}'", e);
 			}
-			ModInfo? modInfo = ModSupportService.QueryMod(repos, query);
+			ModInfo? modInfo = ModSupportService.QueryMod(repos, query, installed);
 			if (modInfo != null)
 			{
 				modInfos.Add(modInfo);
@@ -151,7 +156,7 @@ public class RootCommand
 	{
 		public async Task RunAsync()
 		{
-			var args = GetCommonArgs().Build();
+			var args = GetCommonArgsBuilder().Build();
 			Console.Out.WriteLine();
 			
 			var mainRepo = await ModSupportService.LoadRepositoryAsync(args.MainRepository);
@@ -198,19 +203,24 @@ public class RootCommand
 	{
 		public async Task RunAsync()
 		{
-			CommonArgs commonArgs = GetCommonArgs().Build();
-			List<ModInfo> modList = await GetFilteredModsAsync(commonArgs);
+			CommonArgs commonArgs = GetCommonArgsBuilder().Build();
+			List<ModInfo> modList = await FilterSupportedModsAsync(commonArgs);
 			
 			foreach (ModInfo modInfo in modList)
 			{
 				Console.Out.WriteLine($"Installing mod '{modInfo.Name}'");
 				try
 				{
-					ModLocalState state = await ModSupportService.InstallMod(commonArgs, modInfo, (_, evArgs) =>
+					ModLocalState state = await ModSupportService.InstallModAsync(commonArgs, modInfo, (_, evArgs) =>
 					{
 						if (evArgs.Data != null) Console.Out.WriteLine("  " + evArgs.Data);
 					});
 					Console.Out.WriteLine($"Mod '{modInfo.Name}' successfully installed at '{state.AbsoluteInstallPath}'");
+					if (modInfo.GetPathType() == ModPathType.RelativePath)
+					{
+						Console.Out.WriteLine("Warning: Mod uses relative file path. If you execute this program from" +
+						                      " any other directory, expect issues.");
+					}
 				}
 				catch (Exception e)
 				{
@@ -225,16 +235,22 @@ public class RootCommand
 	{
 		public async Task RunAsync()
 		{
-			CommonArgs commonArgs = GetCommonArgs().Build();
-			List<ModInfo> modList = await GetFilteredModsAsync(commonArgs);
+			CommonArgs commonArgs = GetCommonArgsBuilder().Build();
+			List<ModInfo> modList = await FilterInstalledModsAsync(commonArgs);
 			
 			foreach (ModInfo modInfo in modList)
 			{
-				Console.Out.Write($"Uninstalling mod '{modInfo.Name}'");
+				Console.Out.WriteLine($"Uninstalling mod '{modInfo.Name}'");
 				try
 				{
-					await ModSupportService.UninstallMod(commonArgs, modInfo);
-					Console.Out.WriteLine($"Mod '{modInfo.Name}' successfully uninstalled");
+					if (await ModSupportService.UninstallModAsync(commonArgs, ModQuery.ForName(modInfo.Name)))
+					{
+						Console.Out.WriteLine($"Mod '{modInfo.Name}' successfully uninstalled");
+					}
+					else
+					{
+						Console.Out.WriteLine($"Mod '{modInfo.Name}' could not be uninstalled");
+					}
 				}
 				catch (Exception e)
 				{

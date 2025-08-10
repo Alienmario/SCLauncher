@@ -6,6 +6,7 @@ namespace ModSupportLib.Repository;
 	UseStringEnumConverter = true,
 	PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
 	PropertyNameCaseInsensitive = true,
+	DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
 	AllowTrailingCommas = true,
 	WriteIndented = true,
 	IndentSize = 4)]

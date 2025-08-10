@@ -13,13 +13,13 @@ public static class Utils
 	}
 	
 	/// Extension method for extracting all nested messages from exceptions.
-	public static string GetAllMessages(this Exception? e, string delimiter = " - ")
+	public static string GetAllMessages(this Exception? e, string delimiter = " - ", bool includeTypes = false)
 	{
 		var messages = new List<string>();
 		do
 		{
 			if (!string.IsNullOrWhiteSpace(e!.Message))
-				messages.Add(e.Message);
+				messages.Add((includeTypes ? e.GetType() + ": " : "") + e.Message);
 			e = e.InnerException;
 		}
 		while (e != null);
