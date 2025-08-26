@@ -118,19 +118,17 @@ public static class ModSupportService
 		return null;
 	}
 
-	/// Installs a mod to the install repository, potentially downloads it to WorkshopPath.
-	/// <exception cref="InstallException">for any issues</exception>
+	/// Installs a mod to the install repository and potentially downloads it to WorkshopPath.
+	/// <exception cref="InstallException">for any install issues</exception>
 	/// <exception cref="ArgumentException">if required arguments are invalid</exception>
+	/// <exception cref="RepositoryLoadException">on install repository load failure</exception>
 	public static async Task<ModLocalState> InstallModAsync(CommonArgs commonArgs, ModInfo modInfo,
 		DataReceivedEventHandler? messageHandler, bool updateIfInstalled = false, CancellationToken ct = default)
 	{
 		// check for duplicates
 		
 		ModRepository installRepo = await LoadRepositoryAsync(commonArgs.InstallRepository, ct);
-		if (installRepo.LoadException != null && installRepo.LoadException is not FileNotFoundException)
-		{
-			throw new InstallException("Unable to load install repository for update", installRepo.LoadException);
-		}
+		installRepo.ThrowIfLoadFailure();
 		
 		ModInfo? cachedModInfo = QueryMod([installRepo], ModQuery.ForName(modInfo.Name), true);
 		if (cachedModInfo != null && !cachedModInfo.Equals(modInfo))
@@ -170,22 +168,7 @@ public static class ModSupportService
 			}
 		
 			// download via DepotDownloader to the supplied WorkshopPath
-		
-			var installPath = Path.Join(commonArgs.WorkshopPath, modInfo.Workshop.ToString());
-			var dlConfig = new PubFileDownloadConfig
-			{
-				AppId = commonArgs.AppId,
-				PublishedFileId = modInfo.Workshop.Value,
-				InstallDirectory = installPath
-			};
-		
-			ct.ThrowIfCancellationRequested();
-			
-			int dlStatus = await SubProcess.PubFileDownload(dlConfig, messageHandler, messageHandler, null, ct);
-			if (dlStatus != SubProcess.Success)
-			{
-				throw new InstallException("Failed to download mod content from Steam Workshop");
-			}
+			await DownloadWorkshopModAsync(commonArgs, modInfo.Workshop.Value, messageHandler, ct);
 		}
 		
 		// validate installation
@@ -198,10 +181,7 @@ public static class ModSupportService
 		if (cachedModInfo == null)
 		{
 			installRepo = await RefreshRepositoryAsync(installRepo);
-			if (installRepo.LoadException != null && installRepo.LoadException is not FileNotFoundException)
-			{
-				throw new InstallException("Unable to load install repository for update", installRepo.LoadException);
-			}
+			installRepo.ThrowIfLoadFailure();
 
 			try
 			{
@@ -218,24 +198,41 @@ public static class ModSupportService
 	}
 
 	/// Updates a mod if it had been installed via Workshop.
-	/// <exception cref="InstallException">for any issues</exception>
+	/// <exception cref="InstallException">for any update issues</exception>
 	/// <exception cref="ArgumentException">if required arguments are invalid</exception>
+	/// <exception cref="RepositoryLoadException">on install repository load failure</exception>
 	public static async Task<bool> UpdateModAsync(CommonArgs commonArgs, ModQuery query,
 		DataReceivedEventHandler? messageHandler, CancellationToken ct = default)
 	{
+		if (string.IsNullOrWhiteSpace(commonArgs.WorkshopPath))
+		{
+			throw new ArgumentException("Workshop path is not provided");
+		}
+
+		ModRepository installRepo = await LoadRepositoryAsync(commonArgs.InstallRepository, ct);
+		installRepo.ThrowIfLoadFailure();
+		
+		ModInfo? cachedModInfo = QueryMod([installRepo], query, true);
+		if (cachedModInfo != null)
+		{
+			if (cachedModInfo.Workshop == null)
+			{
+				throw new InstallException("The specified mod does not have a Workshop ID");
+			}
+			await DownloadWorkshopModAsync(commonArgs, cachedModInfo.Workshop.Value, messageHandler, ct);
+			return true;
+		}
 		return false;
 	}
 
 	/// Uninstalls an installed mod.
-	/// <exception cref="UninstallException">for any issues</exception>
+	/// <exception cref="UninstallException">for any uninstall issues</exception>
 	/// <exception cref="ArgumentException">if required arguments are invalid</exception>
+	/// <exception cref="RepositoryLoadException">on install repository load failure</exception>
 	public static async Task<bool> UninstallModAsync(CommonArgs commonArgs, ModQuery query)
 	{
 		ModRepository installRepo = await LoadRepositoryAsync(commonArgs.InstallRepository);
-		if (installRepo.LoadException != null && installRepo.LoadException is not FileNotFoundException)
-		{
-			throw new UninstallException("Unable to load install repository for update", installRepo.LoadException);
-		}
+		installRepo.ThrowIfLoadFailure();
 		
 		ModInfo? cachedModInfo = QueryMod([installRepo], query, true);
 		if (cachedModInfo != null)
@@ -320,5 +317,28 @@ public static class ModSupportService
 				return false;
 		}
 		return true;
+	}
+
+	private static async Task DownloadWorkshopModAsync(
+		CommonArgs commonArgs,
+		ulong workshopId, 
+		DataReceivedEventHandler? messageHandler,
+		CancellationToken ct = default)
+	{
+		var installPath = Path.Join(commonArgs.WorkshopPath, workshopId.ToString());
+		var dlConfig = new PubFileDownloadConfig
+		{
+			AppId = commonArgs.AppId,
+			PublishedFileId = workshopId,
+			InstallDirectory = installPath
+		};
+		
+		ct.ThrowIfCancellationRequested();
+		
+		int dlStatus = await SubProcess.PubFileDownload(dlConfig, messageHandler, messageHandler, null, ct);
+		if (dlStatus != SubProcess.Success)
+		{
+			throw new InstallException("Failed to download mod content from Steam Workshop");
+		}
 	}
 }

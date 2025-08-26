@@ -1,4 +1,5 @@
-﻿using DotMake.CommandLine;
+﻿using System.Diagnostics;
+using DotMake.CommandLine;
 using ModSupportLib.Local;
 using ModSupportLib.Repository;
 using ModSupportLib.Service;
@@ -6,7 +7,7 @@ using Tmds.Utils;
 
 namespace ModSupportCli;
 
-class Program
+internal static class Program
 {
 	private static int Main(string[] args)
 	{
@@ -201,6 +202,11 @@ public class RootCommand
 	[CliCommand(Alias = "i", Name = "install", Description = "Installs mods")]
 	public class InstallModsCommand : BaseModQueryCommand
 	{
+		[CliOption(
+			Description = "Whether to try to update matched mods that have been installed previously."
+		)]
+		public bool UpdateIfInstalled { get; set; } = true;
+		
 		public async Task RunAsync()
 		{
 			CommonArgs commonArgs = GetCommonArgsBuilder().Build();
@@ -211,15 +217,19 @@ public class RootCommand
 				Console.Out.WriteLine($"Installing mod '{modInfo.Name}'");
 				try
 				{
-					ModLocalState state = await ModSupportService.InstallModAsync(commonArgs, modInfo, (_, evArgs) =>
+					void MessageHandler(object sender, DataReceivedEventArgs evArgs)
 					{
 						if (evArgs.Data != null) Console.Out.WriteLine("  " + evArgs.Data);
-					});
+					}
+
+					ModLocalState state = await ModSupportService.InstallModAsync(commonArgs, modInfo,
+						MessageHandler, UpdateIfInstalled);
+					
 					Console.Out.WriteLine($"Mod '{modInfo.Name}' successfully installed at '{state.AbsoluteInstallPath}'");
 					if (modInfo.GetPathType() == ModPathType.RelativePath)
 					{
 						Console.Out.WriteLine("Warning: Mod uses relative file path. If you execute this program from" +
-						                      " any other directory, expect issues.");
+						                      " any other directory, expect to have issues.");
 					}
 				}
 				catch (Exception e)
@@ -229,7 +239,42 @@ public class RootCommand
 			}
 		}
 	}
-		
+	
+	[CliCommand(Alias = "r", Name = "refresh", Description = "Updates / re-downloads mods")]
+	public class RefreshModsCommand : BaseModQueryCommand
+	{
+		public async Task RunAsync()
+		{
+			CommonArgs commonArgs = GetCommonArgsBuilder().Build();
+			List<ModInfo> modList = await FilterInstalledModsAsync(commonArgs);
+			
+			foreach (ModInfo modInfo in modList)
+			{
+				Console.Out.WriteLine($"Refreshing mod '{modInfo.Name}'");
+				try
+				{
+					void MessageHandler(object sender, DataReceivedEventArgs evArgs)
+					{
+						if (evArgs.Data != null) Console.Out.WriteLine("  " + evArgs.Data);
+					}
+					
+					if (await ModSupportService.UpdateModAsync(commonArgs, ModQuery.ForName(modInfo.Name), MessageHandler))
+					{
+						Console.Out.WriteLine($"Mod '{modInfo.Name}' successfully refreshed");
+					}
+					else
+					{
+						Console.Out.WriteLine($"Mod '{modInfo.Name}' could not be refreshed");
+					}
+				}
+				catch (Exception e)
+				{
+					Console.Out.WriteLine($"Refresh failed - {e.GetAllMessages()}");
+				}
+			}
+		}
+	}
+	
 	[CliCommand(Alias = "u", Name = "uninstall", Description = "Uninstalls mods")]
 	public class UninstallModsCommand : BaseModQueryCommand
 	{

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ModSupportLib.Exceptions;
 
 namespace ModSupportLib.Repository;
 
@@ -12,4 +13,12 @@ public class ModRepository
 	[JsonIgnore] public DateTime LoadTime { get; internal set; }
 	[JsonIgnore] public DateTime? LastChanged { get; internal set; }
 	[JsonIgnore] public Exception? LoadException { get; internal set; }
+
+	public void ThrowIfLoadFailure()
+	{
+		if (LoadException != null && LoadException is not FileNotFoundException)
+		{
+			throw new RepositoryLoadException("Unable to load repository", LoadException);
+		}
+	}
 }
