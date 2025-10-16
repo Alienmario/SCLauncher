@@ -22,6 +22,10 @@
 - Install new campaign mods on server and client
 - Select active campaign mod on server and client
 
+## Known issues
+#### Windows application error when starting the server
+- Download and install vc_redist (x86) for 2013 and 2015-2022 from [Microsoft](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version).
+
 ## Made possible by
 - [Avalonia UI](https://avaloniaui.net/)
 - [DepotDownloader](https://github.com/SteamRE/DepotDownloader) / [DepotDownloaderSubProcess](https://github.com/Alienmario/DepotDownloaderSubProcess)
