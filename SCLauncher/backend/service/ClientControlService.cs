@@ -26,26 +26,25 @@ public class ClientControlService(BackendService backend, GlobalConfiguration gl
 			args.AddRange(["+password", password]);
 		}
 
-		return RunClient(args);
+		List<string> configArgs = backend.GetClientConfig().ToLaunchParams();
+		configArgs.Remove("-multirun"); // do not launch extra instances when just connecting
+
+		return RunClient(configArgs.Concat(args));
 	}
 
-	/// <param name="args">Launch parameter args</param>
-	/// <param name="useConfig">Whether to concat game client configuration to the args</param>
+	/// <param name="args">Launch parameter arguments, null means use the client config.</param>
 	/// <exception cref="InvalidGamePathException">Thrown when the game executable cannot be found at configured path</exception>
-	public bool RunClient(IEnumerable<string>? args = null, bool useConfig = true)
+	public bool RunClient(IEnumerable<string>? args = null)
 	{
 		var exec = Path.Join(globalConfig.GamePath, backend.ActiveApp.GameExecutable[Environment.OSVersion.Platform]);
 
 		if (!File.Exists(exec))
 			throw new InvalidGamePathException();
 
-		args ??= [];
-		IEnumerable<string> finalArgs = useConfig ? backend.GetClientConfig().ToLaunchParams().Concat(args) : args;
-
 		try
 		{
 			Process? process = Process.Start(
-				new ProcessStartInfo(exec, finalArgs)
+				new ProcessStartInfo(exec, args ?? backend.GetClientConfig().ToLaunchParams())
 				{
 					UseShellExecute = true,
 					Verb = "open"

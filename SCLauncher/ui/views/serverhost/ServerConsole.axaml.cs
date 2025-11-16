@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -37,24 +36,13 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		backend = App.GetService<BackendService>();
 		config = App.GetService<GlobalConfiguration>();
 
-		StartButton.Click += (sender, args) =>
-		{
-			svController.Start();
-		};
-		StopButton.Click += (sender, args) =>
-		{
-			svController.Stop();
-		};
+		StartButton.Click += OnStartServerClicked;
+		StopButton.Click += OnStopServerClicked;
 		svController.StateChanged += OnServerStateChanged;
 		svController.OutputReceived += OnServerOutputReceived;
 		svController.ErrorReceived += OnServerErrorReceived;
 		
 		OnServerStateChanged(this, false);
-	}
-
-	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs args)
-	{
-		base.OnAttachedToVisualTree(args);
 	}
 
 	private void OnServerErrorReceived(object sender, DataReceivedEventArgs args)
@@ -98,6 +86,16 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		}
 	}
 
+	private void OnStartServerClicked(object? sender, RoutedEventArgs args)
+	{
+		svController.Start();
+	}
+	
+	private void OnStopServerClicked(object? sender, RoutedEventArgs args)
+	{
+		svController.Stop();
+	}
+	
 	private void OnMenuJoinClicked(object? sender, RoutedEventArgs args)
 	{
 		if (!svController.IsRunning)
