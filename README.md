@@ -25,6 +25,11 @@
 ## Known issues
 #### Windows application error when starting the server
 - Download and install vc_redist (x86) for 2013 and 2015-2022 from [Microsoft](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version).
+#### Server browser not working anymore
+- Valve has suddenly shutdown their Master server endpoint. You can still query servers directly via IP or link.
+
+## Details
+The launcher stores its persistent data at `%LocalAppData%\SCLauncher`.
 
 ## Made possible by
 - [Avalonia UI](https://avaloniaui.net/)
