@@ -114,8 +114,8 @@
 								          Click="OnMenuToggleTimeDisplayClicked"
 								          IsChecked="{Binding #ConsoleViewer.DisplayTime}"/>
 								<MenuItem Header="-"/>
-								<MenuItem Header="Reinstall or Update" Click="OnMenuInstallClicked"/>
-								<MenuItem Header="Uninstall" Click="OnMenuUninstallClicked"/>
+								<MenuItem Header="Install..." Click="OnMenuInstallClicked"/>
+								<MenuItem Header="Uninstall..." Click="OnMenuUninstallClicked"/>
 							</MenuFlyout>
 						</Button.Flyout>
 					</Button>

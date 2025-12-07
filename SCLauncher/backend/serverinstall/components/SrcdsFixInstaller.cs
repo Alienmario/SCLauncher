@@ -18,7 +18,7 @@ public class SrcdsFixInstaller : IServerComponentInstaller<ComponentInfo>
 	public const string ExecutableWin64 = "srcds_sclauncher_x64.exe";
 	public const string ExecutableLinux = "srcds_sclauncher";
 	
-	public ServerInstallComponent ComponentType => ServerInstallComponent.SrcdsFix;
+	public ServerInstallComponent Component => ServerInstallComponent.SrcdsFix;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken ct)

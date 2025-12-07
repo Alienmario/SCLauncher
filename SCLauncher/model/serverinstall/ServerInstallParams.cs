@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -19,6 +18,5 @@ public partial class ServerInstallParams : INotifyPropertyChanged
 	public bool CreateSubfolder { get; set; } = true;
 
 	/// Components to install
-	public ISet<ServerInstallComponent> Components { get; set; }
-		= new HashSet<ServerInstallComponent>(Enum.GetValues<ServerInstallComponent>());
+	public ISet<ServerInstallComponent> Components { get; set; } = new HashSet<ServerInstallComponent>();
 }

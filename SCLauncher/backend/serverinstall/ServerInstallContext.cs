@@ -18,8 +18,7 @@ public class ServerInstallContext
 
 	public ServerInstallParams Params { get; }
 
-	public readonly IDictionary<ServerInstallComponent, ComponentInfo> ComponentInfos
-		= new Dictionary<ServerInstallComponent, ComponentInfo>();
+	public readonly Dictionary<ServerInstallComponent, ComponentInfo> ComponentInfos = new();
 
 	private readonly string installDir;
 

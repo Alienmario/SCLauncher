@@ -176,7 +176,7 @@ public class ServerControlService
 		}
 	}
 
-	public async Task<ServerAvailability> IsAvailableAsync(CancellationToken cancellationToken = default)
+	public async Task<ServerAvailability> IsAvailableAsync(CancellationToken ct = default)
 	{
 		if (globalConfig.ServerPath == null)
 			return ServerAvailability.Unavailable;
@@ -189,9 +189,11 @@ public class ServerControlService
 			CreateSubfolder = false
 		};
 		
-		var infos = await installService.GatherComponentInfoAsync(p, false, cancellationToken);
-		bool installIncomplete = infos.Values.Any(info => info is { Installable: true, Installed: false });
-		bool installPartial = infos.Values.Any(info => info is { Installable: true, Installed: true }) && installIncomplete;
+		var infos = await installService.GatherComponentInfosAsync(p, false, ct);
+		bool installIncomplete = infos.Any(info => info is { Value: { Installable: true, Installed: false }, Key.Optional: false });
+		bool installPartial = infos.Any(info => info is { Value : { Installable: true, Installed: true }, Key.Optional: false })
+		                      && installIncomplete;
+		
 		return installIncomplete
 			? installPartial ? ServerAvailability.PartiallyInstalled : ServerAvailability.Unavailable
 			: ServerAvailability.Available;

@@ -11,15 +11,17 @@ using SCLauncher.backend.util;
 using SCLauncher.model;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
-using Path = System.IO.Path;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstaller<ComponentInfo>
+public class BasePluginInstaller(InstallHelper helper) : IServerComponentInstaller<ComponentInfo>
 {
-	
-	public ServerInstallComponent ComponentType => ServerInstallComponent.SourceCoop;
-	
+
+	public required ServerInstallComponent Component { get; init; }
+	public required string PluginFileName { get; init; }
+	public required string GithubOwner { get; init; }
+	public required string GithubRepo { get; init; }
+
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken ct)
 	{
@@ -30,7 +32,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 		}
 		catch (Exception e)
 		{
-			throw new InstallException("Unable to find latest SourceCoop release on GitHub", e);
+			throw new InstallException($"Unable to find latest {Component} release on GitHub", e);
 		}
 
 		(string url, string filename) dl = GetDownload(ctx, release);
@@ -45,7 +47,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 		catch (Exception e)
 		{
 			helper.SafeDelete(archivePath);
-			throw new InstallException("Failed to download SourceCoop", e);
+			throw new InstallException($"Failed to download {Component}", e);
 		}
 		
 		yield return new StatusMessage($"Extracting...");
@@ -56,7 +58,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 		}
 		catch (Exception e)
 		{
-			throw new InstallException("Failed to extract SourceCoop", e);
+			throw new InstallException($"Failed to extract {Component}", e);
 		}
 		finally
 		{
@@ -66,8 +68,8 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades, CancellationToken ct = default)
 	{
-		string scPlugin = Path.Join(ctx.AddonsDir, "sourcemod", "plugins", "srccoop.smx");
-		if (!File.Exists(scPlugin))
+		string pluginPath = Path.Join(ctx.AddonsDir, "sourcemod", "plugins", PluginFileName);
+		if (!File.Exists(pluginPath))
 		{
 			return ComponentInfo.ReadyToInstall;
 		}
@@ -78,7 +80,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 		{
 			try
 			{
-				var pluginInfo = SourcemodPluginAnalyzer.Analyze(scPlugin);
+				var pluginInfo = SourcemodPluginAnalyzer.Analyze(pluginPath);
 				localVersion = pluginInfo.MyInfo.Version;
 				if (localVersion != null)
 				{
@@ -88,7 +90,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 					if (latestVersion.StartsWith('v'))
 						latestVersion = latestVersion[1..];
 					
-					Trace.WriteLine($"Checking SourceCoop version [Local: {localVersion}, Latest: {latestVersion}]");
+					Trace.WriteLine($"Checking {Component} version [Local: {localVersion}, Latest: {latestVersion}]");
 					if (VersionUtils.SmartCompare(localVersion, latestVersion) < 0)
 					{
 						upgradeVersion = latestVersion;
@@ -103,7 +105,7 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 
 		return new ComponentInfo
 		{
-			Path = scPlugin,
+			Path = pluginPath,
 			Upgradable = upgradeVersion != null,
 			UpgradeVersion = upgradeVersion,
 			Version = localVersion
@@ -112,16 +114,25 @@ public class SourceCoopInstaller(InstallHelper helper) : IServerComponentInstall
 
 	private Task<Release> GetLatestRelease()
 	{
-		return helper.GithubClient.Repository.Release.GetLatest("ampreeT", "SourceCoop");
+		return helper.GithubClient.Repository.Release.GetLatest(GithubOwner, GithubRepo);
 	}
 
 	private static (string url, string filename) GetDownload(ServerInstallContext ctx, Release release)
 	{
 		foreach (ReleaseAsset asset in release.Assets)
 		{
-			if (asset.Name.EndsWith($"-{ctx.Params.AppInfo.ModFolder}.zip"))
+			if (asset.Name.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase)
+			    || asset.Name.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase)
+			    || asset.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
 			{
-				return (asset.BrowserDownloadUrl, asset.Name);
+				foreach (string split in asset.Name.Split(['-', '_', '.'], 
+					         StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+				{
+					if (split.Equals(ctx.Params.AppInfo.ModFolder, StringComparison.OrdinalIgnoreCase))
+					{
+						return (asset.BrowserDownloadUrl, asset.Name);
+					}
+				}
 			}
 		}
 

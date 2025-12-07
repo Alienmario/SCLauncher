@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -45,34 +44,22 @@ public class ServerInstallService(
 		return serverInstallRunner.Uninstaller(uninstallParams);
 	}
 
-	public async Task<IDictionary<ServerInstallComponent, ComponentInfo>> GatherComponentInfoAsync(
-		ServerInstallParams p,
-		bool checkForUpgrades,
-		CancellationToken cancellationToken = default)
+	public async Task<IDictionary<ServerInstallComponent, ComponentInfo>> GatherComponentInfosAsync(
+		ServerInstallParams p, bool checkForUpgrades, CancellationToken ct = default)
 	{
 		var ctx = new ServerInstallContext(p);
 		
-		foreach (var component in Enum.GetValues<ServerInstallComponent>())
+		foreach (var installer in componentInstallers.OrderBy(installer => installer.Component.InstallOrder))
 		{
-			await GatherComponentInfoAsync(component, ctx, checkForUpgrades, cancellationToken);
+			ctx.ComponentInfos[installer.Component] = await installer.GatherInfoAsync(ctx, checkForUpgrades, ct);
 		}
 		
 		return ctx.ComponentInfos;
 	}
-	
-	internal async Task GatherComponentInfoAsync(
-		ServerInstallComponent component,
-		ServerInstallContext ctx,
-		bool checkForUpgrades,
-		CancellationToken cancellationToken = default)
-	{
-		ctx.ComponentInfos[component] = await GetComponentInstaller(component)
-			.GatherInfoAsync(ctx, checkForUpgrades, cancellationToken);
-	}
 
 	internal IServerComponentInstaller<ComponentInfo> GetComponentInstaller(ServerInstallComponent component)
 	{
-		return componentInstallers.First(i => i.ComponentType == component);
+		return componentInstallers.First(installer => installer.Component == component);
 	}
 	
 }
