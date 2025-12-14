@@ -16,23 +16,29 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 	internal async IAsyncEnumerable<StatusMessage> Installer(ServerInstallParams installParams,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
+		yield return new StatusMessage("Installation started");
+		
 		ServerInstallContext ctx = new ServerInstallContext(installParams);
 		
-		yield return new StatusMessage("Installation started");
-
-		foreach (var component in Enum.GetValues<ServerInstallComponent>())
+		// ensure server info is always available in the context
+		if (!ctx.Params.Components.Contains(ServerInstallComponent.Server))
 		{
-			var installer = installers.FirstOrDefault(i => i.ComponentType == component);
+			var serverInstaller = installers.First(installer => installer.Component == ServerInstallComponent.Server);
+			ctx.ComponentInfos[ServerInstallComponent.Server] = await serverInstaller.GatherInfoAsync(ctx, false, ct);
+		}
+
+		foreach (var component in ctx.Params.Components.OrderBy(component => component.InstallOrder))
+		{
+			var installer = installers.FirstOrDefault(i => i.Component == component);
 			if (installer == null)
+			{
+				yield return new StatusMessage($"Component <{component}> has no corresponding installer!", MessageStatus.Error);
 				continue;
-			
+			}
+
 			ct.ThrowIfCancellationRequested();
 
 			ctx.ComponentInfos[component] = await installer.GatherInfoAsync(ctx, false, ct);
-			
-			if (!ctx.Params.Components.Contains(component))
-				continue;
-
 			if (!ctx.ComponentInfos[component].Installable)
 			{
 				yield return new StatusMessage($"Component <{component}> is not installable, skipping");
@@ -42,7 +48,6 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 			ct.ThrowIfCancellationRequested();
 			
 			yield return new StatusMessage($"Installing component <{component}>");
-
 			await foreach (var message in installer.Install(ctx, ct))
 			{
 				yield return message;
@@ -71,14 +76,11 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 		
 		yield return new StatusMessage("Uninstall started");
 
-		foreach (var component in Enum.GetValues<ServerInstallComponent>())
+		foreach (var installer in installers.OrderByDescending(installer => installer.Component.InstallOrder))
 		{
-			var installer = installers.FirstOrDefault(i => i.ComponentType == component);
-			if (installer == null)
-				continue;
-
 			ct.ThrowIfCancellationRequested();
 
+			var component = installer.Component;
 			IAsyncEnumerable<StatusMessage> componentUninstaller;
 			try
 			{

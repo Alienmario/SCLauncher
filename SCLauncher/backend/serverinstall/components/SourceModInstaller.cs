@@ -20,7 +20,7 @@ public partial class SourceModInstaller(InstallHelper helper) : IServerComponent
 	
 	private const string SourceModVersion = "1.12";
 
-	public ServerInstallComponent ComponentType => ServerInstallComponent.SourceMod;
+	public ServerInstallComponent Component => ServerInstallComponent.SourceMod;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken ct)

@@ -26,7 +26,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 		public bool Validate { get; init; }
 	}
 	
-	public ServerInstallComponent ComponentType => ServerInstallComponent.Server;
+	public ServerInstallComponent Component => ServerInstallComponent.Server;
 	
 	public IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx, CancellationToken ct = default)
 	{
@@ -76,7 +76,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 		{
 			InstallDirectory = ctx.InstallDir,
 			VerifyAll = true,
-			AppId = (uint)ctx.Params.AppInfo.ServerAppId
+			AppId = ctx.Params.AppInfo.ServerAppId
 		};
 
 		int? exitCode = null;

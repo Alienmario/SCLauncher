@@ -18,7 +18,7 @@ public partial class MetaModInstaller(InstallHelper helper) : IServerComponentIn
 {
 	private const string MetaModVersion = "1.12";
 
-	public ServerInstallComponent ComponentType => ServerInstallComponent.MetaMod;
+	public ServerInstallComponent Component => ServerInstallComponent.MetaMod;
 	
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken ct)

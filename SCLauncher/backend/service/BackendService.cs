@@ -40,7 +40,11 @@ public class BackendService
 			DefaultServerConfigProvider = () => new ServerConfiguration
 			{
 				Teamplay = true,
-				StartMap = "bm_c0a0a"
+				StartMap = "bm_c0a0a",
+				CustomParams =
+				{
+					new CustomParam("+modelchooser_teambased", "0")
+				}
 			},
 			DefaultClientConfigProvider = () => new ClientConfigurationBlackMesa()
 		};

@@ -101,8 +101,9 @@ public partial class InstallOverview : UserControl, WizardNavigator.IWizardConte
 			if (cancellationToken.IsCancellationRequested)
 				return;
 			
-			var componentInfos = await installService.GatherComponentInfoAsync(
-				installParams, true, cancellationToken);
+			var componentInfos =
+				(await installService.GatherComponentInfosAsync(installParams, true, cancellationToken))
+					.OrderBy(pair => pair.Key.InstallOrder);
 			
 			if (cancellationToken.IsCancellationRequested)
 				return;
@@ -136,7 +137,7 @@ public partial class InstallOverview : UserControl, WizardNavigator.IWizardConte
 						Component = component,
 						Status = status,
 						Install = !status.Equals("Already installed"),
-						InstallEditable = !status.Equals("Ready to install")
+						InstallEditable = !status.Equals("Ready to install") || component.Optional
 					});
 				}
 				Wizard?.SetControls(forward: true);

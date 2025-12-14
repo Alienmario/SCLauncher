@@ -23,28 +23,29 @@
 			<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
 			<Setter Property="HorizontalContentAlignment" Value="Left"/>
 			<Setter Property="Padding" Value="0 3"/>
+			<Setter Property="FontSize" Value="16"/>
 		</Style>
 		<Style Selector=":is(Control).Value">
 			<Setter Property="Margin" Value="0 0 0 5"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
 		</Style>
-		<Style Selector="TextBlock.Value">
+		<Style Selector=":is(TextBlock).Value">
 			<Setter Property="TextWrapping">Wrap</Setter>
 		</Style>
 	</UserControl.Styles>
 	
 	<DockPanel Margin="0 10 0 5">
 		
-		<!-- Install properties -->
+		<!-- Installation properties -->
 		<Grid ColumnDefinitions="Auto *"
 		      RowDefinitions="Auto, Auto, Auto"
 		      VerticalAlignment="Center"
 		      DockPanel.Dock="Top">
 			
-			<Label Grid.Row="1" Grid.Column="0" Content="Install method:" Classes="Key"/>
+			<Label Grid.Row="1" Grid.Column="0" Content="Install method" Classes="Key"/>
 			<SelectableTextBlock Grid.Row="1" Grid.Column="1" Classes="Value" Text="{Binding Method}"/>
 			
-			<Label Grid.Row="2" Grid.Column="0" Content="Install directory:" Classes="Key"
+			<Label Grid.Row="2" Grid.Column="0" Content="Install directory" Classes="Key"
 			       IsVisible="{Binding #PathText.IsVisible}"/>
 			<SelectableTextBlock Grid.Row="2" Grid.Column="1" Name="PathText" Classes="Value"
 			           Text="{Binding Path, Mode=OneTime}"
@@ -52,34 +53,40 @@
 						ConverterParameter={x:Static serverinstallmodel:ServerInstallMethod.External}}"/>
 		</Grid>
 		
-		<!-- Install components -->
+		<!-- Installation components -->
 		<ScrollViewer AllowAutoHide="False" DockPanel.Dock="Bottom">
 			<ItemsControl Name="ComponentsGrid" ItemsSource="{Binding}" Margin="1 0">
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Spacing="0"/>
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
 				<ItemsControl.ItemTemplate>
 					<DataTemplate DataType="serverinstallviews:OverviewComponentEntry">
-						<DockPanel>
+						<DockPanel Margin="0 2">
+							
+							<DockPanel DockPanel.Dock="Right">
+								<SelectableTextBlock DockPanel.Dock="Right" VerticalAlignment="Center" TextWrapping="Wrap"
+								                     Text="{Binding Status}"/>
+							</DockPanel>
+							
 							<CheckBox DockPanel.Dock="Left" VerticalAlignment="Top"
 							          IsChecked="{Binding Install}"
-							          IsEnabled="{Binding InstallEditable}"/>
-							<SelectableTextBlock DockPanel.Dock="Left"
-							                     Text="{Binding Component}"
-							                     VerticalAlignment="Center"/>
-							<SelectableTextBlock DockPanel.Dock="Right"
-							           Text="{Binding Status}"
-							           VerticalAlignment="Center"/>
-							<Border Classes="DashedUnderline"/>
+							          IsEnabled="{Binding InstallEditable}">
+							          
+								<TextBlock TextWrapping="Wrap" VerticalAlignment="Center">
+									<TextBlock.Effect>
+										<DropShadowEffect BlurRadius="15" Color="#80151515"/>
+									</TextBlock.Effect>
+									<Run FontSize="14" Foreground="{DynamicResource TextControlForeground}" Text="{Binding Component.Title}"/>
+									<Run FontSize="12" Foreground="#BEBEBE" FontWeight="DemiBold" Text="{Binding Component.Description}"/>
+								</TextBlock>
+							</CheckBox>
+							
+							<Border Classes="DashedUnderline" Padding="0 10" VerticalAlignment="Bottom"/>
+
 						</DockPanel>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
 		</ScrollViewer>
 		
-		<!-- Install components loading indicator -->
+		<!-- Installation components loading indicator -->
 		<li:LoadingIndicator Name="LoadingIndicator" IsActive="True" Mode="DoubleBounce" SpeedRatio="1.5"
 		                     Foreground="{StaticResource Highlight}"
 		                     MaxHeight="150"
