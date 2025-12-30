@@ -14,8 +14,10 @@ public record CommonArgs
 	public Uri? UserRepository { get; init; }
 	/// Repository where installed mod information is cached.
 	public required Uri InstallRepository { get; init; }
-	/// Path where workshop mods are downloaded - contains subfolders named by their workshop id
+	/// Path where workshop mods are downloaded to - contains subfolders named by their workshop id.
 	public string? WorkshopPath { get; init; }
+	/// Path to the game or server where to activate requested mods (aka create links to workshop content).
+	public string? AppPath { get; init; }
 	/// AppId for workshop downloads
 	public required uint AppId { get; init; }
 }
@@ -26,6 +28,7 @@ public partial class CommonArgsBuilder(uint appId) : INotifyPropertyChanged
 	public Uri? UserRepository { get; set; } = CommonArgs.DefaultUserRepository;
 	public Uri? InstallRepository { get; set; } = CommonArgs.DefaultInstallRepository;
 	public string? WorkshopPath { get; set; }
+	public string? AppPath { get; set; }
 	
 	public CommonArgs Build()
 	{
@@ -35,6 +38,7 @@ public partial class CommonArgsBuilder(uint appId) : INotifyPropertyChanged
 			UserRepository = UserRepository,
 			InstallRepository = InstallRepository ?? throw new InvalidOperationException("InstallRepository must be set"),
 			WorkshopPath = WorkshopPath,
+			AppPath = AppPath,
 			AppId = appId
 		};
 	}

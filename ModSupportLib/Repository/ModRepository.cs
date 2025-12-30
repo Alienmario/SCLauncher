@@ -14,11 +14,12 @@ public class ModRepository
 	[JsonIgnore] public DateTime? LastChanged { get; internal set; }
 	[JsonIgnore] public Exception? LoadException { get; internal set; }
 
-	public void ThrowIfLoadFailure()
+	public ModRepository ThrowForLoadFailure()
 	{
 		if (LoadException != null && LoadException is not FileNotFoundException)
 		{
 			throw new RepositoryLoadException("Unable to load repository", LoadException);
 		}
+		return this;
 	}
 }

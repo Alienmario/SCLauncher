@@ -7,7 +7,7 @@ using ModSupportLib.Repository;
 
 namespace ModSupportLib.Service;
 
-public static class ModSupportService
+public static class ModRepositoryService
 {
 	private static readonly HttpClient HttpClient = new();
 	
@@ -127,8 +127,7 @@ public static class ModSupportService
 	{
 		// check for duplicates
 		
-		ModRepository installRepo = await LoadRepositoryAsync(commonArgs.InstallRepository, ct);
-		installRepo.ThrowIfLoadFailure();
+		ModRepository installRepo = (await LoadRepositoryAsync(commonArgs.InstallRepository, ct)).ThrowForLoadFailure();
 		
 		ModInfo? cachedModInfo = QueryMod([installRepo], ModQuery.ForName(modInfo.Name), true);
 		if (cachedModInfo != null && !cachedModInfo.Equals(modInfo))
@@ -176,22 +175,20 @@ public static class ModSupportService
 		ModLocalState localState = await GetModLocalStateAsync(commonArgs, modInfo)
 		    ?? throw new InstallException($"Failed to validate mod installation at '{GetModAbsPath(commonArgs, modInfo)}'");
 
-		// if new installation, append the mod
+		// update entry in the repository
+		
+		modInfo.LastUpdated = DateTime.Now;
 
-		if (cachedModInfo == null)
+		installRepo = (await RefreshRepositoryAsync(installRepo)).ThrowForLoadFailure();
+		try
 		{
-			installRepo = await RefreshRepositoryAsync(installRepo);
-			installRepo.ThrowIfLoadFailure();
-
-			try
-			{
-				installRepo.Installed.Add(modInfo);
-				await SaveRepositoryAsync(installRepo);
-			}
-			catch (Exception e)
-			{
-				throw new InstallException("Unable to update install repository", e);
-			}
+			installRepo.Installed.Remove(modInfo);
+			installRepo.Installed.Add(modInfo);
+			await SaveRepositoryAsync(installRepo);
+		}
+		catch (Exception e)
+		{
+			throw new InstallException("Unable to update install repository", e);
 		}
 
 		return localState;
@@ -209,8 +206,7 @@ public static class ModSupportService
 			throw new ArgumentException("Workshop path is not provided");
 		}
 
-		ModRepository installRepo = await LoadRepositoryAsync(commonArgs.InstallRepository, ct);
-		installRepo.ThrowIfLoadFailure();
+		ModRepository installRepo = (await LoadRepositoryAsync(commonArgs.InstallRepository, ct)).ThrowForLoadFailure();
 		
 		ModInfo? cachedModInfo = QueryMod([installRepo], query, true);
 		if (cachedModInfo != null)
@@ -220,6 +216,23 @@ public static class ModSupportService
 				throw new InstallException("The specified mod does not have a Workshop ID");
 			}
 			await DownloadWorkshopModAsync(commonArgs, cachedModInfo.Workshop.Value, messageHandler, ct);
+			
+			// update entry in the repository
+		
+			cachedModInfo.LastUpdated = DateTime.Now;
+
+			installRepo = (await RefreshRepositoryAsync(installRepo)).ThrowForLoadFailure();
+			try
+			{
+				installRepo.Installed.Remove(cachedModInfo);
+				installRepo.Installed.Add(cachedModInfo);
+				await SaveRepositoryAsync(installRepo);
+			}
+			catch (Exception e)
+			{
+				throw new InstallException("Unable to update install repository", e);
+			}
+
 			return true;
 		}
 		return false;
@@ -231,8 +244,7 @@ public static class ModSupportService
 	/// <exception cref="RepositoryLoadException">on install repository load failure</exception>
 	public static async Task<bool> UninstallModAsync(CommonArgs commonArgs, ModQuery query)
 	{
-		ModRepository installRepo = await LoadRepositoryAsync(commonArgs.InstallRepository);
-		installRepo.ThrowIfLoadFailure();
+		ModRepository installRepo = (await LoadRepositoryAsync(commonArgs.InstallRepository)).ThrowForLoadFailure();
 		
 		ModInfo? cachedModInfo = QueryMod([installRepo], query, true);
 		if (cachedModInfo != null)
@@ -269,11 +281,6 @@ public static class ModSupportService
 			return true;
 		}
 		return false;
-	}
-	
-	public static async Task SetActiveMods(CommonArgs commonArgs, List<ModInfo> mods)
-	{
-		
 	}
 
 	public static async Task<ModLocalState?> GetModLocalStateAsync(CommonArgs commonArgs, ModInfo modInfo)

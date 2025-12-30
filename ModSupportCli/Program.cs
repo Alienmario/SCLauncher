@@ -34,7 +34,7 @@ public abstract class BaseCommand
 	[CliOption(
 		Required = false,
 		Description = "Main repository from where \"official\" mods are loaded. Local/Remote." +
-		              " [default: " + CommonArgs.DefaultRepositoryBase + "/{appId}.json]",
+		              " [default: " + CommonArgs.DefaultRepositoryBase + "/{AppID}.json]",
 		HelpName = "URI"
 	)]
 	public Uri? MainRepo { get; set; }
@@ -54,10 +54,17 @@ public abstract class BaseCommand
 
 	[CliOption(
 		Required = false,
-		Description = "Path where workshop mods are downloaded - contains subfolders named by their Workshop ID.",
+		Description = "Path where workshop mods are downloaded to - contains subfolders named by their Workshop ID.",
 		HelpName = "path"
 	)]
 	public string? WorkshopPath { get; set; }
+
+	[CliOption(
+		Required = false,
+		Description = "Path to the game or server where to activate requested mods (aka create links to workshop content).",
+		HelpName = "path"
+	)]
+	public string? AppPath { get; set; }
 
 	[CliOption(
 		Alias = "app",
@@ -75,6 +82,8 @@ public abstract class BaseCommand
 		builder.InstallRepository = InstallRepo;
 		if (WorkshopPath != null)
 			builder.WorkshopPath = WorkshopPath;
+		if (AppPath != null)
+			builder.AppPath = AppPath;
 		return builder;
 	}
 }
@@ -92,16 +101,16 @@ public abstract class BaseModQueryCommand : BaseCommand
 		List<ModRepository> repos = [];
 		if (args.UserRepository != null)
 		{
-			repos.Add(await ModSupportService.LoadRepositoryAsync(args.UserRepository));
+			repos.Add(await ModRepositoryService.LoadRepositoryAsync(args.UserRepository));
 		}
-		repos.Add(await ModSupportService.LoadRepositoryAsync(args.MainRepository));
+		repos.Add(await ModRepositoryService.LoadRepositoryAsync(args.MainRepository));
 		
 		return FilterMods(repos, false);
 	}
 	
 	protected async Task<List<ModInfo>> FilterInstalledModsAsync(CommonArgs args)
 	{
-		return FilterMods([await ModSupportService.LoadRepositoryAsync(args.InstallRepository)], true);
+		return FilterMods([await ModRepositoryService.LoadRepositoryAsync(args.InstallRepository)], true);
 	}
 
 	protected List<ModInfo> FilterMods(List<ModRepository> repos, bool installed)
@@ -118,7 +127,7 @@ public abstract class BaseModQueryCommand : BaseCommand
 			{
 				throw new ArgumentException($"Invalid mod identifier '{mod}'", e);
 			}
-			ModInfo? modInfo = ModSupportService.QueryMod(repos, query, installed);
+			ModInfo? modInfo = ModRepositoryService.QueryMod(repos, query, installed);
 			if (modInfo != null)
 			{
 				modInfos.Add(modInfo);
@@ -142,7 +151,7 @@ public class RootCommand
 	{
 		public async Task RunAsync()
 		{
-			var repo = await ModSupportService.LoadRepositoryAsync(InstallRepo);
+			var repo = await ModRepositoryService.LoadRepositoryAsync(InstallRepo);
 			if (repo.Installed.Count > 0)
 			{
 				Console.Out.WriteLine($"Listing installed mods (Total: {repo.Installed.Count})");
@@ -160,7 +169,7 @@ public class RootCommand
 			var args = GetCommonArgsBuilder().Build();
 			Console.Out.WriteLine();
 			
-			var mainRepo = await ModSupportService.LoadRepositoryAsync(args.MainRepository);
+			var mainRepo = await ModRepositoryService.LoadRepositoryAsync(args.MainRepository);
 			if (mainRepo.LoadException == null)
 			{
 				if (mainRepo.Supported.Count > 0)
@@ -179,7 +188,7 @@ public class RootCommand
 			if (args.UserRepository != null)
 			{
 				Console.Out.WriteLine();
-				var userRepo = await ModSupportService.LoadRepositoryAsync(args.UserRepository);
+				var userRepo = await ModRepositoryService.LoadRepositoryAsync(args.UserRepository);
 				if (userRepo.LoadException == null)
 				{
 					if (userRepo.Supported.Count > 0)
@@ -222,7 +231,7 @@ public class RootCommand
 						if (evArgs.Data != null) Console.Out.WriteLine("  " + evArgs.Data);
 					}
 
-					ModLocalState state = await ModSupportService.InstallModAsync(commonArgs, modInfo,
+					ModLocalState state = await ModRepositoryService.InstallModAsync(commonArgs, modInfo,
 						MessageHandler, UpdateIfInstalled);
 					
 					Console.Out.WriteLine($"Mod '{modInfo.Name}' successfully installed at '{state.AbsoluteInstallPath}'");
@@ -258,7 +267,7 @@ public class RootCommand
 						if (evArgs.Data != null) Console.Out.WriteLine("  " + evArgs.Data);
 					}
 					
-					if (await ModSupportService.UpdateModAsync(commonArgs, ModQuery.ForName(modInfo.Name), MessageHandler))
+					if (await ModRepositoryService.UpdateModAsync(commonArgs, ModQuery.ForName(modInfo.Name), MessageHandler))
 					{
 						Console.Out.WriteLine($"Mod '{modInfo.Name}' successfully refreshed");
 					}
@@ -288,7 +297,7 @@ public class RootCommand
 				Console.Out.WriteLine($"Uninstalling mod '{modInfo.Name}'");
 				try
 				{
-					if (await ModSupportService.UninstallModAsync(commonArgs, ModQuery.ForName(modInfo.Name)))
+					if (await ModRepositoryService.UninstallModAsync(commonArgs, ModQuery.ForName(modInfo.Name)))
 					{
 						Console.Out.WriteLine($"Mod '{modInfo.Name}' successfully uninstalled");
 					}
@@ -302,6 +311,17 @@ public class RootCommand
 					Console.Out.WriteLine($"Uninstall failed - {e.GetAllMessages()}");
 				}
 			}
+		}
+	}
+	
+	[CliCommand(Alias = "a", Name = "activate", Description = "Sets active mods")]
+	public class ActivateModsCommand : BaseModQueryCommand
+	{
+
+		public async Task RunAsync()
+		{
+			CommonArgs commonArgs = GetCommonArgsBuilder().Build();
+			List<ModInfo> modList = await FilterSupportedModsAsync(commonArgs);
 		}
 	}
 }

@@ -8,6 +8,20 @@ public record ModInfo
 	public ulong? Workshop { get; set; }
 	public required ModType Type { get; set; }
 	public string Path { get; set; } = ".";
+	public DateTime? LastUpdated { get; internal set; }
+
+	public virtual bool Equals(ModInfo? other)
+	{
+		if (other is null) return false;
+		if (ReferenceEquals(this, other)) return true;
+		return Name == other.Name && Short == other.Short && FirstMap == other.FirstMap && Workshop == other.Workshop
+		       && Type == other.Type && Path == other.Path;
+	}
+
+	public override int GetHashCode()
+	{
+		return HashCode.Combine(Name, Short, FirstMap, Workshop, (int)Type, Path);
+	}
 
 	public ModPathType GetPathType()
 	{
