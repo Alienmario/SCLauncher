@@ -1,0 +1,56 @@
+<controls:BaseDialogWindow xmlns="https://github.com/avaloniaui"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:converters="clr-namespace:SCLauncher.ui.converters"
+                           xmlns:profiles="clr-namespace:SCLauncher.ui.views.profiles"
+                           xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+                           mc:Ignorable="d"
+                           x:Class="SCLauncher.ui.views.profiles.ProfileManager"
+                           Title="Profile Manager"
+                           Width="600" Height="450"
+                           CanResize="False"
+                           VerticalScrollBarVisibility="Disabled">
+	
+	<controls:BaseDialogWindow.MainContent>
+		<DockPanel Margin="20" VerticalSpacing="20">
+			<TextBlock DockPanel.Dock="Top" Text="Profile Manager" FontSize="20" FontWeight="Bold"/>
+
+			<Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" BorderThickness="1"
+			        CornerRadius="4">
+				<ListBox Name="ProfilesListBox" SelectionMode="Single" DoubleTapped="OnDoubleTapped">
+					<ListBox.ItemTemplate>
+						<DataTemplate DataType="profiles:ProfileManagerEntry">
+							<Grid ColumnDefinitions="*,Auto" Margin="8">
+								<StackPanel Grid.Column="0" Spacing="4">
+									<TextBlock Text="{Binding Profile.Name}" FontWeight="SemiBold"
+									           FontSize="14"/>
+									<TextBlock Text="{Binding Profile.AppType, Converter={x:Static converters:EnumDescriptionConverter.Instance}}"
+									           FontSize="12" Opacity="0.7"/>
+								</StackPanel>
+								<StackPanel Grid.Column="1" Spacing="4">
+									<TextBlock Text="{Binding Profile.CreatedAt, StringFormat='{}Created: {0:yyyy-MM-dd}'}"
+									           FontSize="11" Opacity="0.6" VerticalAlignment="Center"/>
+									<TextBlock Text="Active" FontSize="11" Opacity="0.6" FontWeight="Bold" VerticalAlignment="Center"
+									           IsVisible="{Binding IsActive}"/>
+								</StackPanel>
+							</Grid>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+			</Border>
+		</DockPanel>
+	</controls:BaseDialogWindow.MainContent>
+
+	<controls:BaseDialogWindow.FooterContent>
+		<DockPanel Margin="20" HorizontalSpacing="15">
+			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+				<Button Name="AddButton" Content="New" Classes="action" HotKey="N"/>
+				<Button Name="EditButton" Content="Edit" IsEnabled="False" Classes="action" HotKey="E"/>
+				<Button Name="DeleteButton" Content="Delete" IsEnabled="False" Classes="action" HotKey="Delete"/>
+				<Button Name="CloseButton" Content="Close" Classes="action" HotKey="Escape"/>
+			</StackPanel>
+		</DockPanel>
+	</controls:BaseDialogWindow.FooterContent>
+
+</controls:BaseDialogWindow>

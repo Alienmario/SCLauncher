@@ -134,7 +134,6 @@ public static class SteamUtils
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
-
 			using var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Valve\Steam");
 			if (key == null)
 			{

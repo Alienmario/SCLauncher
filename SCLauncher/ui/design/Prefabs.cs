@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using SCLauncher.model;
 using SCLauncher.model.config;
 using SCLauncher.model.serverbrowser;
 using SCLauncher.model.serverinstall;
@@ -11,7 +10,7 @@ public class DServerInstallParams : ServerInstallParams
 {
 	public DServerInstallParams()
 	{
-		AppInfo = DAppInfo.Instance;
+		Profile = DAppProfile.Instance;
 		Method = ServerInstallMethod.External;
 		Path = @"C:\Program Files\Program Files\Program Files\Program Files\Program Files\Program Files\Server";
 	}
@@ -21,7 +20,7 @@ public class DServerUninstallParams : ServerUninstallParams
 {
 	public DServerUninstallParams()
 	{
-		AppInfo = DAppInfo.Instance;
+		Profile = DAppProfile.Instance;
 		Path = @"C:\Program Files\Program Files\Program Files\Program Files\Program Files\Program Files\Server";
 	}
 }
@@ -37,17 +36,20 @@ public class DServerConfiguration : ServerConfiguration
 	}
 }
 
-public class DAppInfo : AppInfo
+public class DAppProfile : AppProfile
 {
-	public static readonly DAppInfo Instance = new()
+	public static readonly DAppProfile Instance = new()
 	{
+		Name = "Design Time Profile",
+		AppType = AppType.BlackMesa,
 		GameAppId = 362890,
 		ServerAppId = 346680,
 		GameInstallFolder = "Black Mesa",
 		ServerInstallFolder = "Black Mesa Dedicated Server",
 		ModFolder = "bms",
 		GameExecutable = new Dictionary<PlatformID, string>(),
-		DefaultServerConfigProvider = () => new DServerConfiguration()
+		ServerConfig = new ServerConfiguration(),
+		ClientConfig = new ClientConfigurationBlackMesa()
 	};
 }
 

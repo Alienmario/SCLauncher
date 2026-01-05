@@ -8,17 +8,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using DepotDownloader;
 using SCLauncher.backend.install;
+using SCLauncher.backend.service;
 using SCLauncher.backend.steam;
 using SCLauncher.backend.util;
 using SCLauncher.model;
-using SCLauncher.model.config;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
 using SteamKit2.Authentication;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallHelper installHelper)
+public class DedicatedServerInstaller(BackendService backend, InstallHelper installHelper)
 	: IServerComponentInstaller<ComponentInfo>
 {
 	public class ServerComponentInfo : ComponentInfo
@@ -43,13 +43,13 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 	public async IAsyncEnumerable<StatusMessage> InstallViaSteamClient(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
-		if (!SteamUtils.IsValidSteamInstallDir(globalConfig.SteamPath))
+		if (!SteamUtils.IsValidSteamInstallDir(backend.GlobalConfig.SteamPath))
 		{
 			throw new InstallException("Steam not found! Install it or specify Steam path in settings, then retry.");
 		}
 
-		SteamUtils.InstallApp(ctx.Params.AppInfo.ServerAppId);
-		yield return new StatusMessage($"Waiting for Steam to finish downloading \"{ctx.Params.AppInfo.ServerInstallFolder}\"");
+		SteamUtils.InstallApp(ctx.Params.Profile.ServerAppId);
+		yield return new StatusMessage($"Waiting for Steam to finish downloading \"{ctx.Params.Profile.ServerInstallFolder}\"");
 		
 		while (true)
 		{
@@ -59,11 +59,11 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 			if (info is ServerComponentInfo { Validate: true })
 			{
 				yield return new StatusMessage("Requesting Steam validation");
-				SteamUtils.ValidateApp(ctx.Params.AppInfo.ServerAppId);
+				SteamUtils.ValidateApp(ctx.Params.Profile.ServerAppId);
 			}
 			else if (info.Installed)
 			{
-				globalConfig.ServerPath = info.Path;
+				ctx.Params.Profile.ServerPath = info.Path;
 				break;
 			}
 		}
@@ -76,7 +76,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 		{
 			InstallDirectory = ctx.InstallDir,
 			VerifyAll = true,
-			AppId = ctx.Params.AppInfo.ServerAppId
+			AppId = ctx.Params.Profile.ServerAppId
 		};
 
 		int? exitCode = null;
@@ -93,7 +93,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 			throw new InstallException("Dedicated server download failed");
 		}
 
-		globalConfig.ServerPath = ctx.InstallDir;
+		ctx.Params.Profile.ServerPath = ctx.InstallDir;
 	}
 	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
@@ -101,11 +101,11 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
-			string? steamDir = globalConfig.SteamPath;
+			string? steamDir = backend.GlobalConfig.SteamPath;
 			if (steamDir == null) // this is explicitly handled during install
 				return ComponentInfo.ReadyToInstall;
 
-			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.AppInfo.ServerAppId, ct);
+			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.Profile.ServerAppId, ct);
 			if (manifest == null)
 				return ComponentInfo.ReadyToInstall;
 
@@ -154,7 +154,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 				try
 				{
 					var uintVersion = Convert.ToUInt32(version);
-					upgradeVersion = await SteamUpToDateCheckAsync(ctx.Params.AppInfo.ServerAppId, uintVersion, ct);
+					upgradeVersion = await SteamUpToDateCheckAsync(ctx.Params.Profile.ServerAppId, uintVersion, ct);
 				}
 				catch (Exception e)
 				{
@@ -179,11 +179,11 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 		
 		do
 		{
-			string? steamDir = globalConfig.SteamPath;
+			string? steamDir = backend.GlobalConfig.SteamPath;
 			if (steamDir == null)
 				yield break;
 			
-			var manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.AppInfo.ServerAppId, ct);
+			var manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.Profile.ServerAppId, ct);
 			if (manifest == null)
 				yield break;
 
@@ -206,7 +206,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 
 			if (!steamRequestDispatched)
 			{
-				SteamUtils.UninstallApp(ctx.Params.AppInfo.ServerAppId);
+				SteamUtils.UninstallApp(ctx.Params.Profile.ServerAppId);
 				yield return new StatusMessage("Waiting for Steam uninstaller to finish");
 				steamRequestDispatched = true;
 			}

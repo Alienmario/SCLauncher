@@ -21,8 +21,15 @@ public partial class Game : UserControl
 
         backend = App.GetService<BackendService>();
         clientController = App.GetService<ClientControlService>();
-        DataContext = backend.GetClientConfig();
-        LaunchButton.Content = "Launch " + backend.ActiveApp.GameInstallFolder;
+        
+        backend.ProfileSwitched += OnProfileSwitched;
+        OnProfileSwitched(this, backend.ActiveProfile);
+    }
+
+    private void OnProfileSwitched(object? sender, AppProfile newProfile)
+    {
+        DataContext = newProfile.ClientConfig;
+        LaunchButton.Content = "Launch " + newProfile.GameInstallFolder;
     }
 
     private void OnLaunchGameClicked(object? sender, RoutedEventArgs e)
@@ -46,7 +53,7 @@ public partial class Game : UserControl
     
     private void OnConfiguratorResetClicked(object? sender, RoutedEventArgs e)
     {
-        DataContext = backend.GetClientConfig(true);
+        DataContext = backend.ActiveProfile.NewClientConfig();
         ResetConfigButton?.Flyout?.Hide();
     }
 

@@ -128,7 +128,7 @@ public class BasePluginInstaller(InstallHelper helper) : IServerComponentInstall
 				foreach (string split in asset.Name.Split(['-', '_', '.'], 
 					         StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
 				{
-					if (split.Equals(ctx.Params.AppInfo.ModFolder, StringComparison.OrdinalIgnoreCase))
+					if (split.Equals(ctx.Params.Profile.ModFolder, StringComparison.OrdinalIgnoreCase))
 					{
 						return (asset.BrowserDownloadUrl, asset.Name);
 					}
@@ -136,7 +136,7 @@ public class BasePluginInstaller(InstallHelper helper) : IServerComponentInstall
 			}
 		}
 
-		throw new InstallException($"No downloadable archive for game \"{ctx.Params.AppInfo.ModFolder}\" in " +
+		throw new InstallException($"No downloadable archive for game \"{ctx.Params.Profile.ModFolder}\" in " +
 		                           $"Github release \"{release.Name}\"");
 	}
 

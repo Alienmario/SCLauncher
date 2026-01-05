@@ -24,7 +24,7 @@ public class ServerBrowserService
 	public ServerBrowserService(BackendService backend)
 	{
 		filter = new MasterServerQueryFiltersBuilder()
-			.WithAppId((int)backend.ActiveApp.GameAppId)
+			.WithAppId((int)backend.ActiveProfile.GameAppId)
 			.Build();
 	}
 

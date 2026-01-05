@@ -1,0 +1,32 @@
+<controls:BaseDialogWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:config="clr-namespace:SCLauncher.model.config"
+        xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+        mc:Ignorable="d"
+        x:Class="SCLauncher.ui.views.profiles.DeleteProfileDialog"
+        x:DataType="config:AppProfile"
+        Title="Confirm Delete"
+        CanResize="False">
+
+	<controls:BaseDialogWindow.MainContent>
+		<TextBlock Margin="10 10 10 0" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"
+		           TextWrapping="Wrap" FontSize="16" LineSpacing="10">
+			<Run Text="Are you sure you want to delete the profile"/>
+			<LineBreak/>
+			<Run Name="ProfileNameRun" Text="{Binding Name}" FontWeight="Bold"/>
+			<Run Text="?"/>
+		</TextBlock>
+	</controls:BaseDialogWindow.MainContent>
+	
+	<controls:BaseDialogWindow.FooterContent>
+		<DockPanel Margin="20" HorizontalSpacing="15">
+			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+				<Button Name="CancelButton" Content="Cancel" Classes="action" HotKey="Escape"/>
+				<Button Name="DeleteButton" Content="Delete" Classes="action danger" HotKey="Enter"/>
+			</StackPanel>
+		</DockPanel>
+	</controls:BaseDialogWindow.FooterContent>
+
+</controls:BaseDialogWindow>

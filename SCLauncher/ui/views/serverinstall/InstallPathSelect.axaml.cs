@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Avalonia.Controls;
-using SCLauncher.model.config;
+using SCLauncher.backend.service;
 using SCLauncher.model.serverinstall;
 using SCLauncher.ui.controls;
 
@@ -17,7 +17,8 @@ public partial class InstallPathSelect : UserControl, WizardNavigator.IWizardCon
 		{
 			if (DataContext is ServerInstallParams p && string.IsNullOrWhiteSpace(p.Path))
 			{
-				var configPath = App.GetService<GlobalConfiguration>().ServerPath;
+				var backend = App.GetService<BackendService>();
+				var configPath = backend.ActiveProfile.ServerPath;
 				if (!string.IsNullOrWhiteSpace(configPath))
 				{
 					p.Path = configPath;

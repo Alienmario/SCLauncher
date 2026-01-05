@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:SCLauncher.ui.views"
         xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+        xmlns:profiles="clr-namespace:SCLauncher.ui.views.profiles"
         mc:Ignorable="d"
         x:Class="SCLauncher.ui.views.MainWindow"
         Title="SCLauncher"
@@ -60,16 +61,19 @@
 		<DockPanel Margin="0 5 0 0">
 			
 			<!-- Custom titlebar (Windows only) -->
-			<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5 0 0 0" Spacing="5"
-			            IsHitTestVisible="False" IsVisible="{OnPlatform Windows=True, Default=False}">
-				<Border CornerRadius="4" ClipToBounds="True">
-					<Image Source="/ui/assets/logo-sc.ico" Width="20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
-				</Border>
-				<Label VerticalAlignment="Center" FontSize="14" Foreground="#EFEFEF">
-					Launcher
-				</Label>
-			</StackPanel>
-			
+			<DockPanel DockPanel.Dock="Top" Margin="5 0 0 0" HorizontalSpacing="10"
+			            IsVisible="{OnPlatform Windows=True, Default=False}">
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Top" IsHitTestVisible="False">
+					<Border CornerRadius="4" ClipToBounds="True">
+						<Image Source="/ui/assets/logo-sc.ico" Width="20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+					</Border>
+					<Label VerticalAlignment="Center" FontSize="14" Foreground="#EFEFEF">
+						Launcher
+					</Label>
+				</StackPanel>
+				<profiles:ProfileSwitcher/>
+			</DockPanel>
+
 			<controls:UpdateNotification DockPanel.Dock="Bottom" Opacity="0.9"/>
 
 			<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="0 5 0 10">

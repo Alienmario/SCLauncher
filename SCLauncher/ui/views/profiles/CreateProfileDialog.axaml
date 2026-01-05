@@ -1,0 +1,39 @@
+<controls:BaseDialogWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+        mc:Ignorable="d"
+        x:Class="SCLauncher.ui.views.profiles.CreateProfileDialog"
+        Title="Create New Profile"
+        Width="400" Height="250" SizeToContent="Height"
+        CanResize="False">
+
+	<controls:BaseDialogWindow.MainContent>
+		<StackPanel Margin="20" Spacing="15">
+			<TextBlock Text="Create New Profile" FontSize="18" FontWeight="Bold"/>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="App Type:"/>
+				<ComboBox Name="AppTypeComboBox" SelectedIndex="0"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Profile Name:"/>
+				<TextBox Name="ProfileNameTextBox" Watermark="Enter profile name"/>
+			</StackPanel>
+		</StackPanel>
+	</controls:BaseDialogWindow.MainContent>
+
+	<controls:BaseDialogWindow.FooterContent>
+		<DockPanel Margin="20" HorizontalSpacing="15">
+			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+				<Button Name="CancelButton" Content="Cancel" Classes="action" HotKey="Escape"/>
+				<Button Name="CreateButton" Content="Create" Classes="action accent" HotKey="Enter"/>
+			</StackPanel>
+			
+			<TextBlock DockPanel.Dock="Left" Name="ErrorMessage" Foreground="Red" TextWrapping="Wrap" IsVisible="False"/>
+		</DockPanel>
+	</controls:BaseDialogWindow.FooterContent>
+
+</controls:BaseDialogWindow>

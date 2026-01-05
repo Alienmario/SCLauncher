@@ -2,10 +2,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 	
 	<Design.PreviewWith>
-		<StackPanel Orientation="Vertical" Margin="10" Background="Black" Width="500">
+		<StackPanel Orientation="Vertical" Margin="10" Background="Black" Width="600">
 			<StackPanel Orientation="Horizontal" Spacing="10">
 				<Button Content="Button"/>
 				<Button Content="Accent Button" Classes="accent"/>
+				<Button Content="Danger Button" Classes="danger"/>
 				<Button Content="Transparent Button" Classes="Transparent"/>
 				<Button Classes="Highlight Rotate Grow">
 					<PathIcon Data="{StaticResource arrow_left_regular}"/>
@@ -114,6 +115,22 @@
 		<Style Selector="^:pressed /template/ ContentPresenter">
 			<Setter Property="Background" Value="Transparent"/>
 		</Style>
+	</Style>
+	
+	<Style Selector="Button.danger">
+		<Setter Property="Background" Value="#9C0000"/>
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="#B70000"/>
+		</Style>
+		<Style Selector="^:pressed /template/ ContentPresenter">
+			<Setter Property="Background" Value="#830000"/>
+		</Style>
+	</Style>
+	
+	<!-- dialog action button -->
+	<Style Selector="Button.action">
+		<Setter Property="Width" Value="80"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
 	</Style>
 	
 	<Style Selector="Button.Grow">

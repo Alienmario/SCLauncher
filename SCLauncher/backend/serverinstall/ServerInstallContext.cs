@@ -12,8 +12,8 @@ public class ServerInstallContext
 		Params = p;
 		installDir =
 			p.CreateSubfolder
-				? Path.Join(p.Path, p.AppInfo.ServerInstallFolder)
-				: p.Path ?? p.AppInfo.ServerInstallFolder;
+				? Path.Join(p.Path, p.Profile.ServerInstallFolder)
+				: p.Path ?? p.Profile.ServerInstallFolder;
 	}
 
 	public ServerInstallParams Params { get; }
@@ -34,8 +34,8 @@ public class ServerInstallContext
 	}
 
 	/// Full path to the default game/mod folder under the server root
-	public string GameModDir => Path.Join(InstallDir, Params.AppInfo.ModFolder);
+	public string GameModDir => Path.Join(InstallDir, Params.Profile.ModFolder);
 
 	/// Full addons path
-	public string AddonsDir => Path.Join(InstallDir, Params.AppInfo.ModFolder, "addons");
+	public string AddonsDir => Path.Join(InstallDir, Params.Profile.ModFolder, "addons");
 }

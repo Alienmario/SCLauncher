@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace SCLauncher.model.config;
 
+[JsonDerivedType(typeof(ClientConfigurationBlackMesa), typeDiscriminator: "BlackMesa")]
 public partial class ClientConfiguration : INotifyPropertyChanged
 {
     public enum WindowModeEnum

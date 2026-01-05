@@ -60,7 +60,7 @@ public partial class InstallOverview : UserControl, WizardNavigator.IWizardConte
 		{
 			if (installParams.CreateSubfolder)
 			{
-				PathText.Text = Path.Join(installParams.Path, installParams.AppInfo.ServerInstallFolder);
+				PathText.Text = Path.Join(installParams.Path, installParams.Profile.ServerInstallFolder);
 			}
 			else
 			{

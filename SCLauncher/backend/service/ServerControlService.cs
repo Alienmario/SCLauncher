@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using SCLauncher.backend.serverinstall.components;
-using SCLauncher.model.config;
 using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.service;
@@ -18,13 +17,11 @@ public class ServerControlService
 	public event EventHandler<bool>? StateChanged;
 
 	private Process? serverProcess;
-	private readonly GlobalConfiguration globalConfig;
 	private readonly BackendService backend;
 	private readonly ServerInstallService installService;
 
-	public ServerControlService(GlobalConfiguration globalConfig, BackendService backend, ServerInstallService installService)
+	public ServerControlService(BackendService backend, ServerInstallService installService)
 	{
-		this.globalConfig = globalConfig;
 		this.backend = backend;
 		this.installService = installService;
 
@@ -48,7 +45,7 @@ public class ServerControlService
 
 	public bool Start()
 	{
-		if (globalConfig.ServerPath == null)
+		if (backend.ActiveProfile.ServerPath == null)
 			return false;
 		if (IsRunning)
 			return false;
@@ -56,7 +53,7 @@ public class ServerControlService
 		string executable;
 		try
 		{
-			executable = Path.Join(globalConfig.ServerPath, SrcdsFixInstaller.GetExecForCurrentPlatform());
+			executable = Path.Join(backend.ActiveProfile.ServerPath, SrcdsFixInstaller.GetExecForCurrentPlatform());
 		}
 		catch (PlatformNotSupportedException e)
 		{
@@ -74,7 +71,7 @@ public class ServerControlService
 		
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 		{
-			string srcdsLinux = Path.Join(globalConfig.ServerPath, "srcds_linux");
+			string srcdsLinux = Path.Join(backend.ActiveProfile.ServerPath, "srcds_linux");
 			try
 			{
 				File.SetUnixFileMode(executable, File.GetUnixFileMode(executable) | UnixFileMode.UserExecute);
@@ -95,7 +92,7 @@ public class ServerControlService
 				StartInfo = new ProcessStartInfo
 				{
 					FileName = executable,
-					WorkingDirectory = globalConfig.ServerPath,
+					WorkingDirectory = backend.ActiveProfile.ServerPath,
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
@@ -105,12 +102,12 @@ public class ServerControlService
 			};
 
 			var args = serverProcess.StartInfo.ArgumentList;
-			var appInfo = backend.ActiveApp;
+			var appInfo = backend.ActiveProfile;
 			args.Add("-console");
 			args.Add("-nocrashdialog");
 			args.Add("-game");
 			args.Add(appInfo.ModFolder);
-			foreach (string arg in backend.GetServerConfig().ToLaunchParams())
+			foreach (string arg in backend.ActiveProfile.ServerConfig.ToLaunchParams())
 			{
 				args.Add(arg);
 			}
@@ -178,14 +175,14 @@ public class ServerControlService
 
 	public async Task<ServerAvailability> IsAvailableAsync(CancellationToken ct = default)
 	{
-		if (globalConfig.ServerPath == null)
+		if (backend.ActiveProfile.ServerPath == null)
 			return ServerAvailability.Unavailable;
 
 		var p = new ServerInstallParams
 		{
-			AppInfo = backend.ActiveApp,
+			Profile = backend.ActiveProfile,
 			Method = ServerInstallMethod.External,
-			Path = globalConfig.ServerPath,
+			Path = backend.ActiveProfile.ServerPath,
 			CreateSubfolder = false
 		};
 		

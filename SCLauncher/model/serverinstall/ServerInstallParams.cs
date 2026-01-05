@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using SCLauncher.model.config;
 
 namespace SCLauncher.model.serverinstall;
 
 public partial class ServerInstallParams : INotifyPropertyChanged
 {
 	/// App definition
-	public required AppInfo AppInfo { get; init; }
-	
+	public required AppProfile Profile { get; init; }
+
 	/// Steam, External
 	public ServerInstallMethod? Method { get; set; }
 

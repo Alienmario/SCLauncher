@@ -76,7 +76,9 @@
 		</Expander>
     </DockPanel>
 	
+	<!-- Game specific templates -->
 	<UserControl.DataTemplates>
+		
 		<DataTemplate DataType="config:ClientConfigurationBlackMesa">
 			<StackPanel>
 				<TextBlock Text="Black Mesa" Classes="SectionHeader" Margin="0 10 0 0"/>
@@ -88,6 +90,10 @@
 				</UniformGrid>
 			</StackPanel>
 		</DataTemplate>
+		
+		<!-- empty fallback -->
+		<DataTemplate DataType="config:ClientConfiguration"/>
+		
 	</UserControl.DataTemplates>
 	
 </UserControl>

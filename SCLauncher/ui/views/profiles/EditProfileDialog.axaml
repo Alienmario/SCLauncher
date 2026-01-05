@@ -1,0 +1,86 @@
+<controls:BaseDialogWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+        mc:Ignorable="d"
+        x:Class="SCLauncher.ui.views.profiles.EditProfileDialog"
+        Title="Edit Profile"
+        Width="500" Height="600">
+
+	<controls:BaseDialogWindow.MainContent>
+		<StackPanel Margin="20" Spacing="10">
+			<TextBlock Text="Edit Profile" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+
+			<StackPanel Spacing="15" Orientation="Horizontal" Margin="0,0,0,10">
+				<TextBlock Text="App Type:" VerticalAlignment="Center"/>
+				<Label Name="AppTypeLabel" IsEnabled="False"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Profile Name:"/>
+				<TextBox Name="ProfileNameTextBox" Watermark="Enter profile name"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Game App ID:"/>
+				<TextBox Name="GameAppIdTextBox" Watermark="Enter game App ID"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Server App ID:"/>
+				<TextBox Name="ServerAppIdTextBox" Watermark="Enter server App ID"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Game Install Folder:"/>
+				<TextBox Name="GameInstallFolderTextBox" Watermark="Enter game install folder"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Server Install Folder:"/>
+				<TextBox Name="ServerInstallFolderTextBox" Watermark="Enter server install folder"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Mod Folder:"/>
+				<TextBox Name="ModFolderTextBox" Watermark="Enter mod folder"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Game Executable (Windows):"/>
+				<TextBox Name="GameExecutableWinTextBox" Watermark="Enter Windows executable"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Game Executable (Linux):"/>
+				<TextBox Name="GameExecutableLinuxTextBox" Watermark="Enter Linux executable"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Game Path:"/>
+				<TextBox Name="GamePathTextBox" Watermark="Enter game path (optional)"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Server Path:"/>
+				<TextBox Name="ServerPathTextBox" Watermark="Enter server path (optional)"/>
+			</StackPanel>
+
+		</StackPanel>
+	</controls:BaseDialogWindow.MainContent>
+
+	<controls:BaseDialogWindow.FooterContent>
+		<DockPanel Margin="20" HorizontalSpacing="15">
+			<!-- Action Buttons -->
+			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+				<Button Name="CancelButton" Content="Cancel" Classes="action" HotKey="Escape"/>
+				<Button Name="SaveButton" Content="Save" Classes="action accent" HotKey="Enter"/>
+			</StackPanel>
+			<!-- Error Message -->
+			<TextBlock DockPanel.Dock="Left" Name="ErrorMessage" Foreground="Red" FontWeight="SemiBold"
+			           TextWrapping="Wrap" IsVisible="False" VerticalAlignment="Center"/>
+		</DockPanel>
+	</controls:BaseDialogWindow.FooterContent>
+
+</controls:BaseDialogWindow>

@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.LogicalTree;
@@ -24,7 +26,7 @@ public partial class App : Application
 	public new static App Current => (App)Application.Current!;
 	
 	private ServiceProvider? services;
-	private WindowNotificationManager? notificationMgrBottom;
+	private readonly Dictionary<Window, WindowNotificationManager> notificationManagers = new();
 
 	public override void Initialize()
 	{
@@ -43,12 +45,10 @@ public partial class App : Application
 		{
 			MainWindow mainWindow = GetService<MainWindow>();
 			desktop.MainWindow = mainWindow;
-			
-			notificationMgrBottom = new WindowNotificationManager(mainWindow)
-			{
-				Position = NotificationPosition.BottomCenter
-			};
-			
+
+			// Cache the MainWindow's notification manager
+			GetNotificationManager(mainWindow);
+
 			#if !DEBUG
 			CheckForUpdates();
 			#endif
@@ -68,25 +68,64 @@ public partial class App : Application
 		return res;
 	}
 
-	public static void ShowSuccess(string msg)
+	private WindowNotificationManager GetNotificationManager(Window? window)
 	{
-		Current.notificationMgrBottom!.Show(new Notification(
-			"Success", msg, NotificationType.Information, TimeSpan.FromSeconds(2))
-		);
+		// If no window is provided, try to get the MainWindow
+		if (window == null)
+		{
+			if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+			{
+				window = desktop.MainWindow;
+			}
+
+			if (window == null)
+			{
+				throw new InvalidOperationException("No window available for notifications");
+			}
+		}
+
+		// Check if we already have a notification manager for this window
+		if (notificationManagers.TryGetValue(window, out var existingManager))
+		{
+			return existingManager;
+		}
+
+		// Create a new notification manager for this window
+		var newManager = new WindowNotificationManager(window)
+		{
+			Position = NotificationPosition.BottomCenter
+		};
+
+		notificationManagers[window] = newManager;
+
+		// Subscribe to the window's Closed event to clean up the dictionary
+		window.Closed += (sender, e) =>
+		{
+			if (sender is Window closedWindow)
+			{
+				notificationManagers.Remove(closedWindow);
+			}
+		};
+
+		return newManager;
 	}
 
-	public static void ShowFailure(string msg)
+	public static void ShowSuccess(string msg, Window? window = null)
 	{
-		Current.notificationMgrBottom!.Show(new Notification(
-			"Failed", msg, NotificationType.Error, TimeSpan.FromSeconds(4))
-		);
+		var manager = Current.GetNotificationManager(window);
+		manager.Show(new Notification("Success", msg, NotificationType.Information, TimeSpan.FromSeconds(2)));
+	}
+
+	public static void ShowFailure(string msg, Window? window = null)
+	{
+		var manager = Current.GetNotificationManager(window);
+		manager.Show(new Notification("Failed", msg, NotificationType.Error, TimeSpan.FromSeconds(4)));
 	}
 	
-	public static void ShowInfo(string msg)
+	public static void ShowInfo(string msg, Window? window = null)
 	{
-		Current.notificationMgrBottom!.Show(new Notification(
-			"Info", msg, NotificationType.Information, TimeSpan.FromSeconds(4))
-		);
+		var manager = Current.GetNotificationManager(window);
+		manager.Show(new Notification("Info", msg, NotificationType.Information, TimeSpan.FromSeconds(4)));
 	}
 	
 	public static string Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString(2) ?? string.Empty;

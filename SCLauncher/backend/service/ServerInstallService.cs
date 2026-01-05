@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using SCLauncher.backend.serverinstall;
 using SCLauncher.model;
-using SCLauncher.model.config;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
 
@@ -12,7 +11,6 @@ namespace SCLauncher.backend.service;
 
 public class ServerInstallService(
 	BackendService backend,
-	GlobalConfiguration globalConfig,
 	ServerInstallRunner serverInstallRunner,
 	IEnumerable<IServerComponentInstaller<ComponentInfo>> componentInstallers)
 {
@@ -21,7 +19,7 @@ public class ServerInstallService(
 	{
 		return new ServerInstallParams
 		{
-			AppInfo = backend.ActiveApp
+			Profile = backend.ActiveProfile
 		};
 	}
 
@@ -29,8 +27,8 @@ public class ServerInstallService(
 	{
 		return new ServerUninstallParams
 		{
-			AppInfo = backend.ActiveApp,
-			Path = globalConfig.ServerPath ?? string.Empty
+			Profile = backend.ActiveProfile,
+			Path = backend.ActiveProfile.ServerPath ?? string.Empty
 		};
 	}
 

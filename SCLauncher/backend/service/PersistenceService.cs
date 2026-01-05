@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -117,7 +118,22 @@ public class PersistenceService
 		object? loaded = Load(name, instance.GetType(), context);
 		if (loaded != null)
 		{
-			MergeProperties(loaded, instance);
+			if (instance is IEnumerable and not string)
+			{
+				if (loaded is IEnumerable srcEnumerable and not string)
+				{
+					dynamic dynamicCollection = instance;
+					dynamicCollection.Clear();
+					foreach (var item in srcEnumerable)
+					{
+						dynamicCollection.Add((dynamic)item);
+					}
+				}
+			}
+			else
+			{
+				MergeProperties(loaded, instance);
+			}
 		}
 	}
 	

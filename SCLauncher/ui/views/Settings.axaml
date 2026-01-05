@@ -7,14 +7,17 @@
              xmlns:config="clr-namespace:SCLauncher.model.config"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SCLauncher.ui.views.Settings"
-             x:DataType="config:GlobalConfiguration">
+             x:DataType="config:AppProfile">
 	
 	<DockPanel Margin="0 10 0 0">
 		
 		<StackPanel DockPanel.Dock="Top">
 			<Label Content="Steam installation" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-			<custom:FilePickerTextBox Mode="Folder" Title="Select Steam installation folder" Name="SteamPath"
-			                          Text="{Binding SteamPath}"/>
+			
+			<ContentControl x:DataType="config:GlobalConfiguration" Name="GlobalConfigConent">
+				<custom:FilePickerTextBox Mode="Folder" Title="Select Steam installation folder" Name="SteamPath"
+				                          Text="{Binding SteamPath}"/>
+			</ContentControl>
 			
 			<Label Content="Game path" VerticalAlignment="Center" HorizontalAlignment="Left"
 			       Margin="0 10 0 0"/>
