@@ -18,21 +18,23 @@
 
 			<Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" BorderThickness="1"
 			        CornerRadius="4">
-				<ListBox Name="ProfilesListBox" SelectionMode="Single" DoubleTapped="OnDoubleTapped">
+				<ListBox Name="ProfilesListBox" DoubleTapped="OnDoubleTapped">
 					<ListBox.ItemTemplate>
 						<DataTemplate DataType="profiles:ProfileManagerEntry">
 							<Grid ColumnDefinitions="*,Auto" Margin="8">
-								<StackPanel Grid.Column="0" Spacing="4">
+								<StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
 									<TextBlock Text="{Binding Profile.Name}" FontWeight="SemiBold"
 									           FontSize="14"/>
 									<TextBlock Text="{Binding Profile.AppType, Converter={x:Static converters:EnumDescriptionConverter.Instance}}"
 									           FontSize="12" Opacity="0.7"/>
-								</StackPanel>
-								<StackPanel Grid.Column="1" Spacing="4">
-									<TextBlock Text="{Binding Profile.CreatedAt, StringFormat='{}Created: {0:yyyy-MM-dd}'}"
+									<TextBlock Text="{Binding Profile.CreatedAt, StringFormat='{}Created {0:yyyy-MM-dd}'}"
 									           FontSize="11" Opacity="0.6" VerticalAlignment="Center"/>
-									<TextBlock Text="Active" FontSize="11" Opacity="0.6" FontWeight="Bold" VerticalAlignment="Center"
-									           IsVisible="{Binding IsActive}"/>
+								</StackPanel>
+								<StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+									<TextBlock Text="Active" FontSize="12" Opacity="0.8" FontWeight="Bold" Margin="0,0,13,0"
+									           Foreground="{StaticResource Highlight}" IsVisible="{Binding IsActive}"/>
+									<Button Content="Activate" FontSize="12" IsVisible="{Binding !IsActive}"
+									        Click="OnActivateClick"/>
 								</StackPanel>
 							</Grid>
 						</DataTemplate>

@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         x:Class="SCLauncher.ui.views.profiles.CreateProfileDialog"
         Title="Create New Profile"
-        Width="400" Height="250" SizeToContent="Height"
+        SizeToContent="Height"
         CanResize="False">
 
 	<controls:BaseDialogWindow.MainContent>

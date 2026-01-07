@@ -9,7 +9,18 @@ using SCLauncher.ui.controls;
 
 namespace SCLauncher.ui.views.profiles;
 
-internal record ProfileManagerEntry(AppProfile Profile, bool IsActive);
+internal record ProfileManagerEntry(AppProfile Profile, bool IsActive)
+{
+	public virtual bool Equals(ProfileManagerEntry? other)
+	{
+		return other is not null && Profile.Name == other.Profile.Name;
+	}
+
+	public override int GetHashCode()
+	{
+		return Profile.Name.GetHashCode();
+	}
+}
 
 public partial class ProfileManager : BaseDialogWindow
 {
@@ -138,6 +149,17 @@ public partial class ProfileManager : BaseDialogWindow
 		catch (Exception e)
 		{
 			e.Log();
+		}
+	}
+
+	private void OnActivateClick(object? sender, RoutedEventArgs args)
+	{
+		if (sender is Control { DataContext: ProfileManagerEntry entry })
+		{
+			if (backendService.SetActiveProfile(entry.Profile.Name))
+			{
+				ProfilesListBox.SelectedItem = entry;
+			}
 		}
 	}
 }

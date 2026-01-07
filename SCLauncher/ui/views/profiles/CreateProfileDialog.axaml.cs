@@ -15,12 +15,15 @@ public partial class CreateProfileDialog : BaseDialogWindow
 	{
 		InitializeComponent();
 		backendService = App.GetService<BackendService>();
-		
-		AppTypeComboBox.ItemsSource = Enum.GetValues<AppType>().Select(e => e.GetDescription());
-
 		CancelButton.Click += OnCancelClick;
 		CreateButton.Click += OnCreateClick;
-		Activated += delegate { ProfileNameTextBox.Focus(); };
+		AppTypeComboBox.ItemsSource = Enum.GetValues<AppType>().Select(e => e.GetDescription());
+		
+		Activated += delegate
+		{
+			ProfileNameTextBox.Focus();
+			InvalidateArrange(); // SizeToContent bugfix
+		};
 	}
 
 	private void OnCancelClick(object? sender, RoutedEventArgs e)
