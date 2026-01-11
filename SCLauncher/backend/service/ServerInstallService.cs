@@ -10,7 +10,7 @@ using SCLauncher.model.serverinstall;
 namespace SCLauncher.backend.service;
 
 public class ServerInstallService(
-	BackendService backend,
+	ProfilesService profilesService,
 	ServerInstallRunner serverInstallRunner,
 	IEnumerable<IServerComponentInstaller<ComponentInfo>> componentInstallers)
 {
@@ -19,7 +19,7 @@ public class ServerInstallService(
 	{
 		return new ServerInstallParams
 		{
-			Profile = backend.ActiveProfile
+			Profile = profilesService.ActiveProfile
 		};
 	}
 
@@ -27,8 +27,8 @@ public class ServerInstallService(
 	{
 		return new ServerUninstallParams
 		{
-			Profile = backend.ActiveProfile,
-			Path = backend.ActiveProfile.ServerPath ?? string.Empty
+			Profile = profilesService.ActiveProfile,
+			Path = profilesService.ActiveProfile.ServerPath ?? string.Empty
 		};
 	}
 

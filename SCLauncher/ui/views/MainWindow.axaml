@@ -13,7 +13,7 @@
         TransparencyLevelHint="{OnPlatform Windows='Mica,AcrylicBlur', Default='None'}"
         WindowStartupLocation="CenterScreen"
         Width="700" Height="450"
-        MinWidth="600" MinHeight="200">
+        MinWidth="600" MinHeight="300">
 
 	<Window.Styles>
 		<Style Selector="Window">
@@ -60,9 +60,8 @@
 		
 		<DockPanel Margin="0 5 0 0">
 			
-			<!-- Custom titlebar (Windows only) -->
-			<DockPanel DockPanel.Dock="Top" Margin="5 0 0 0" HorizontalSpacing="10"
-			            IsVisible="{OnPlatform Windows=True, Default=False}">
+			<!-- Custom titlebar -->
+			<DockPanel DockPanel.Dock="Top" Margin="10 0" HorizontalSpacing="10">
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Top" IsHitTestVisible="False">
 					<Border CornerRadius="4" ClipToBounds="True">
 						<Image Source="/ui/assets/logo-sc.ico" Width="20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
@@ -71,7 +70,7 @@
 						Launcher
 					</Label>
 				</StackPanel>
-				<profiles:ProfileSwitcher/>
+				<profiles:ProfileSwitcher HorizontalAlignment="{OnPlatform Default=Left, Linux=Right}"/>
 			</DockPanel>
 
 			<controls:UpdateNotification DockPanel.Dock="Bottom" Opacity="0.9"/>

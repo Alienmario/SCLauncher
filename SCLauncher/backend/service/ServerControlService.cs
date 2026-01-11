@@ -16,13 +16,13 @@ public class ServerControlService
 	public event DataReceivedEventHandler? ErrorReceived;
 	public event EventHandler<bool>? StateChanged;
 
-	private Process? serverProcess;
-	private readonly BackendService backend;
+	private readonly ProfilesService profilesService;
 	private readonly ServerInstallService installService;
+	private Process? serverProcess;
 
-	public ServerControlService(BackendService backend, ServerInstallService installService)
+	public ServerControlService(ProfilesService profilesService, ServerInstallService installService)
 	{
-		this.backend = backend;
+		this.profilesService = profilesService;
 		this.installService = installService;
 
 		AppDomain.CurrentDomain.ProcessExit += (sender, args) => Stop();
@@ -45,7 +45,7 @@ public class ServerControlService
 
 	public bool Start()
 	{
-		if (backend.ActiveProfile.ServerPath == null)
+		if (profilesService.ActiveProfile.ServerPath == null)
 			return false;
 		if (IsRunning)
 			return false;
@@ -53,7 +53,7 @@ public class ServerControlService
 		string executable;
 		try
 		{
-			executable = Path.Join(backend.ActiveProfile.ServerPath, SrcdsFixInstaller.GetExecForCurrentPlatform());
+			executable = Path.Join(profilesService.ActiveProfile.ServerPath, SrcdsFixInstaller.GetExecForCurrentPlatform());
 		}
 		catch (PlatformNotSupportedException e)
 		{
@@ -71,7 +71,7 @@ public class ServerControlService
 		
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 		{
-			string srcdsLinux = Path.Join(backend.ActiveProfile.ServerPath, "srcds_linux");
+			string srcdsLinux = Path.Join(profilesService.ActiveProfile.ServerPath, "srcds_linux");
 			try
 			{
 				File.SetUnixFileMode(executable, File.GetUnixFileMode(executable) | UnixFileMode.UserExecute);
@@ -92,7 +92,7 @@ public class ServerControlService
 				StartInfo = new ProcessStartInfo
 				{
 					FileName = executable,
-					WorkingDirectory = backend.ActiveProfile.ServerPath,
+					WorkingDirectory = profilesService.ActiveProfile.ServerPath,
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
@@ -102,12 +102,12 @@ public class ServerControlService
 			};
 
 			var args = serverProcess.StartInfo.ArgumentList;
-			var appInfo = backend.ActiveProfile;
+			var appInfo = profilesService.ActiveProfile;
 			args.Add("-console");
 			args.Add("-nocrashdialog");
 			args.Add("-game");
 			args.Add(appInfo.ModFolder);
-			foreach (string arg in backend.ActiveProfile.ServerConfig.ToLaunchParams())
+			foreach (string arg in profilesService.ActiveProfile.ServerConfig.ToLaunchParams())
 			{
 				args.Add(arg);
 			}
@@ -119,7 +119,7 @@ public class ServerControlService
 			if (IsRunning)
 			{
 				StateChanged?.Invoke(this, true);
-				serverProcess.Exited += (sender, args) => StateChanged?.Invoke(sender, false);
+				serverProcess.Exited += (sender, _) => StateChanged?.Invoke(sender, false);
 				serverProcess.BeginOutputReadLine();
 				serverProcess.BeginErrorReadLine();
 				
@@ -175,14 +175,14 @@ public class ServerControlService
 
 	public async Task<ServerAvailability> IsAvailableAsync(CancellationToken ct = default)
 	{
-		if (backend.ActiveProfile.ServerPath == null)
+		if (profilesService.ActiveProfile.ServerPath == null)
 			return ServerAvailability.Unavailable;
 
 		var p = new ServerInstallParams
 		{
-			Profile = backend.ActiveProfile,
+			Profile = profilesService.ActiveProfile,
 			Method = ServerInstallMethod.External,
-			Path = backend.ActiveProfile.ServerPath,
+			Path = profilesService.ActiveProfile.ServerPath,
 			CreateSubfolder = false
 		};
 		

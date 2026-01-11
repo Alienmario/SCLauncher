@@ -11,7 +11,7 @@ using SteamQuery.Models;
 
 namespace SCLauncher.backend.service;
 
-public class ServerBrowserService
+public class ServerBrowserService(ProfilesService profilesService)
 {
 	private const int MaxConcurrentQueries = 50;
 	private static readonly TimeSpan ServerQuerySendTimeout = TimeSpan.FromSeconds(5);
@@ -19,14 +19,9 @@ public class ServerBrowserService
 
 	// This constructor creates connections
 	// private readonly MasterServer masterServer = new(MasterServerEndPoint.Source);
-	private readonly MasterServerQueryFilters filter;
-
-	public ServerBrowserService(BackendService backend)
-	{
-		filter = new MasterServerQueryFiltersBuilder()
-			.WithAppId((int)backend.ActiveProfile.GameAppId)
-			.Build();
-	}
+	private readonly MasterServerQueryFilters filter = new MasterServerQueryFiltersBuilder()
+		.WithAppId((int)profilesService.ActiveProfile.GameAppId)
+		.Build();
 
 	public async IAsyncEnumerable<Server> GetServers([EnumeratorCancellation] CancellationToken ct = default)
 	{

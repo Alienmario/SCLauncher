@@ -21,6 +21,7 @@ public static class ServiceConfig
 		
 		// Services
 		collection.AddSingleton<BackendService>();
+		collection.AddSingleton<ProfilesService>();
 		collection.AddSingleton<ServerInstallService>();
 		collection.AddSingleton<ServerControlService>();
 		collection.AddSingleton<ServerMessageAnalyzerService>();

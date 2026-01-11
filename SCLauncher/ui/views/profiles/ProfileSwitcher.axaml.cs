@@ -1,5 +1,6 @@
 using System;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.model.config;
 
@@ -9,25 +10,27 @@ public partial class ProfileSwitcher : UserControl
 {
 	private const string ManageProfilesItem = "Manage Profiles...";
 	
-	private readonly BackendService backendService;
+	private readonly ProfilesService profilesService;
 
 	public ProfileSwitcher()
 	{
 		InitializeComponent();
-		backendService = App.GetService<BackendService>();
-
+		profilesService = App.GetService<ProfilesService>();
+		var backend = App.GetService<BackendService>();
+		
 		ProfileComboBox.SelectionChanged += OnProfileSelectionChanged;
 
 		Refresh();
-		backendService.ProfileSwitched += (s, e) => SelectActiveProfile();
-		backendService.ProfileAdded += (s, e) => Refresh();
-		backendService.ProfileDeleted += (s, e) => Refresh();
+		profilesService.ProfileSwitched += (s, e) => Dispatcher.UIThread.Post(SelectActiveProfile);
+		profilesService.ProfileAdded += (s, e) => Dispatcher.UIThread.Post(Refresh);
+		profilesService.ProfileDeleted += (s, e) => Dispatcher.UIThread.Post(Refresh);
+		backend.CanSwitchProfilesChanged += (s, val) => Dispatcher.UIThread.Post(() => ProfileComboBox.IsEnabled = val);
 	}
 
 	private void Refresh()
 	{
 		ProfileComboBox.Items.Clear();
-		foreach (var profile in backendService.Profiles)
+		foreach (var profile in profilesService.Profiles)
 		{
 			ProfileComboBox.Items.Add(profile);
 		}
@@ -38,7 +41,7 @@ public partial class ProfileSwitcher : UserControl
 
 	private void SelectActiveProfile()
 	{
-		var activeProfile = backendService.ActiveProfile;
+		var activeProfile = profilesService.ActiveProfile;
 		foreach (var item in ProfileComboBox.Items)
 		{
 			if (item == activeProfile)
@@ -49,7 +52,7 @@ public partial class ProfileSwitcher : UserControl
 		}
 	}
 
-	private void OnProfileSelectionChanged(object? sender, SelectionChangedEventArgs e)
+	private void OnProfileSelectionChanged(object? sender, SelectionChangedEventArgs args)
 	{
 		if (ProfileComboBox.SelectedItem is string selectedString)
 		{
@@ -63,7 +66,7 @@ public partial class ProfileSwitcher : UserControl
 		}
 		else if (ProfileComboBox.SelectedItem is AppProfile selectedProfile)
 		{
-			backendService.SetActiveProfile(selectedProfile.Name);
+			profilesService.SetActiveProfile(selectedProfile.Name);
 		}
 	}
 

@@ -8,7 +8,7 @@ using Path = System.IO.Path;
 
 namespace SCLauncher.backend.service;
 
-public class ClientControlService(BackendService backend)
+public class ClientControlService(ProfilesService profilesService)
 {
 	/// <summary>
 	/// Starts the game client or hijacks running instance and connects to the specified server address.
@@ -25,7 +25,7 @@ public class ClientControlService(BackendService backend)
 			args.AddRange(["+password", password]);
 		}
 
-		List<string> configArgs = backend.ActiveProfile.ClientConfig.ToLaunchParams();
+		List<string> configArgs = profilesService.ActiveProfile.ClientConfig.ToLaunchParams();
 		configArgs.Remove("-multirun"); // do not launch extra instances when just connecting
 
 		return RunClient(configArgs.Concat(args));
@@ -35,7 +35,8 @@ public class ClientControlService(BackendService backend)
 	/// <exception cref="InvalidGamePathException">Thrown when the game executable cannot be found at configured path</exception>
 	public bool RunClient(IEnumerable<string>? args = null)
 	{
-		var exec = Path.Join(backend.ActiveProfile.GamePath, backend.ActiveProfile.GameExecutable[Environment.OSVersion.Platform]);
+		var exec = Path.Join(profilesService.ActiveProfile.GamePath,
+			profilesService.ActiveProfile.GameExecutable[Environment.OSVersion.Platform]);
 
 		if (!File.Exists(exec))
 			throw new InvalidGamePathException();
@@ -43,7 +44,7 @@ public class ClientControlService(BackendService backend)
 		try
 		{
 			Process? process = Process.Start(
-				new ProcessStartInfo(exec, args ?? backend.ActiveProfile.ClientConfig.ToLaunchParams())
+				new ProcessStartInfo(exec, args ?? profilesService.ActiveProfile.ClientConfig.ToLaunchParams())
 				{
 					UseShellExecute = true,
 					Verb = "open"

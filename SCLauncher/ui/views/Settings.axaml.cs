@@ -11,12 +11,11 @@ public partial class Settings : UserControl
 	{
 		InitializeComponent();
 
-		var backend = App.GetService<BackendService>();
+		var profilesService = App.GetService<ProfilesService>();
+		GlobalConfigConent.DataContext = App.GetService<GlobalConfiguration>();
 		
-		GlobalConfigConent.DataContext = backend.GlobalConfig;
-		
-		backend.ProfileSwitched += OnProfileSwitched;
-		OnProfileSwitched(this, backend.ActiveProfile);
+		profilesService.ProfileSwitched += OnProfileSwitched;
+		OnProfileSwitched(this, profilesService.ActiveProfile);
 	}
 
 	private void OnProfileSwitched(object? sender, AppProfile newProfile)

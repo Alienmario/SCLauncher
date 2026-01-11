@@ -11,7 +11,7 @@ namespace SCLauncher.ui.views;
 public partial class Game : UserControl
 {
     private readonly ClientControlService clientController;
-    private readonly BackendService backend;
+    private readonly ProfilesService profilesService;
 
     public Game()
     {
@@ -19,11 +19,11 @@ public partial class Game : UserControl
 
         WindowModeCombo.ItemsSource = Enum.GetValues<ClientConfiguration.WindowModeEnum>().Select(e => e.GetDescription());
 
-        backend = App.GetService<BackendService>();
+        profilesService = App.GetService<ProfilesService>();
         clientController = App.GetService<ClientControlService>();
         
-        backend.ProfileSwitched += OnProfileSwitched;
-        OnProfileSwitched(this, backend.ActiveProfile);
+        profilesService.ProfileSwitched += OnProfileSwitched;
+        OnProfileSwitched(this, profilesService.ActiveProfile);
     }
 
     private void OnProfileSwitched(object? sender, AppProfile newProfile)
@@ -53,7 +53,7 @@ public partial class Game : UserControl
     
     private void OnConfiguratorResetClicked(object? sender, RoutedEventArgs e)
     {
-        DataContext = backend.ActiveProfile.NewClientConfig();
+        DataContext = profilesService.ActiveProfile.NewClientConfig();
         ResetConfigButton?.Flyout?.Hide();
     }
 

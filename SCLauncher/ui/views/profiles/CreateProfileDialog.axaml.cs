@@ -9,12 +9,12 @@ namespace SCLauncher.ui.views.profiles;
 
 public partial class CreateProfileDialog : BaseDialogWindow
 {
-	private readonly BackendService backendService;
+	private readonly ProfilesService profilesService;
 
 	public CreateProfileDialog()
 	{
 		InitializeComponent();
-		backendService = App.GetService<BackendService>();
+		profilesService = App.GetService<ProfilesService>();
 		CancelButton.Click += OnCancelClick;
 		CreateButton.Click += OnCreateClick;
 		AppTypeComboBox.ItemsSource = Enum.GetValues<AppType>().Select(e => e.GetDescription());
@@ -42,7 +42,7 @@ public partial class CreateProfileDialog : BaseDialogWindow
 			return;
 		}
 
-		if (backendService.Profiles.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+		if (profilesService.Profiles.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
 		{
 			ShowError("A profile with this name already exists");
 			return;
@@ -50,7 +50,7 @@ public partial class CreateProfileDialog : BaseDialogWindow
 
 		try
 		{
-			var newProfile = backendService.CreateProfile(appType, name);
+			var newProfile = profilesService.CreateProfile(appType, name);
 			Close(newProfile);
 		}
 		catch (Exception ex)

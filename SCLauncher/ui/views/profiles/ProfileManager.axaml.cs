@@ -24,13 +24,13 @@ internal record ProfileManagerEntry(AppProfile Profile, bool IsActive)
 
 public partial class ProfileManager : BaseDialogWindow
 {
-	private readonly BackendService backendService;
+	private readonly ProfilesService profilesService;
 
 	public ProfileManager()
 	{
 		InitializeComponent();
-		backendService = App.GetService<BackendService>();
-		backendService.ProfileSwitched += (s, e) => { LoadProfiles(); };
+		profilesService = App.GetService<ProfilesService>();
+		profilesService.ProfileSwitched += (s, e) => { LoadProfiles(); };
 
 		AddButton.Click += OnAddClick;
 		EditButton.Click += OnEditClick;
@@ -43,15 +43,15 @@ public partial class ProfileManager : BaseDialogWindow
 
 	private void LoadProfiles()
 	{
-		ProfilesListBox.ItemsSource = backendService.Profiles
-			.Select(p => new ProfileManagerEntry(p, p == backendService.ActiveProfile));
+		ProfilesListBox.ItemsSource = profilesService.Profiles
+			.Select(p => new ProfileManagerEntry(p, p == profilesService.ActiveProfile));
 	}
 
 	private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
 	{
 		var hasSelection = ProfilesListBox.SelectedItem != null;
 		EditButton.IsEnabled = hasSelection;
-		DeleteButton.IsEnabled = hasSelection;
+		DeleteButton.IsEnabled = ProfilesListBox.ItemCount > 1 && hasSelection;
 	}
 
 	private async void OnAddClick(object? sender, RoutedEventArgs args)
@@ -95,7 +95,7 @@ public partial class ProfileManager : BaseDialogWindow
 		{
 			if (ProfilesListBox.SelectedItem is ProfileManagerEntry selectedEntry)
 			{
-				if (backendService.Profiles.Count <= 1)
+				if (profilesService.Profiles.Count <= 1)
 				{
 					App.ShowFailure("Cannot delete the last profile", this);
 					return;
@@ -109,7 +109,7 @@ public partial class ProfileManager : BaseDialogWindow
 
 				if (confirmed)
 				{
-					if (backendService.DeleteProfile(selectedEntry.Profile.Name))
+					if (profilesService.DeleteProfile(selectedEntry.Profile.Name))
 					{
 						LoadProfiles();
 					}
@@ -156,7 +156,7 @@ public partial class ProfileManager : BaseDialogWindow
 	{
 		if (sender is Control { DataContext: ProfileManagerEntry entry })
 		{
-			if (backendService.SetActiveProfile(entry.Profile.Name))
+			if (profilesService.SetActiveProfile(entry.Profile.Name))
 			{
 				ProfilesListBox.SelectedItem = entry;
 			}

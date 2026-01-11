@@ -17,8 +17,8 @@ public partial class InstallPathSelect : UserControl, WizardNavigator.IWizardCon
 		{
 			if (DataContext is ServerInstallParams p && string.IsNullOrWhiteSpace(p.Path))
 			{
-				var backend = App.GetService<BackendService>();
-				var configPath = backend.ActiveProfile.ServerPath;
+				var profilesService = App.GetService<ProfilesService>();
+				var configPath = profilesService.ActiveProfile.ServerPath;
 				if (!string.IsNullOrWhiteSpace(configPath))
 				{
 					p.Path = configPath;

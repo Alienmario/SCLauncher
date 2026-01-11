@@ -7,7 +7,7 @@
              x:Class="SCLauncher.ui.views.profiles.ProfileSwitcher">
 
 	<ComboBox Name="ProfileComboBox"
-	          Padding="8,2"
+	          Padding="8,0"
 	          MinHeight="22"
 	          BorderThickness="0"
 	          CornerRadius="10"
@@ -20,6 +20,9 @@
 				<TextBlock Text="{Binding Name}"/>
 			</DataTemplate>
 		</ComboBox.DataTemplates>
+		<ComboBox.Resources>
+			<Color x:Key="ComboBoxBackgroundDisabled">Transparent</Color>
+		</ComboBox.Resources>
 	</ComboBox>
 
 </UserControl>

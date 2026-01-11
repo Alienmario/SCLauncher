@@ -6,18 +6,18 @@ namespace SCLauncher.ui.views.serverhost;
 
 public partial class ServerConfigurator : UserControl
 {
-	private readonly BackendService backend;
+	private readonly ProfilesService profilesService;
 	
 	public ServerConfigurator()
 	{
 		InitializeComponent();
-		backend = App.GetService<BackendService>();
+		profilesService = App.GetService<ProfilesService>();
 		
 		if (Design.IsDesignMode)
 			return;
 
-		backend.ProfileSwitched += OnProfileSwitched;
-		OnProfileSwitched(this, backend.ActiveProfile);
+		profilesService.ProfileSwitched += OnProfileSwitched;
+		OnProfileSwitched(this, profilesService.ActiveProfile);
 	}
 
 	private void OnProfileSwitched(object? sender, AppProfile newProfile)
@@ -27,7 +27,7 @@ public partial class ServerConfigurator : UserControl
 
 	public void ResetToDefaults()
 	{
-		DataContext = backend.ActiveProfile.NewServerConfig();
+		DataContext = profilesService.ActiveProfile.NewServerConfig();
 	}
 	
 }

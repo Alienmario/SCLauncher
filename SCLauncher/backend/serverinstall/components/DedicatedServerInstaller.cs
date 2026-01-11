@@ -8,17 +8,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using DepotDownloader;
 using SCLauncher.backend.install;
-using SCLauncher.backend.service;
 using SCLauncher.backend.steam;
 using SCLauncher.backend.util;
 using SCLauncher.model;
+using SCLauncher.model.config;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
 using SteamKit2.Authentication;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public class DedicatedServerInstaller(BackendService backend, InstallHelper installHelper)
+public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallHelper installHelper)
 	: IServerComponentInstaller<ComponentInfo>
 {
 	public class ServerComponentInfo : ComponentInfo
@@ -43,7 +43,7 @@ public class DedicatedServerInstaller(BackendService backend, InstallHelper inst
 	public async IAsyncEnumerable<StatusMessage> InstallViaSteamClient(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
-		if (!SteamUtils.IsValidSteamInstallDir(backend.GlobalConfig.SteamPath))
+		if (!SteamUtils.IsValidSteamInstallDir(globalConfig.SteamPath))
 		{
 			throw new InstallException("Steam not found! Install it or specify Steam path in settings, then retry.");
 		}
@@ -101,7 +101,7 @@ public class DedicatedServerInstaller(BackendService backend, InstallHelper inst
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
-			string? steamDir = backend.GlobalConfig.SteamPath;
+			string? steamDir = globalConfig.SteamPath;
 			if (steamDir == null) // this is explicitly handled during install
 				return ComponentInfo.ReadyToInstall;
 
@@ -179,7 +179,7 @@ public class DedicatedServerInstaller(BackendService backend, InstallHelper inst
 		
 		do
 		{
-			string? steamDir = backend.GlobalConfig.SteamPath;
+			string? steamDir = globalConfig.SteamPath;
 			if (steamDir == null)
 				yield break;
 			

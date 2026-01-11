@@ -57,6 +57,7 @@
 				<TextBox Name="GameExecutableLinuxTextBox" Watermark="Enter Linux executable"/>
 			</StackPanel>
 
+			<!--
 			<StackPanel Spacing="5">
 				<TextBlock Text="Game Path:"/>
 				<TextBox Name="GamePathTextBox" Watermark="Enter game path (optional)"/>
@@ -66,6 +67,7 @@
 				<TextBlock Text="Server Path:"/>
 				<TextBox Name="ServerPathTextBox" Watermark="Enter server path (optional)"/>
 			</StackPanel>
+			-->
 
 		</StackPanel>
 	</controls:BaseDialogWindow.MainContent>

@@ -22,7 +22,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	private readonly ServerControlService svController;
 	private readonly ClientControlService clController;
 	private readonly ServerMessageAnalyzerService analyzer;
-	private readonly BackendService backend;
+	private readonly ProfilesService profilesService;
 
 	public ServerConsole()
 	{
@@ -31,7 +31,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		svController = App.GetService<ServerControlService>();
 		clController = App.GetService<ClientControlService>();
 		analyzer = App.GetService<ServerMessageAnalyzerService>();
-		backend = App.GetService<BackendService>();
+		profilesService = App.GetService<ProfilesService>();
 
 		StartButton.Click += OnStartServerClicked;
 		StopButton.Click += OnStopServerClicked;
@@ -60,7 +60,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 
 	private void OnServerStateChanged(object? sender, bool running)
 	{
-		var hostname = backend.ActiveProfile.ServerConfig.Hostname;
+		var hostname = profilesService.ActiveProfile.ServerConfig.Hostname;
 		Dispatcher.UIThread.Post(() =>
 		{
 			StatusIndicatorLabel.Text = running ? "Online - " + hostname : "Offline";
@@ -116,7 +116,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 
 		try
 		{
-			if (clController.ConnectToServer(localIp + ":" + analyzer.ServerPort, backend.ActiveProfile.ServerConfig.Password))
+			if (clController.ConnectToServer(localIp + ":" + analyzer.ServerPort, profilesService.ActiveProfile.ServerConfig.Password))
 			{
 				App.ShowSuccess("Joining local server...");
 			}
@@ -142,7 +142,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 			}
 
 			var link = SteamUtils.GetConnectLink(analyzer.PublicIp + ":" + analyzer.ServerPort,
-				backend.ActiveProfile.GameAppId, backend.ActiveProfile.ServerConfig.Password);
+				profilesService.ActiveProfile.GameAppId, profilesService.ActiveProfile.ServerConfig.Password);
 		
 			await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(link);
 			App.ShowSuccess("Public join link copied to clipboard.");
@@ -177,11 +177,11 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	{
 		try
 		{
-			if (backend.ActiveProfile.ServerPath == null)
+			if (profilesService.ActiveProfile.ServerPath == null)
 				return;
 
 			if (!await TopLevel.GetTopLevel(this)!.Launcher.LaunchDirectoryInfoAsync(
-				    new DirectoryInfo(backend.ActiveProfile.ServerPath)))
+				    new DirectoryInfo(profilesService.ActiveProfile.ServerPath)))
 			{
 				App.ShowFailure("Unable to open server directory.");
 			}

@@ -11,12 +11,12 @@ namespace SCLauncher.ui.views.profiles;
 
 public partial class EditProfileDialog : BaseDialogWindow
 {
-	private readonly BackendService backendService;
+	private readonly ProfilesService profilesService;
 
 	public EditProfileDialog()
 	{
 		InitializeComponent();
-		backendService = App.GetService<BackendService>();
+		profilesService = App.GetService<ProfilesService>();
 
 		DataContextChanged += (sender, args) =>
 		{
@@ -49,8 +49,8 @@ public partial class EditProfileDialog : BaseDialogWindow
 		GameExecutableLinuxTextBox.Text = profile.GameExecutable
 			.TryGetValue(PlatformID.Unix, out var linuxExe) ? linuxExe : string.Empty;
 
-		GamePathTextBox.Text = profile.GamePath ?? string.Empty;
-		ServerPathTextBox.Text = profile.ServerPath ?? string.Empty;
+		// GamePathTextBox.Text = profile.GamePath ?? string.Empty;
+		// ServerPathTextBox.Text = profile.ServerPath ?? string.Empty;
 	}
 
 	private bool SaveProfile(AppProfile profile)
@@ -65,7 +65,7 @@ public partial class EditProfileDialog : BaseDialogWindow
 
 		// Check if name is different and if it conflicts with another profile
 		if (!name.Equals(profile.Name, StringComparison.OrdinalIgnoreCase) &&
-		    backendService.Profiles.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+		    profilesService.Profiles.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
 		{
 			ShowError("A profile with this name already exists");
 			return false;
@@ -134,8 +134,8 @@ public partial class EditProfileDialog : BaseDialogWindow
 				{ PlatformID.Win32NT, gameExecutableWin },
 				{ PlatformID.Unix, gameExecutableLinux }
 			};
-			profile.GamePath = GamePathTextBox.Text?.Trim();
-			profile.ServerPath = ServerPathTextBox.Text?.Trim();
+			// profile.GamePath = GamePathTextBox.Text?.Trim();
+			// profile.ServerPath = ServerPathTextBox.Text?.Trim();
 
 			return true;
 		}

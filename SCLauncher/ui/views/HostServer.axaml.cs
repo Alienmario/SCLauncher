@@ -14,28 +14,20 @@ namespace SCLauncher.ui.views;
 
 public partial class HostServer : UserControl
 {
+	private readonly ServerControlService serverControlService;
+	private readonly ServerInstallService serverInstallService;
+	private readonly ProfilesService profilesService;
+	private CancellationTokenSource? cancellationTokenSource;
 	
 	public HostServer()
 	{
 		InitializeComponent();
+		serverControlService = App.GetService<ServerControlService>();
+		serverInstallService = App.GetService<ServerInstallService>();
+		profilesService = App.GetService<ProfilesService>();
 		ServerInstallWizard.OnExit += OnServerInstallWizardExit;
 		ServerUninstallWizard.OnExit += OnServerInstallWizardExit;
-	}
-
-	public void GoToServerInstallWizard()
-	{
-		SwitchContent(ServerInstallWizard);
-		ServerInstallWizard.Reset();
-		ServerInstallWizard.SetContent(new InstallMethodSelect());
-		ServerInstallWizard.DataContext = App.GetService<ServerInstallService>().NewInstallParams();
-	}
-	
-	public void GoToServerUninstallWizard()
-	{
-		SwitchContent(ServerUninstallWizard);
-		ServerUninstallWizard.Reset();
-		ServerUninstallWizard.SetContent(new UninstallOverview());
-		ServerUninstallWizard.DataContext = App.GetService<ServerInstallService>().NewUninstallParams();
+		profilesService.ProfileSwitched += (s, e) => Dispatcher.UIThread.Post(CheckAvailability);
 	}
 
 	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -43,12 +35,28 @@ public partial class HostServer : UserControl
 		Control? content = GetContent();
 		if (content == null
 		    || content == ServerNotFoundPanel
-		    || (content == ServerConsole && !App.GetService<ServerControlService>().IsRunning))
+		    || (content == ServerConsole && !serverControlService.IsRunning))
 		{
 			CheckAvailability();
 		}
 	}
-	
+
+	public void GoToServerInstallWizard()
+	{
+		SwitchContent(ServerInstallWizard);
+		ServerInstallWizard.Reset();
+		ServerInstallWizard.SetContent(new InstallMethodSelect());
+		ServerInstallWizard.DataContext = serverInstallService.NewInstallParams();
+	}
+
+	public void GoToServerUninstallWizard()
+	{
+		SwitchContent(ServerUninstallWizard);
+		ServerUninstallWizard.Reset();
+		ServerUninstallWizard.SetContent(new UninstallOverview());
+		ServerUninstallWizard.DataContext = serverInstallService.NewUninstallParams();
+	}
+
 	private void OnLocateServerClicked(object? sender, RoutedEventArgs e)
 	{
 		var mainWindow = App.GetService<MainWindow>();
@@ -88,17 +96,20 @@ public partial class HostServer : UserControl
 
 	private void CheckAvailability()
 	{
+		cancellationTokenSource?.Cancel();
+		cancellationTokenSource?.Dispose();
+		cancellationTokenSource = new CancellationTokenSource();
+		var ct = cancellationTokenSource.Token;
+
 		SwitchContent(LoadingPanel);
-		var serverControlService = App.GetService<ServerControlService>();
-		var cancellationTokenSource = new CancellationTokenSource();
-		var cancellationToken = cancellationTokenSource.Token;
-		Task.Run(async () =>
-		{
-			return await serverControlService.IsAvailableAsync(cancellationToken);
-		}, cancellationToken).ContinueWith(task =>
+		
+		Task.Run(async () => await serverControlService.IsAvailableAsync(ct), ct).ContinueWith(task =>
 		{
 			Dispatcher.UIThread.Post(() =>
 			{
+				if (ct.IsCancellationRequested)
+					return;
+				
 				if (!task.IsCompletedSuccessfully)
 				{
 					task.LogExceptions();
@@ -117,7 +128,7 @@ public partial class HostServer : UserControl
 					SwitchContent(ServerNotFoundPanel);
 				}
 			});
-		}, cancellationToken);
+		}, ct);
 	}
 
 }
