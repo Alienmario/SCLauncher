@@ -12,6 +12,7 @@
         ExtendClientAreaToDecorationsHint="{OnPlatform Windows=True, Default=False}"
         TransparencyLevelHint="{OnPlatform Windows='Mica,AcrylicBlur', Default='None'}"
         WindowStartupLocation="CenterScreen"
+        Padding="{Binding $self.OffScreenMargin}"
         Width="700" Height="450"
         MinWidth="600" MinHeight="300">
 
