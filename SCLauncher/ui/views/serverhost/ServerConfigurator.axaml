@@ -17,16 +17,18 @@
 	<UserControl.Styles>
 		<Style Selector="TextBlock">
 			<Setter Property="TextTrimming" Value="{x:Static TextTrimming.CharacterEllipsis}"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
 		</Style>
 		<Style Selector="TextBox">
 			<Setter Property="TextWrapping" Value="Wrap"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
 		</Style>
 	</UserControl.Styles>
 	
 	<DockPanel>
 		<StackPanel DockPanel.Dock="Top">
-			<TextBlock Text="Server options" FontSize="15" LetterSpacing="2" Margin="8 0 8 0"
-			           FontWeight="Regular" Foreground="{DynamicResource TextControlPlaceholderForeground}">
+			<TextBlock Text="Server options" FontSize="15" LetterSpacing="1" Margin="8 0 8 0"
+			           FontWeight="Regular" Foreground="{DynamicResource TextControlButtonForeground}">
 				<TextBlock.Effect>
 					<DropShadowEffect Color="Gray" BlurRadius=".5" OffsetX="0" OffsetY="0"/>
 				</TextBlock.Effect>
@@ -40,44 +42,60 @@
 				<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*" ColumnDefinitions="Auto,*"
 				      RowSpacing="5" ColumnSpacing="8">
 					
-					<TextBlock Grid.Row="0" Grid.Column="0" Text="Hostname:" VerticalAlignment="Center"/>
+					<TextBlock Grid.Row="0" Grid.Column="0" Text="Hostname:"/>
 					<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Hostname}"/>
 					
-					<TextBlock Grid.Row="1" Grid.Column="0" Text="Password:" VerticalAlignment="Center"/>
+					<TextBlock Grid.Row="1" Grid.Column="0" Text="Password:"/>
 					<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Password}"/>
 					
-					<TextBlock Grid.Row="2" Grid.Column="0" Text="Start Map:" VerticalAlignment="Center"/>
+					<TextBlock Grid.Row="2" Grid.Column="0" Text="Start Map:"/>
 					<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding StartMap}"/>
 					
-					<TextBlock Grid.Row="3" Grid.Column="0" Text="Max Players:" VerticalAlignment="Center"/>
+					<TextBlock Grid.Row="3" Grid.Column="0" Text="Max Players:"/>
 					<NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding Maxplayers}" Minimum="2" Maximum="255" FormatString="0"/>
 				    
-					<TextBlock Grid.Row="4" Grid.Column="0" Text="Config file:" VerticalAlignment="Center"/>
+					<TextBlock Grid.Row="4" Grid.Column="0" Text="Config file:"/>
 					<TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ServerCfgFile}"/>
 					
-				    <TextBlock Grid.Row="5" Grid.Column="0" Text="Local IP:" VerticalAlignment="Center"/>
+				    <TextBlock Grid.Row="5" Grid.Column="0" Text="Local IP:"/>
 				    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Ip}"/>
 				    
-				    <TextBlock Grid.Row="6" Grid.Column="0" Text="Port:" VerticalAlignment="Center"/>
+				    <TextBlock Grid.Row="6" Grid.Column="0" Text="Port:"/>
 				    <NumericUpDown Grid.Row="6" Grid.Column="1" Value="{Binding Port}" Minimum="1" Maximum="65535" FormatString="0"/>
 				    
-				    <TextBlock Grid.Row="7" Grid.Column="0" Text="Strict Port Bind:" VerticalAlignment="Center"/>
+				    <TextBlock Grid.Row="7" Grid.Column="0" Text="Strict Port Bind:"/>
 				    <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding StrictPortBind}"/>
 				    
-				    <TextBlock Grid.Row="8" Grid.Column="0" Text="LAN Mode:" VerticalAlignment="Center"/>
+				    <TextBlock Grid.Row="8" Grid.Column="0" Text="LAN Mode:"/>
 				    <CheckBox Grid.Row="8" Grid.Column="1" IsChecked="{Binding Lan}"/>
 				    
-				    <TextBlock Grid.Row="9" Grid.Column="0" Text="Team Play:" VerticalAlignment="Center"/>
+				    <TextBlock Grid.Row="9" Grid.Column="0" Text="Team Play:"/>
 				    <CheckBox Grid.Row="9" Grid.Column="1" IsChecked="{Binding Teamplay}"/>
-				
-				    <StackPanel Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Spacing="4">
-					    <TextBlock Text="╭ Custom Parameters ╮" HorizontalAlignment="Center" Margin="0 8 0 0"
-					               IsVisible="{Binding CustomParams.Count}"/>
-					    <controls:CustomParamEntry DataContext="{Binding CustomParams}"/>
-				    </StackPanel>
-					
 				</Grid>
+				
+				<ContentControl Content="{Binding}"/>
+				
+				<StackPanel Spacing="4">
+					<TextBlock Text="╭ Custom Parameters ╮" HorizontalAlignment="Center" Margin="0 8 0 0"
+					           IsVisible="{Binding CustomParams.Count}"/>
+					<controls:CustomParamEntry DataContext="{Binding CustomParams}"/>
+				</StackPanel>
 			</StackPanel>
 		</ScrollViewer>
 	</DockPanel>
+	
+	<!-- Game specific templates -->
+	<UserControl.DataTemplates>
+		
+		<DataTemplate DataType="config:ServerConfigurationHl2dm">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*" RowSpacing="5" ColumnSpacing="8">
+				<TextBlock Grid.Row="0" Grid.Column="0" Text="Steam Networking:"/>
+				<CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding UseSteamNetworking}"/>
+			</Grid>
+		</DataTemplate>
+		
+		<!-- empty fallback -->
+		<DataTemplate DataType="config:ServerConfiguration"/>
+		
+	</UserControl.DataTemplates>
 </UserControl>

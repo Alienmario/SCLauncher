@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace SCLauncher.model.config;
 
+[JsonDerivedType(typeof(ServerConfigurationHl2dm), typeDiscriminator: "HL2DM")]
 public partial class ServerConfiguration : INotifyPropertyChanged
 {
 

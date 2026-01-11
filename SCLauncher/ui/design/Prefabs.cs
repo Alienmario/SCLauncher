@@ -25,7 +25,7 @@ public class DServerUninstallParams : ServerUninstallParams
 	}
 }
 
-public class DServerConfiguration : ServerConfiguration
+public class DServerConfiguration : ServerConfigurationHl2dm
 {
 	public DServerConfiguration()
 	{

@@ -65,7 +65,7 @@
 					</UniformGrid>
 	    
 					<!-- Game specific -->
-					<ContentControl Content="{Binding .}"/>
+					<ContentControl Content="{Binding}"/>
 				
 					<!-- Custom entry -->
 					<TextBlock Text="Custom Parameters" Classes="SectionHeader" Margin="0 10 0 5"/>

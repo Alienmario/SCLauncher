@@ -72,7 +72,7 @@ public partial class AppProfile : INotifyPropertyChanged
 						new CustomParam("+modelchooser_teambased", "0")
 					]
 				},
-				AppType.HL2DM => new ServerConfiguration
+				AppType.HL2DM => new ServerConfigurationHl2dm
 				{
 					Teamplay = false,
 					StartMap = "dm_lockdown",
