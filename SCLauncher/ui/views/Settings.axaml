@@ -14,10 +14,22 @@
 		<StackPanel DockPanel.Dock="Top">
 			<Label Content="Steam installation" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 			
-			<ContentControl x:DataType="config:GlobalConfiguration" Name="GlobalConfigConent">
+			<StackPanel x:DataType="config:GlobalConfiguration" Name="GlobalConfigConent">
 				<custom:FilePickerTextBox Mode="Folder" Title="Select Steam installation folder" Name="SteamPath"
 				                          Text="{Binding SteamPath}"/>
-			</ContentControl>
+				                          
+				<Label Content="Steam Web API Key (for server browser)" VerticalAlignment="Center" HorizontalAlignment="Left"
+				       Margin="0 10 0 0"/>
+				<TextBox Text="{Binding SteamWebApiKey}" Name="SteamApiKey">
+					<TextBox.InnerRightContent>
+						<HyperlinkButton NavigateUri="https://steamcommunity.com/dev/apikey" Name="SteamApiKeyLink">
+							<PathIcon Data="{StaticResource open_folder_regular}"
+							          Foreground="{StaticResource Highlight}"
+							          Height="16"/>
+						</HyperlinkButton>
+					</TextBox.InnerRightContent>
+				</TextBox>
+			</StackPanel>
 			
 			<Label Content="Game path" VerticalAlignment="Center" HorizontalAlignment="Left"
 			       Margin="0 10 0 0"/>

@@ -53,7 +53,7 @@ public class DAppProfile : AppProfile
 	};
 }
 
-public record DServer : Server
+public class DServer : Server
 {
 	public static readonly DServer Instance = new()
 	{
@@ -68,7 +68,7 @@ public record DServer : Server
 		NumBots = 1,
 		Map = "bm_dm",
 		Type = "Dedicated",
-		VAC = true,
+		Secure = true,
 		Password = true,
 		Version = "1200",
 		Keywords = "val1,val2,val3",

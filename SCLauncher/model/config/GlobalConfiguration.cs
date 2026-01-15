@@ -7,6 +7,8 @@ public partial class GlobalConfiguration : INotifyPropertyChanged
 	
 	public string? SteamPath { get; set; }
 	
+	public string? SteamWebApiKey { get; set; }
+	
 	public string? CurrentTab { get; set; }
 
 	public string? ActiveProfile { get; set; }

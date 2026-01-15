@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SCLauncher.model.serverbrowser;
 
-public record Server
+public partial class Server : INotifyPropertyChanged
 {
-	public required IList<ServerPlayer> Players { get; init; }
-	public required IList<ServerRule> Rules { get; init; }
+	public IList<ServerPlayer> Players { get; set; } = [];
+	public IList<ServerRule> Rules { get; set; } = [];
 	
 	public required string IP { get; init; }
 	public required int Port { get; init; }
+	public int? SpectatePort { get; init; }
 	public required string Name { get; init; }
 	public required ulong? GameAppId { get; init; }
 	public required string GameModDir { get; init; }
@@ -19,13 +21,13 @@ public record Server
 	public required int NumBots { get; init; }
 	public required string Map { get; init; }
 	public required string Type { get; init; }
-	public required bool VAC { get; init; }
-	public required bool Password { get; init; }
+	public required bool Secure { get; init; }
 	public required string Version { get; init; }
 	public required string Keywords { get; init; }
 	public required ulong? SteamId { get; init; }
 	public required string Environment { get; init; }
-	public required TimeSpan Ping { get; init; }
+	public bool? Password { get; set; }
+	public TimeSpan? Ping { get; set; }
 
 	public string Endpoint => IP + ':' + Port;
 	public int NumRealPlayers => NumPlayers - NumBots;

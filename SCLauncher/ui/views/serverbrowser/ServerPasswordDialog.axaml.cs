@@ -1,18 +1,31 @@
-using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using SCLauncher.ui.controls;
 
 namespace SCLauncher.ui.views.serverbrowser;
 
-public partial class ServerPasswordDialog : Window
+public partial class ServerPasswordDialog : BaseDialogWindow
 {
-	public ServerPasswordDialog()
+	public ServerPasswordDialog() : this(true) {}
+	
+	public ServerPasswordDialog(bool required)
 	{
 		InitializeComponent();
-		Activated += delegate { PasswordTextBox.Focus(); };
+		Title = required ? "Password required" : "Password";
+		Activated += delegate
+		{
+			InvalidateArrange(); // SizeToContent bugfix
+			PasswordTextBox.Focus();
+		};
+		KeyUp += (sender, args) =>
+		{
+			if (args.Key == Key.Escape)
+				Close();
+		};
 	}
 
 	private void ConnectClicked(object? sender, RoutedEventArgs e)
 	{
-		Close(PasswordTextBox.Text);
+		Close(PasswordTextBox.Text ?? string.Empty);
 	}
 }

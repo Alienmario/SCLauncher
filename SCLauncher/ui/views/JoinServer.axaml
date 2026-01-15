@@ -6,6 +6,7 @@
              xmlns:converters="clr-namespace:SCLauncher.ui.converters"
              xmlns:controls="clr-namespace:SCLauncher.ui.controls"
              xmlns:views="clr-namespace:SCLauncher.ui.views"
+             xmlns:config="clr-namespace:SCLauncher.model.config"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SCLauncher.ui.views.JoinServer">
 	
@@ -72,12 +73,19 @@
                 </Button>
             </TextBox.InnerRightContent>
         </TextBox>
-        
+
+        <Button DockPanel.Dock="Bottom" Name="ApiKeyButton"
+                Click="OnGenerateKeyClicked"
+                IsVisible="{Binding SteamWebApiKey, DataType=config:GlobalConfiguration, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                Classes="accent" FontSize="16"
+                Content="Get your Steam API Key to view the server list"/>
+
         <DataGrid Name="ServerGrid" DockPanel.Dock="Bottom" x:DataType="serverbrowser:Server"
                   IsReadOnly="True" GridLinesVisibility="None"
                   CanUserResizeColumns="True" CanUserSortColumns="True"
                   Background="{DynamicResource TextControlBackground}"
-                  CellPointerPressed="OnServerGridCellPointerPressed">
+                  CellPointerPressed="OnGridCellPointerPressed">
             
             <DataGrid.Columns>
                 <DataGridTemplateColumn SortMemberPath="Password" CanUserResize="False">
@@ -86,7 +94,7 @@
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="serverbrowser:Server">
-                            <PathIcon Data="{StaticResource lock_regular}" IsVisible="{Binding Password}"/>
+                            <PathIcon Data="{StaticResource lock_regular}" IsVisible="{Binding Password, TargetNullValue=False}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -97,7 +105,7 @@
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="serverbrowser:Server">
-                            <PathIcon Data="{StaticResource shield_regular}" IsVisible="{Binding VAC}"/>
+                            <PathIcon Data="{StaticResource shield_regular}" IsVisible="{Binding Secure}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -115,8 +123,10 @@
                     </DataGridTextColumn.Binding>
                 </DataGridTextColumn>
                 
+                <!--<DataGridTextColumn Header="Ping" MinWidth="55" CanUserResize="False"
+                                    Binding="{Binding Ping?.Value?.TotalMilliseconds, TargetNullValue='-', StringFormat='{}{0:0}'}"/>-->
                 <DataGridTextColumn Header="Ping" MinWidth="55" CanUserResize="False"
-                                    Binding="{Binding Ping.TotalMilliseconds, StringFormat='{}{0:0}'}"/>
+                                    Binding="{Binding Ping?.Value?.TotalMilliseconds, TargetNullValue='', StringFormat='✓'}"/>
             </DataGrid.Columns>
             
             <DataGrid.RowDetailsTemplate>

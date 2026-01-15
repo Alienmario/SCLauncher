@@ -29,6 +29,7 @@
 		<Setter Property="Height" Value="180"/>
 		<Setter Property="VerticalContentAlignment" Value="Center"/>
 		<Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+		<Setter Property="ShowInTaskbar" Value="False"/>
 		<Setter Property="Template">
 			<ControlTemplate>
 				<Panel>

@@ -1,98 +1,120 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using SCLauncher.model.config;
 using SCLauncher.model.serverbrowser;
+using SteamKit2;
 using SteamQuery;
 using SteamQuery.Models;
 
 namespace SCLauncher.backend.service;
 
-public class ServerBrowserService(ProfilesService profilesService)
+public class ServerBrowserService(ProfilesService profilesService, GlobalConfiguration globalConfig)
 {
 	private const int MaxConcurrentQueries = 50;
 	private static readonly TimeSpan ServerQuerySendTimeout = TimeSpan.FromSeconds(5);
 	private static readonly TimeSpan ServerQueryReadTimeout = TimeSpan.FromSeconds(5);
 
-	// This constructor creates connections
-	// private readonly MasterServer masterServer = new(MasterServerEndPoint.Source);
-	private readonly MasterServerQueryFilters filter = new MasterServerQueryFiltersBuilder()
-		.WithAppId((int)profilesService.ActiveProfile.GameAppId)
-		.Build();
-
 	public async IAsyncEnumerable<Server> GetServers([EnumeratorCancellation] CancellationToken ct = default)
 	{
-		var queryTasks = new List<Task<Server?>>();
-	
-		using MasterServer masterServer = new(MasterServerEndPoint.Source);
-		await foreach (var masterServerResponse in masterServer.GetServersAsync(filter, cancellationToken: ct))
+		if (string.IsNullOrWhiteSpace(globalConfig.SteamWebApiKey))
+			yield break;
+		
+		var queryTasks = new List<Task<Server>>();
+
+		using (dynamic gameServersService = WebAPI.GetAsyncInterface("IGameServersService", globalConfig.SteamWebApiKey))
 		{
+			KeyValue serverList = await gameServersService.GetServerList(
+					filter: "appid\\" + profilesService.ActiveProfile.GameAppId, limit: 9999)
+				.ConfigureAwait(false);
 			ct.ThrowIfCancellationRequested();
-			queryTasks.Add(QueryServer(masterServerResponse, ct));
-	
-			if (queryTasks.Count >= MaxConcurrentQueries)
+			
+			foreach (KeyValue serverKv in serverList["servers"].Children)
 			{
-				Server? server = await WaitForQueryResponses();
-				if (server != null) yield return server;
+				string? endpoint = serverKv["addr"].Value;
+				if (string.IsNullOrWhiteSpace(endpoint)) continue;
+				
+				queryTasks.Add(QueryServer(endpoint, ct: ct)
+					.ContinueWith(t => t.Result ?? TranslateServer(serverKv), ct));
+				
+				if (queryTasks.Count >= MaxConcurrentQueries)
+				{
+					yield return await WaitForQueryResponses().ConfigureAwait(false);
+				}
 			}
 		}
 	
 		while (queryTasks.Count > 0)
 		{
-			Server? server = await WaitForQueryResponses();
-			if (server != null) yield return server;
+			yield return await WaitForQueryResponses().ConfigureAwait(false);
 		}
 		
-		async Task<Server?> WaitForQueryResponses()
+		async Task<Server> WaitForQueryResponses()
 		{
-			var finished = await Task.WhenAny(queryTasks);
+			var finished = await Task.WhenAny(queryTasks).ConfigureAwait(false);
 			ct.ThrowIfCancellationRequested();
 			queryTasks.Remove(finished);
-			return await finished;
+			return await finished.ConfigureAwait(false);
 		}
 	}
 
-	public static async Task<Server?> QueryServer(string endpoint, CancellationToken ct = default)
+	public async Task<Server?> QueryServer(string endpoint,
+		bool players = false, bool rules = false,
+		CancellationToken ct = default)
 	{
-		try
+		return await Task.Run(() =>
 		{
-			using var gameServer = new GameServer(endpoint);
-			return await QueryServer(gameServer, ct);
-		}
-		catch (Exception)
-		{
-			return null;
-		}
-	}
+			try
+			{
+				using var gameServer = new GameServer(endpoint);
+				gameServer.SendTimeout = ServerQuerySendTimeout;
+				gameServer.ReceiveTimeout = ServerQueryReadTimeout;
+				gameServer.GetInformation();
+				ct.ThrowIfCancellationRequested();
+				if (players) gameServer.GetPlayers();
+				ct.ThrowIfCancellationRequested();
+				if (rules) gameServer.GetRules();
+				ct.ThrowIfCancellationRequested();
 	
-	private static async Task<Server?> QueryServer(MasterServerResponse masterServerResponse, CancellationToken ct)
-	{
-		try
-		{
-			using var gameServer = new GameServer(masterServerResponse);
-			return await QueryServer(gameServer, ct);
-		}
-		catch (Exception)
-		{
-			return null;
-		}
+				return TranslateServer(gameServer);
+			}
+			catch (Exception e) when (e is not OperationCanceledException)
+			{
+				if (e is not SocketException) e.Log();
+				return null;
+			}
+		}, ct).ConfigureAwait(false);
 	}
 
-	private static async Task<Server?> QueryServer(GameServer gameServer, CancellationToken ct)
+	private static Server TranslateServer(KeyValue src)
 	{
-		gameServer.SendTimeout = ServerQuerySendTimeout;
-		gameServer.ReceiveTimeout = ServerQueryReadTimeout;
-			
-		var stopwatch = Stopwatch.StartNew();
-		await gameServer.PerformQueryAsync(cancellationToken: ct);
-		stopwatch.Stop();
-		return TranslateServer(gameServer, stopwatch.Elapsed / 3); // did 3? queries
+		return new Server
+		{
+			IP = src["addr"].Value?.Split(":")[0] ?? "",
+			Port = src["gameport"].AsInteger(),
+			SpectatePort = src["specport"].AsInteger(),
+			Name = src["name"].Value ?? "",
+			GameAppId = src["appid"].AsUnsignedLong(),
+			GameModDir = src["gamedir"].Value ?? "",
+			GameDescription = src["product"].Value ?? "",
+			NumPlayers = src["players"].AsInteger() + src["bots"].AsInteger(),
+			MaxPlayers = src["max_players"].AsInteger(),
+			NumBots = src["bots"].AsInteger(),
+			Map = src["map"].Value ?? "",
+			Type = src["dedicated"].AsBoolean() ? "Dedicated" : "Non-dedicated",
+			Secure = src["secure"].AsBoolean(),
+			Version = src["version"].Value ?? "",
+			Keywords = src["gametype"].Value ?? "",
+			SteamId = src["steamid"].AsUnsignedLong(),
+			Environment = src["os"].Value switch { "l" => "Linux", "w" => "Windows", _ => "Other" }
+		};
 	}
 
-	private static Server TranslateServer(GameServer src, TimeSpan ping)
+	private static Server TranslateServer(GameServer src)
 	{
 		return new Server
 		{
@@ -109,13 +131,13 @@ public class ServerBrowserService(ProfilesService profilesService)
 			NumBots = src.Information.Bots,
 			Map = src.Information.Map,
 			Type = src.Information.ServerType.ToString(),
-			VAC = src.Information.VacSecured,
+			Secure = src.Information.VacSecured,
 			Password = !src.Information.Visible,
 			Version = src.Information.Version,
 			Keywords = src.Information.Keywords.Trim(','),
 			SteamId = src.Information.SteamId,
 			Environment = src.Information.Environment.ToString(),
-			Ping = ping
+			Ping = TimeSpan.Zero
 		};
 	}
 
