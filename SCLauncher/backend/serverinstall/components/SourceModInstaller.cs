@@ -26,7 +26,7 @@ public partial class SourceModInstaller(InstallHelper helper) : IServerComponent
 		[EnumeratorCancellation] CancellationToken ct)
 	{
 		(string url, string filename) dl = await GetDownloadAsync(SourceModVersion, ct);
-		string smArchive = Path.Join(ctx.InstallDir, dl.filename);
+		string smArchive = Path.Join(ctx.InstallPath, dl.filename);
 		
 		yield return new StatusMessage($"Downloading...\n URL: {dl.url}\n Target: \"{smArchive}\"");
 		
@@ -52,7 +52,7 @@ public partial class SourceModInstaller(InstallHelper helper) : IServerComponent
 			yield return new StatusMessage($"Extracting...");
 			try
 			{
-				await helper.ExtractAsync(smArchive, ctx.GameModDir, true, ct);
+				await helper.ExtractAsync(smArchive, ctx.GameModPath, true, ct);
 			}
 			catch (Exception e)
 			{
@@ -82,8 +82,8 @@ public partial class SourceModInstaller(InstallHelper helper) : IServerComponent
 
 	public async Task<string?> BackupUserData(ServerInstallContext ctx, CancellationToken ct)
 	{
-		string smConfigsPath = Path.Join(ctx.AddonsDir, "sourcemod", "configs");
-		string backupFile = Path.Join(ctx.AddonsDir, "sourcemod", "sclauncher_backup.zip");
+		string smConfigsPath = Path.Join(ctx.AddonsPath, "sourcemod", "configs");
+		string backupFile = Path.Join(ctx.AddonsPath, "sourcemod", "sclauncher_backup.zip");
 		helper.SafeDelete(backupFile);
 
 		try
@@ -105,13 +105,18 @@ public partial class SourceModInstaller(InstallHelper helper) : IServerComponent
 
 	public async Task RestoreUserData(ServerInstallContext ctx, string backupFile)
 	{
-		await helper.ExtractAsync(backupFile, Path.Join(ctx.AddonsDir, "sourcemod"), true);
+		await helper.ExtractAsync(backupFile, Path.Join(ctx.AddonsPath, "sourcemod"), true);
 	}
 	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
 		CancellationToken ct = default)
 	{
-		string sourcemod = Path.Join(ctx.AddonsDir, "sourcemod");
+		string? sourcemod = null;
+		try
+		{
+			sourcemod = Path.Join(ctx.AddonsPath, "sourcemod");
+		}
+		catch (UnsetInstallPathException) {}
 		
 		if (!Directory.Exists(sourcemod))
 		{

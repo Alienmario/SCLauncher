@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using SCLauncher.backend.install;
 using SCLauncher.model;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
@@ -31,7 +32,7 @@ public class SrcdsFixInstaller : IServerComponentInstaller<ComponentInfo>
 			throw new InstallException("Unable to read embedded executable");
 		}
 
-		string exePath = Path.Join(ctx.InstallDir, executable);
+		string exePath = Path.Join(ctx.InstallPath, executable);
 		await using var fileStream = new FileStream(exePath, FileMode.OpenOrCreate);
 		await stream.CopyToAsync(fileStream, ct);
 		yield break;
@@ -40,11 +41,12 @@ public class SrcdsFixInstaller : IServerComponentInstaller<ComponentInfo>
 	public Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
 		CancellationToken ct = default)
 	{
-		string execPath;
+		string? execPath = null;
 		try
 		{
-			execPath = Path.Join(ctx.InstallDir, GetExecForCurrentPlatform());
+			execPath = Path.Join(ctx.InstallPath, GetExecForCurrentPlatform());
 		}
+		catch (UnsetInstallPathException) {}
 		catch (PlatformNotSupportedException)
 		{
 			return Task.FromResult(ComponentInfo.DoNotInstall);

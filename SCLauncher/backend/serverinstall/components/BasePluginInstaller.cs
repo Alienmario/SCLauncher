@@ -36,7 +36,7 @@ public class BasePluginInstaller(InstallHelper helper) : IServerComponentInstall
 		}
 
 		(string url, string filename) dl = GetDownload(ctx, release);
-		string archivePath = Path.Join(ctx.InstallDir, dl.filename);
+		string archivePath = Path.Join(ctx.InstallPath, dl.filename);
 		
 		yield return new StatusMessage($"Downloading...\n URL: {dl.url}\n Target: \"{archivePath}\"");
 		
@@ -54,7 +54,7 @@ public class BasePluginInstaller(InstallHelper helper) : IServerComponentInstall
 		
 		try
 		{
-			await helper.ExtractAsync(archivePath, ctx.GameModDir, true, ct);
+			await helper.ExtractAsync(archivePath, ctx.GameModPath, true, ct);
 		}
 		catch (Exception e)
 		{
@@ -68,7 +68,13 @@ public class BasePluginInstaller(InstallHelper helper) : IServerComponentInstall
 	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades, CancellationToken ct = default)
 	{
-		string pluginPath = Path.Join(ctx.AddonsDir, "sourcemod", "plugins", PluginFileName);
+		string? pluginPath = null;
+		try
+		{
+			pluginPath = Path.Join(ctx.AddonsPath, "sourcemod", "plugins", PluginFileName);
+		}
+		catch (UnsetInstallPathException) {}
+		
 		if (!File.Exists(pluginPath))
 		{
 			return ComponentInfo.ReadyToInstall;

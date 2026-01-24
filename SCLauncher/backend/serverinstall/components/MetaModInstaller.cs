@@ -24,7 +24,7 @@ public partial class MetaModInstaller(InstallHelper helper) : IServerComponentIn
 		[EnumeratorCancellation] CancellationToken ct)
 	{
 		(string url, string filename) dl = await GetDownloadAsync(MetaModVersion, ct);
-		string archivePath = Path.Join(ctx.InstallDir, dl.filename);
+		string archivePath = Path.Join(ctx.InstallPath, dl.filename);
 		
 		yield return new StatusMessage($"Downloading...\n URL: {dl.url}\n Target: \"{archivePath}\"");
 		
@@ -42,7 +42,7 @@ public partial class MetaModInstaller(InstallHelper helper) : IServerComponentIn
 
 		try
 		{
-			await helper.ExtractAsync(archivePath, ctx.GameModDir, true, ct);
+			await helper.ExtractAsync(archivePath, ctx.GameModPath, true, ct);
 		}
 		catch (Exception e)
 		{
@@ -57,7 +57,12 @@ public partial class MetaModInstaller(InstallHelper helper) : IServerComponentIn
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
 		CancellationToken ct = default)
 	{
-		string metamod = Path.Join(ctx.AddonsDir, "metamod");
+		string? metamod = null;
+		try
+		{
+			metamod = Path.Join(ctx.AddonsPath, "metamod");
+		}
+		catch (UnsetInstallPathException) {}
 		
 		if (!Directory.Exists(metamod))
 		{

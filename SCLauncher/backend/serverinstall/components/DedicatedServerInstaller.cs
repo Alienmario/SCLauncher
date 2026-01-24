@@ -74,7 +74,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 	{
 		var cfg = new AppDownloadConfig
 		{
-			InstallDirectory = ctx.InstallDir,
+			InstallDirectory = ctx.InstallPath,
 			VerifyAll = true,
 			AppId = ctx.Params.Profile.ServerAppId
 		};
@@ -93,7 +93,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 			throw new InstallException("Dedicated server download failed");
 		}
 
-		ctx.Params.Profile.ServerPath = ctx.InstallDir;
+		ctx.Params.Profile.ServerPath = ctx.InstallPath;
 	}
 	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
@@ -129,13 +129,13 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 		}
 		else // ServerInstallMethod.External
 		{
-			if (!Directory.Exists(ctx.InstallDir))
+			if (!Directory.Exists(ctx.InstallPath))
 				return ComponentInfo.ReadyToInstall;
 
 			string? version = null;
 			try
 			{
-				version = await GetLocalPatchVersionAsync(ctx.InstallDir, ct);
+				version = await GetLocalPatchVersionAsync(ctx.InstallPath, ct);
 			}
 			catch (Exception e)
 			{
@@ -164,7 +164,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 
 			return new ComponentInfo
 			{
-				Path = ctx.InstallDir,
+				Path = ctx.InstallPath,
 				Version = version,
 				UpgradeVersion = upgradeVersion,
 				Upgradable = upgradeVersion != null

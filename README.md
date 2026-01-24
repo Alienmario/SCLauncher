@@ -1,9 +1,6 @@
 
 # A self-contained GUI launcher for [SourceCoop](https://github.com/ampreeT/SourceCoop).
 
-> [!NOTE]
-> Currently supports Black Mesa only.
-
 ## Features
 ### Install game server - including addons
 <img src=".github/img/scl-installserver.png" width="700">
