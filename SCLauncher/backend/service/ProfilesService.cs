@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,10 +13,11 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 {
 	// fields
 	private readonly List<AppProfile> profiles = [];
+	private AppProfile? activeProfile;
 
 	// properties
 	public IReadOnlyList<AppProfile> Profiles => profiles.AsReadOnly();
-	public AppProfile ActiveProfile { get; private set; } = null!;
+	public AppProfile ActiveProfile => activeProfile ?? throw new InvalidOperationException("Active profile not set");
 
 	// events
 	public event EventHandler<AppProfile>? ProfileSwitched;
@@ -59,7 +61,7 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 
 	public bool DeleteProfile(string name)
 	{
-		var profile = profiles.FirstOrDefault(p => p.Name == name);
+		AppProfile? profile = profiles.FirstOrDefault(p => p.Name == name);
 
 		// Do not delete the last profile
 		if (profile == null || profiles.Count <= 1)
@@ -69,7 +71,7 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 
 		profiles.Remove(profile);
 
-		if (ActiveProfile == profile)
+		if (activeProfile == profile)
 		{
 			SetActiveProfile(profiles[0].Name);
 		}
@@ -80,18 +82,26 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 
 	public bool SetActiveProfile(string name)
 	{
-		var profile = profiles.FirstOrDefault(p => p.Name == name);
+		AppProfile? profile = profiles.FirstOrDefault(p => p.Name == name);
 		if (profile != null)
 		{
-			globalConfig.ActiveProfile = profile.Name;
-			if (ActiveProfile != profile)
+			if (activeProfile != profile)
 			{
-				ActiveProfile = profile;
-				ProfileSwitched?.Invoke(this, ActiveProfile);
+				activeProfile?.PropertyChanged -= ActiveProfilePropertyChanged;
+				globalConfig.ActiveProfile = profile.Name;
+				activeProfile = profile;
+				activeProfile.PropertyChanged += ActiveProfilePropertyChanged;
+				ProfileSwitched?.Invoke(this, activeProfile);
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private void ActiveProfilePropertyChanged(object? sender, PropertyChangedEventArgs args)
+	{
+		if (args.PropertyName == nameof(AppProfile.Name))
+			globalConfig.ActiveProfile = (sender as AppProfile)!.Name;
 	}
 
 	private void UpdateProfilePaths(IEnumerable<AppProfile> profilesToUpdate)

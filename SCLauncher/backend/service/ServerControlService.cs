@@ -173,9 +173,9 @@ public class ServerControlService
 		}
 	}
 
-	public async Task<ServerAvailability> IsAvailableAsync(CancellationToken ct = default)
+	public async Task<ServerAvailability> GetAvailabilityAsync(CancellationToken ct = default)
 	{
-		if (profilesService.ActiveProfile.ServerPath == null)
+		if (string.IsNullOrWhiteSpace(profilesService.ActiveProfile.ServerPath))
 			return ServerAvailability.Unavailable;
 
 		var p = new ServerInstallParams

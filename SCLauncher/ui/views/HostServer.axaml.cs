@@ -103,7 +103,7 @@ public partial class HostServer : UserControl
 
 		SwitchContent(LoadingPanel);
 		
-		Task.Run(async () => await serverControlService.IsAvailableAsync(ct), ct).ContinueWith(task =>
+		Task.Run(async () => await serverControlService.GetAvailabilityAsync(ct), ct).ContinueWith(task =>
 		{
 			Dispatcher.UIThread.Post(() =>
 			{
@@ -123,7 +123,7 @@ public partial class HostServer : UserControl
 				else
 				{
 					ServerNotFoundText.Text = task.Result == ServerAvailability.PartiallyInstalled
-						? "Some addons are not installed..."
+						? "Some components are not installed..."
 						: "Server installation not found...";
 					SwitchContent(ServerNotFoundPanel);
 				}

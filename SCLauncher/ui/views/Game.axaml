@@ -24,14 +24,15 @@
 	
 	<DockPanel Margin="0 10 0 0" VerticalSpacing="10">
 		
-		<Button DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-		        Classes="accent"
+		<Button DockPanel.Dock="Bottom"
+		        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+		        Classes="accent" FontSize="16"
 		        Content="Launch game"
 		        Name="LaunchButton"
 		        Click="OnLaunchGameClicked"/>
 		
 		<Expander HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsExpanded="True"
-		          Background="{DynamicResource TextControlBackground}">
+		          Background="{DynamicResource TextControlBackground}" BorderBrush="Transparent">
 			<Expander.Header>
 				<DockPanel>
 					<TextBlock Text="Launch options" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
@@ -68,7 +69,7 @@
 					<ContentControl Content="{Binding}"/>
 				
 					<!-- Custom entry -->
-					<TextBlock Text="Custom Parameters" Classes="SectionHeader" Margin="0 10 0 5"/>
+					<TextBlock Text="Custom Parameters" Classes="SectionHeader" Margin="0 10 0 5" FontSize="14"/>
 					<controls:CustomParamEntry DataContext="{Binding CustomParams}" ShowHint="False"
 					                           Margin="0 0 0 5"/>
 				</StackPanel>

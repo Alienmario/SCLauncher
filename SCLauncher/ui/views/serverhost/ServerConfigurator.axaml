@@ -25,19 +25,19 @@
 		</Style>
 	</UserControl.Styles>
 	
+	<UserControl.Effect>
+		<DropShadowDirectionEffect BlurRadius="10" ShadowDepth="-5"/>
+	</UserControl.Effect>
+	
 	<DockPanel>
 		<StackPanel DockPanel.Dock="Top">
-			<TextBlock Text="Server options" FontSize="15" LetterSpacing="1" Margin="8 0 8 0"
-			           FontWeight="Regular" Foreground="{DynamicResource TextControlButtonForeground}">
-				<TextBlock.Effect>
-					<DropShadowEffect Color="Gray" BlurRadius=".5" OffsetX="0" OffsetY="0"/>
-				</TextBlock.Effect>
-			</TextBlock>
+			<TextBlock Text="Server options" FontSize="15" Margin="8 0 8 0"/>
 			<Border Opacity="0.75" Margin="0 4 0 0"
 			        BorderBrush="{DynamicResource ButtonBackground}" BorderThickness=".5"/>
 		</StackPanel>
 		
 		<ScrollViewer AllowAutoHide="False" Name="Scroller">
+			
 			<StackPanel Margin="8">
 				<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*" ColumnDefinitions="Auto,*"
 				      RowSpacing="5" ColumnSpacing="8">

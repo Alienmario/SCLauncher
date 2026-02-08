@@ -4,13 +4,9 @@ using SCLauncher.model.config;
 
 namespace SCLauncher.backend.service;
 
-public class BackendService
+public class BackendService(GlobalConfiguration globalConfig, PersistenceService persistence,
+	ServerControlService serverControlService, ProfilesService profilesService)
 {
-	// dependencies
-	private readonly ProfilesService profilesService;
-	private readonly ServerControlService serverControlService;
-	private readonly GlobalConfiguration globalConfig;
-	
 	// events
 	public event EventHandler<bool>? CanSwitchProfilesChanged;
 	
@@ -28,13 +24,8 @@ public class BackendService
 		}
 	} = true;
 
-	public BackendService(GlobalConfiguration globalConfig, PersistenceService persistence,
-		ServerControlService serverControlService, ProfilesService profilesService)
+	public void Initialize()
 	{
-		this.globalConfig = globalConfig;
-		this.serverControlService = serverControlService;
-		this.profilesService = profilesService;
-
 		serverControlService.StateChanged += (sender, isRunning) => ComputeCanSwitchProfiles();
 
 		persistence.Bind("global", globalConfig, JsonSourceGenerationContext.Default);

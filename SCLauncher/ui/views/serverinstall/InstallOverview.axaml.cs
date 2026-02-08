@@ -14,7 +14,7 @@ namespace SCLauncher.ui.views.serverinstall;
 
 public class OverviewComponentEntry
 {
-	public required ServerInstallComponent Component { get; set; }
+	public required ServerInstallComponent Component { get; init; }
 	public required string Status { get; set; }
 	public bool Install { get; set; }
 	public bool InstallEditable { get; set; }
@@ -45,7 +45,7 @@ public partial class InstallOverview : UserControl, WizardNavigator.IWizardConte
 			});
 			ComponentEntries.Add(new OverviewComponentEntry
 			{
-				Component = ServerInstallComponent.SourceMod, Status = "Upgrade from x.x.x", Install = true, InstallEditable = true
+				Component = ServerInstallComponent.SourceMod, Status = "Upgrade (x.x.x -> y.y.y)", Install = true, InstallEditable = true
 			});
 		}
 	}

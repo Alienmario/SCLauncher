@@ -5,49 +5,54 @@
              xmlns:custom="clr-namespace:SCLauncher.ui.controls"
              xmlns:ui="clr-namespace:SCLauncher.ui"
              xmlns:config="clr-namespace:SCLauncher.model.config"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="250"
              x:Class="SCLauncher.ui.views.Settings"
              x:DataType="config:AppProfile">
 	
-	<DockPanel Margin="0 10 0 0">
-		
-		<StackPanel DockPanel.Dock="Top">
-			<Label Content="Steam installation" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-			
-			<StackPanel x:DataType="config:GlobalConfiguration" Name="GlobalConfigConent">
-				<custom:FilePickerTextBox Mode="Folder" Title="Select Steam installation folder" Name="SteamPath"
-				                          Text="{Binding SteamPath}"/>
-				                          
-				<Label Content="Steam Web API Key (for server browser)" VerticalAlignment="Center" HorizontalAlignment="Left"
-				       Margin="0 10 0 0"/>
-				<TextBox Text="{Binding SteamWebApiKey}" Name="SteamApiKey">
-					<TextBox.InnerRightContent>
-						<HyperlinkButton NavigateUri="https://steamcommunity.com/dev/apikey" Name="SteamApiKeyLink">
-							<PathIcon Data="{StaticResource open_folder_regular}"
-							          Foreground="{StaticResource Highlight}"
-							          Height="16"/>
-						</HyperlinkButton>
-					</TextBox.InnerRightContent>
-				</TextBox>
-			</StackPanel>
-			
-			<Label Content="Game path" VerticalAlignment="Center" HorizontalAlignment="Left"
-			       Margin="0 10 0 0"/>
-			<custom:FilePickerTextBox Mode="Folder" Title="Select game path" Name="GamePath"
-			                          Text="{Binding GamePath}"/>
-			
-			<Label Content="Server path" VerticalAlignment="Center" HorizontalAlignment="Left"
-			       Margin="0 10 0 0"/>
-			<custom:FilePickerTextBox Mode="Folder" Title="Select server path" Name="ServerPath"
-			                          Text="{Binding ServerPath}"/>
-		</StackPanel>
-		
-		<TextBlock DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Right"
-		           Foreground="{DynamicResource TextControlForegroundDisabled}" FontSize="12">
-			<Run>SCLauncher</Run>
-			<Run Text="{x:Static ui:App.Version}"/>
-		</TextBlock>
-		
-	</DockPanel>
+	<UserControl.Effect>
+		<DropShadowDirectionEffect BlurRadius="10" ShadowDepth="-5"/>
+	</UserControl.Effect>
 	
+	<ScrollViewer Classes="RightMargin" HorizontalScrollBarVisibility="Disabled">
+		<DockPanel Margin="0 10 0 0" VerticalSpacing="20">
+			<StackPanel DockPanel.Dock="Top">
+				<Label Content="Steam installation" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+
+				<StackPanel x:DataType="config:GlobalConfiguration" Name="GlobalConfigConent">
+					<custom:FilePickerTextBox Mode="Folder" Title="Select Steam installation folder" Name="SteamPath"
+					                          Text="{Binding SteamPath}"/>
+
+					<Label Content="Steam Web API Key (for server browser)" VerticalAlignment="Center" HorizontalAlignment="Left"
+					       Margin="0 10 0 0"/>
+					<TextBox Text="{Binding SteamWebApiKey}" Name="SteamApiKey">
+						<TextBox.InnerRightContent>
+							<HyperlinkButton NavigateUri="https://steamcommunity.com/dev/apikey" Name="SteamApiKeyLink">
+								<PathIcon Data="{StaticResource open_folder_regular}"
+								          Foreground="{StaticResource Highlight}"
+								          Height="16"/>
+							</HyperlinkButton>
+						</TextBox.InnerRightContent>
+					</TextBox>
+				</StackPanel>
+
+				<Label Content="Game path" VerticalAlignment="Center" HorizontalAlignment="Left"
+				       Margin="0 10 0 0"/>
+				<custom:FilePickerTextBox Mode="Folder" Title="Select game path" Name="GamePath"
+				                          Text="{Binding GamePath}"/>
+
+				<Label Content="Server path" VerticalAlignment="Center" HorizontalAlignment="Left"
+				       Margin="0 10 0 0"/>
+				<custom:FilePickerTextBox Mode="Folder" Title="Select server path" Name="ServerPath"
+				                          Text="{Binding ServerPath}"/>
+			</StackPanel>
+
+			<!-- Version -->
+			<TextBlock DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Right"
+			           Foreground="{DynamicResource TextControlForegroundDisabled}" FontSize="12">
+				<Run>SCLauncher</Run>
+				<Run Text="{x:Static ui:App.Version}"/>
+			</TextBlock>
+		</DockPanel>
+	</ScrollViewer>
+
 </UserControl>

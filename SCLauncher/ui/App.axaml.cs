@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Octokit;
 using SCLauncher.backend;
 using SCLauncher.backend.install;
+using SCLauncher.backend.service;
 using SCLauncher.backend.util;
 using SCLauncher.ui.controls;
 using SCLauncher.ui.views;
@@ -40,6 +41,7 @@ public partial class App : Application
 		services.AddBackendServices();
 		services.AddUIServices();
 		this.services = services.BuildServiceProvider();
+		this.services.GetRequiredService<BackendService>().Initialize();
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{

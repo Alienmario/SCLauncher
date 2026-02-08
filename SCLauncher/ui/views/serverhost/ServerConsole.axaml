@@ -24,8 +24,8 @@
 		<Style Selector="Button#StartButton">
 			<Setter Property="Background">
 				<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-					<GradientStop Color="#006400" Offset="0.0"/>
-					<GradientStop Color="#004500" Offset="1.0"/>
+					<GradientStop Color="#A3006432" Offset="0.0"/>
+					<GradientStop Color="#A3004532" Offset="1.0"/>
 				</LinearGradientBrush>
 			</Setter>
 		</Style>
@@ -33,8 +33,8 @@
 		<Style Selector="Button#StopButton">
 			<Setter Property="Background">
 				<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-					<GradientStop Color="#8B0000" Offset="0.0"/>
-					<GradientStop Color="#4E000B" Offset="1.0"/>
+					<GradientStop Color="#A38B0000" Offset="0.0"/>
+					<GradientStop Color="#A34E000B" Offset="1.0"/>
 				</LinearGradientBrush>
 			</Setter>
 		</Style>
@@ -55,34 +55,33 @@
 		
 		<!--ServerConfigurator pane -->
 		<SplitView.Pane>
-			<ThemeVariantScope RequestedThemeVariant="Light">
-				<Border Background="#9BFFFFFF"
-				        BorderBrush="{StaticResource SystemAccentColor}" Margin="10 0 0 0" 
-				        BorderThickness="0" CornerRadius="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-					<Panel>
-						<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-							<Button Classes="Transparent Grow" ZIndex="1" Name="ResetServerConfigButton" HorizontalAlignment="Center">
-								<PathIcon Data="{StaticResource arrow_undo_regular}"
-								          Height="10" Width="10" Foreground="Firebrick"/>
-								<Button.Flyout>
-									<Flyout Placement="BottomEdgeAlignedRight" HorizontalOffset="12">
-										<StackPanel>
-											<Label>Do you want to reset all options?</Label>
-											<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-											        Content="OK" Click="OnConfiguratorResetClicked"/>
-										</StackPanel>
-									</Flyout>
-								</Button.Flyout>
-							</Button>
-							<Button Classes="Transparent Grow" ZIndex="1" Click="OnConfiguratorCloseClicked" HorizontalAlignment="Center">
-								<PathIcon Data="{StaticResource dismiss_regular}" Height="10" Width="10"
-								          Foreground="{DynamicResource TextControlPlaceholderForeground}"/>
-							</Button>
-						</StackPanel>
-						<serverhost:ServerConfigurator Name="ServerConfigurator"/>
-					</Panel>
-				</Border>
-			</ThemeVariantScope>
+			<Border Background="#3E909090"
+			        BorderBrush="{DynamicResource ExpanderHeaderBorderBrush}" Margin="10 0 0 0" 
+			        BorderThickness=".5" CornerRadius="2"
+			        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+				<Panel>
+					<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+						<Button Classes="Transparent Grow" ZIndex="1" Name="ResetServerConfigButton" HorizontalAlignment="Center">
+							<PathIcon Data="{StaticResource arrow_undo_regular}"
+							          Height="10" Width="10" Foreground="Firebrick"/>
+							<Button.Flyout>
+								<Flyout Placement="BottomEdgeAlignedRight" HorizontalOffset="12">
+									<StackPanel>
+										<Label>Do you want to reset all options?</Label>
+										<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+										        Content="OK" Click="OnConfiguratorResetClicked"/>
+									</StackPanel>
+								</Flyout>
+							</Button.Flyout>
+						</Button>
+						<Button Classes="Transparent Grow" ZIndex="1" Click="OnConfiguratorCloseClicked" HorizontalAlignment="Center">
+							<PathIcon Data="{StaticResource dismiss_regular}" Height="10" Width="10"
+							          Foreground="{DynamicResource TextControlPlaceholderForeground}"/>
+						</Button>
+					</StackPanel>
+					<serverhost:ServerConfigurator Name="ServerConfigurator"/>
+				</Panel>
+			</Border>
 		</SplitView.Pane>
 		
 		<!-- Main content -->

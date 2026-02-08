@@ -107,6 +107,15 @@
 		<Setter Property="VerticalAlignment" Value="Bottom"/>
 	</Style>
 	
+	<!-- Adds small margin between content and vertical scrollbar -->
+	<Style Selector="ScrollViewer.RightMargin">
+		<Setter Property="AllowAutoHide" Value="False"/>
+			
+		<Style Selector="^ /template/ ScrollBar:vertical">
+			<Setter Property="Margin" Value="8 0 0 0"/>
+		</Style>
+	</Style>
+	
 	<Style Selector="Button.Transparent">
 		<Setter Property="Background" Value="Transparent"/>
 		<Style Selector="^:pointerover /template/ ContentPresenter">
