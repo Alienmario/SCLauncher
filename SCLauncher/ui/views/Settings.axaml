@@ -16,9 +16,13 @@
 	<ScrollViewer Classes="RightMargin" HorizontalScrollBarVisibility="Disabled">
 		<DockPanel Margin="0 10 0 0" VerticalSpacing="20">
 			<StackPanel DockPanel.Dock="Top">
-				<Label Content="Steam installation" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 
-				<StackPanel x:DataType="config:GlobalConfiguration" Name="GlobalConfigConent">
+				<StackPanel x:DataType="config:GlobalConfiguration" Name="GlobalConfigContent">
+					<CheckBox IsChecked="{Binding CheckForUpdates}" Name="CheckForUpdatesCheckBox">
+						Check for launcher updates
+					</CheckBox>
+					
+					<Label Content="Steam installation" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 10 0 0"/>
 					<custom:FilePickerTextBox Mode="Folder" Title="Select Steam installation folder" Name="SteamPath"
 					                          Text="{Binding SteamPath}"/>
 

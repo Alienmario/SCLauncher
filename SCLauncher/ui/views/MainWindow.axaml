@@ -13,7 +13,7 @@
         TransparencyLevelHint="{OnPlatform Windows='Mica,AcrylicBlur', Default='None'}"
         WindowStartupLocation="CenterScreen"
         Padding="{Binding $self.OffScreenMargin}"
-        Width="700" Height="500"
+        Width="700" Height="450"
         MinWidth="600" MinHeight="300">
 
 	<Window.Styles>

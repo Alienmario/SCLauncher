@@ -12,7 +12,7 @@ public partial class Settings : UserControl
 		InitializeComponent();
 
 		var profilesService = App.GetService<ProfilesService>();
-		GlobalConfigConent.DataContext = App.GetService<GlobalConfiguration>();
+		GlobalConfigContent.DataContext = App.GetService<GlobalConfiguration>();
 		
 		profilesService.ProfileSwitched += OnProfileSwitched;
 		OnProfileSwitched(this, profilesService.ActiveProfile);

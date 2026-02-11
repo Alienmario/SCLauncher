@@ -12,16 +12,11 @@
 			<Style Selector="^ PathIcon">
 				<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
 			</Style>
-			<Style Selector="^:pointerover">
-				<Style Selector="^ /template/ ContentPresenter">
-					<Setter Property="Background" Value="#373737"/>
-				</Style>
-			</Style>
 		</Style>
 	</TextBox.Styles>
 	
 	<TextBox.InnerRightContent>
-		<Button Classes="PathBrowser" Click="BrowseClicked">
+		<Button Classes="PathBrowser" Click="BrowseClicked" Cursor="Hand">
 			<PathIcon Data="{StaticResource folder_regular}"/>
 		</Button>
 	</TextBox.InnerRightContent>

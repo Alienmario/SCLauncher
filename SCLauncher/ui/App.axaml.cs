@@ -15,6 +15,7 @@ using SCLauncher.backend;
 using SCLauncher.backend.install;
 using SCLauncher.backend.service;
 using SCLauncher.backend.util;
+using SCLauncher.model.config;
 using SCLauncher.ui.controls;
 using SCLauncher.ui.views;
 using Application = Avalonia.Application;
@@ -41,7 +42,7 @@ public partial class App : Application
 		services.AddBackendServices();
 		services.AddUIServices();
 		this.services = services.BuildServiceProvider();
-		this.services.GetRequiredService<BackendService>().Initialize();
+		GetService<BackendService>().Initialize();
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
@@ -51,8 +52,10 @@ public partial class App : Application
 			// Cache the MainWindow's notification manager
 			GetNotificationManager(mainWindow);
 
+			bool checkForUpdates = GetService<GlobalConfiguration>().CheckForUpdates;
+			
 			#if !DEBUG
-			CheckForUpdates();
+			if (checkForUpdates) CheckForUpdates();
 			#endif
 		}
 		

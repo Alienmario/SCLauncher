@@ -55,7 +55,7 @@
 		
 		<!--ServerConfigurator pane -->
 		<SplitView.Pane>
-			<Border Background="#3E909090"
+			<Border Background="{StaticResource BackgroundPane2}"
 			        BorderBrush="{DynamicResource ExpanderHeaderBorderBrush}" Margin="10 0 0 0" 
 			        BorderThickness=".5" CornerRadius="2"
 			        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -65,11 +65,11 @@
 							<PathIcon Data="{StaticResource arrow_undo_regular}"
 							          Height="10" Width="10" Foreground="Firebrick"/>
 							<Button.Flyout>
-								<Flyout Placement="BottomEdgeAlignedRight" HorizontalOffset="12">
+								<Flyout Placement="Left">
 									<StackPanel>
-										<Label>Do you want to reset all options?</Label>
+										<Label>Reset all options?</Label>
 										<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-										        Content="OK" Click="OnConfiguratorResetClicked"/>
+										        Classes="danger" Content="Reset" Click="OnConfiguratorResetClicked"/>
 									</StackPanel>
 								</Flyout>
 							</Button.Flyout>

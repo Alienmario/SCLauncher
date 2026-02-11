@@ -12,5 +12,7 @@ public partial class GlobalConfiguration : INotifyPropertyChanged
 	public string? CurrentTab { get; set; }
 
 	public string? ActiveProfile { get; set; }
+	
+	public bool CheckForUpdates { get; set; } = true;
 
 }

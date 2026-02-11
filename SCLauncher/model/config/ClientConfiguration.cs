@@ -10,7 +10,7 @@ public partial class ClientConfiguration : INotifyPropertyChanged
 {
     public enum WindowModeEnum
     {
-	    [Description("Default display mode")]
+	    [Description("[Display mode]")]
 	    NoChange,
 	    [Description("Fullscreen mode")]
         Fullscreen,

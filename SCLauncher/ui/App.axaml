@@ -4,20 +4,21 @@
              RequestedThemeVariant="Dark">
 	<!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
+	<Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="avares://LoadingIndicators.Avalonia/LoadingIndicators.axaml"/>
+				<ResourceInclude Source="controls/BaseDialogWindow.axaml"/>
+				<ResourceInclude Source="controls/WindowNotificationManager.axaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Application.Resources>
+	
 	<Application.Styles>
 		<FluentTheme/>
 		<StyleInclude Source="AppIcons.axaml"/>
 		<StyleInclude Source="AppStyle.axaml"/>
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
 	</Application.Styles>
-
-	<Application.Resources>
-		<ResourceDictionary>
-			<ResourceDictionary.MergedDictionaries>
-				<ResourceInclude Source="avares://LoadingIndicators.Avalonia/LoadingIndicators.axaml"/>
-				<ResourceInclude Source="controls/BaseDialogWindow.axaml"/>
-			</ResourceDictionary.MergedDictionaries>
-		</ResourceDictionary>
-	</Application.Resources>
 
 </Application>

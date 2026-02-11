@@ -320,7 +320,7 @@ public partial class JoinServer : UserControl
 					{
 						DataContext = newServer
 					};
-					detailsDialog.Show();
+					detailsDialog.Show(App.GetService<MainWindow>());
 				}
 				else App.ShowFailure($"Unable to retrieve details for {server.Name}");
 			}

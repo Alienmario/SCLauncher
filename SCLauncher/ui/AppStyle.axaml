@@ -24,9 +24,22 @@
 	<Styles.Resources>
 		<Color x:Key="HighlightColor">Orange</Color>
 		<Color x:Key="BackgroundColor">#292929</Color>
-		
+		<Color x:Key="BackgroundPane">#15B9B9B9</Color>
+		<Color x:Key="BackgroundPane2">#3E909090</Color>
+		<Color x:Key="BackgroundPane3">#F5232323</Color>
+
 		<SolidColorBrush x:Key="Highlight" Color="{StaticResource HighlightColor}"/>
-		<SolidColorBrush x:Key="NotificationCardBackgroundBrush" Color="#E9424242"/>
+		<!--Flyout-->
+		<SolidColorBrush x:Key="FlyoutPresenterBackground" Color="{StaticResource BackgroundPane3}"/>
+		<SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="{StaticResource BackgroundPane3}"/>
+		<SolidColorBrush x:Key="FlyoutBorderThemeBrush" Color="{DynamicResource SystemBaseMediumHighColor}"/>
+		<SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="{DynamicResource SystemBaseMediumHighColor}"/>
+		<Thickness x:Key="FlyoutBorderThemeThickness">.5</Thickness>
+		<Thickness x:Key="MenuFlyoutPresenterBorderThemeThickness">.5</Thickness>
+		<!--ComboBox-->
+		<SolidColorBrush x:Key="ComboBoxItemBackground" Color="{StaticResource BackgroundPane3}"/>
+		<!--Notification-->
+		<SolidColorBrush x:Key="NotificationCardBackgroundBrush" Color="{StaticResource BackgroundPane3}"/>
 		
 		<!-- Fix title bar buttons PointerOver bg -->
 		<SolidColorBrush x:Key="CaptionButtonBackground" Color="{DynamicResource SystemBaseLowColor}" />
@@ -46,43 +59,6 @@
 			<GradientStop Offset="0.501" Color="Transparent" />
 		</LinearGradientBrush>
 		
-		<ControlTheme x:Key="{x:Type WindowNotificationManager}" TargetType="WindowNotificationManager">
-			<Setter Property="Margin" Value="0 0" />
-			<Setter Property="Template">
-				<ControlTemplate>
-					<ReversibleStackPanel Name="PART_Items" HorizontalAlignment="Stretch">
-						<ReversibleStackPanel.DataTemplates>
-							<DataTemplate DataType="INotification">
-								<StackPanel Margin="12" Spacing="8"
-									TextElement.Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}">
-									<TextBlock FontWeight="Medium" Text="{Binding Title}" />
-									<TextBlock MaxHeight="50" Margin="0,0,12,0"
-										Text="{Binding Message}" TextWrapping="Wrap" />
-								</StackPanel>
-							</DataTemplate>
-						</ReversibleStackPanel.DataTemplates>
-					</ReversibleStackPanel>
-				</ControlTemplate>
-			</Setter>
-			<Style Selector="^:topright /template/ ReversibleStackPanel#PART_Items">
-				<Setter Property="Margin" Value="0 100 15 0" />
-				<Setter Property="VerticalAlignment" Value="Top" />
-				<Setter Property="HorizontalAlignment" Value="Right" />
-			</Style>
-			<Style Selector="^:topcenter /template/ ReversibleStackPanel#PART_Items">
-				<Setter Property="Margin" Value="0 20 0 0" />
-				<Setter Property="VerticalAlignment" Value="Top" />
-			</Style>
-			<Style Selector="^:bottomcenter /template/ ReversibleStackPanel#PART_Items">
-				<Setter Property="ReverseOrder" Value="True" />
-				<Setter Property="VerticalAlignment" Value="Bottom" />
-			</Style>
-			<Style Selector="^:bottomright /template/ ReversibleStackPanel#PART_Items">
-				<Setter Property="Margin" Value="0 0 15 0" />
-				<Setter Property="VerticalAlignment" Value="Bottom" />
-				<Setter Property="HorizontalAlignment" Value="Right" />
-			</Style>
-		</ControlTheme>
 	</Styles.Resources>
 	
 	<Style Selector="NotificationCard">
@@ -127,12 +103,12 @@
 	</Style>
 	
 	<Style Selector="Button.danger">
-		<Setter Property="Background" Value="#9C0000"/>
+		<Setter Property="Background" Value="#660000"/>
 		<Style Selector="^:pointerover /template/ ContentPresenter">
-			<Setter Property="Background" Value="#B70000"/>
+			<Setter Property="Background" Value="#BB2145"/>
 		</Style>
 		<Style Selector="^:pressed /template/ ContentPresenter">
-			<Setter Property="Background" Value="#830000"/>
+			<Setter Property="Background" Value="#871E39"/>
 		</Style>
 	</Style>
 	
