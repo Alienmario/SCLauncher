@@ -13,7 +13,10 @@
 		</TransitioningContentControl.PageTransition>
 
 		<TransitioningContentControl.Content>
-			<Panel Background="#4F061D">
+			<Panel>
+
+				<Border BorderThickness="0 2 0 0" Background="{StaticResource BackgroundPane2}" BorderBrush="#BB2145"
+				       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
 				<Button Cursor="Hand"
 				        Padding="0"
@@ -26,7 +29,7 @@
 						           TextAlignment="Center" VerticalAlignment="Center"
 						           FontSize="14" FontWeight="SemiBold">
 							<TextBlock.Effect>
-								<DropShadowEffect OffsetX="0" OffsetY="0" BlurRadius="3" Color="#D911AEC8"/>
+								<DropShadowEffect OffsetX="0" OffsetY="2" BlurRadius="4" Color="#000000"/>
 							</TextBlock.Effect>
 						</TextBlock>
 				</Button>
