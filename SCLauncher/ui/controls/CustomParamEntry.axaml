@@ -34,6 +34,23 @@
 				</Setter>
 			</Style>
 		</Style>
+		<Style Selector="Button.DeleteButton">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="Width" Value="30"/>
+			<Setter Property="Height" Value="30"/>
+			<Setter Property="Margin" Value="2 0"/>
+			<Setter Property="CornerRadius" Value="15"/>
+			<Setter Property="Content" Value="="/>
+			<Style Selector="^:pointerover">
+				<Setter Property="Cursor" Value="Hand"/>
+				<Setter Property="Content">
+					<Template>
+						<PathIcon Data="{StaticResource dismiss_regular}" Foreground="Red" Height="16"/>
+					</Template>
+				</Setter>
+			</Style>
+		</Style>
 	</UserControl.Styles>
 	
 	<StackPanel>
@@ -49,7 +66,8 @@
 						<TextBox Text="{Binding Key}" Grid.Column="0" Classes="CustomParamKey"
 						         Watermark="Parameter"
 						         LostFocus="OnParamTextLostFocus"/>
-						<TextBlock Text=" = " Grid.Column="1" VerticalAlignment="Center"/>
+						<Button Grid.Column="1" Classes="DeleteButton" VerticalAlignment="Center" Focusable="False"
+						        Click="DeleteParameterClicked"/>
 						<TextBox Text="{Binding Value}" Grid.Column="2" Classes="CustomParamVal"
 						         Watermark="Value"
 						         LostFocus="OnParamTextLostFocus"/>
@@ -69,7 +87,7 @@
 			</TextBlock>
 		</ContentControl>
 		
-		<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Focusable="False"
+		<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
 		        Margin="0 10 0 0" Padding="55 5" CornerRadius="20"
 		        Content="Add new parameter" Click="AddNewParameterClicked" Name="AddParameterButton"/>
 	</StackPanel>

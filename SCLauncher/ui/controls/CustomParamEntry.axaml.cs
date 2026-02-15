@@ -58,5 +58,13 @@ public partial class CustomParamEntry : UserControl
 			}
 		}
 	}
-	
+
+	private void DeleteParameterClicked(object? sender, RoutedEventArgs e)
+	{
+		if (sender is Control { DataContext: CustomParam p })
+		{
+			CustomParams?.Remove(p);
+		}
+	}
+
 }
