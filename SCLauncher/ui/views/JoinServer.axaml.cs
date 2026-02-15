@@ -11,6 +11,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using SCLauncher.backend.service;
+using SCLauncher.backend.util;
 using SCLauncher.model.config;
 using SCLauncher.model.serverbrowser;
 using SCLauncher.ui.design;
@@ -346,6 +347,23 @@ public partial class JoinServer : UserControl
 		}
 	}
 
+	private async void ContextMenu_OnCopyJoinLink(object? sender, RoutedEventArgs args)
+	{
+		try
+		{
+			if (ServerGrid.SelectedItem is Server server)
+			{
+				var link = SteamUtils.GetConnectLink(server.Endpoint, profilesService.ActiveProfile.GameAppId);
+				await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(link);
+				App.ShowSuccess("Server join link copied to clipboard.");
+			}
+		}
+		catch (Exception e)
+		{
+			e.Log();
+		}
+	}
+	
 	private async void ContextMenu_OnCopyIP(object? sender, RoutedEventArgs args)
 	{
 		try

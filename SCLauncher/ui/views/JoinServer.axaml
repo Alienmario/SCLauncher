@@ -153,6 +153,7 @@
                         <ContextMenu Placement="Pointer" Opening="ContextMenu_OnOpening">
                             <MenuItem Header="View details" Click="ContextMenu_OnViewDetails"/>
                             <MenuItem Header="Join now" Click="ContextMenu_OnJoinNow"/>
+                            <MenuItem Header="Copy join link" Click="ContextMenu_OnCopyJoinLink"/>
                             <MenuItem Header="Copy IP" Click="ContextMenu_OnCopyIP"/>
                         </ContextMenu>
                     </Setter>
