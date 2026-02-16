@@ -1,11 +1,14 @@
 
-# A self-contained GUI launcher for [SourceCoop](https://github.com/ampreeT/SourceCoop).
+# A self-contained GUI launcher for Source engine games and mods
 
 ## Features
-### Install game server - including addons
+Modern cross-platform user interface focused on ease of use. Supports multiple games with customizable profiles for each.
+
+### Install game servers
+- including supported addons [Metamod:Source](https://www.sourcemm.net/), [Sourcemod](https://www.sourcemod.net/), [SourceCoop](https://github.com/ampreeT/SourceCoop), [ModelChooser](https://github.com/Alienmario/ModelChooser)
 <img src=".github/img/scl-installserver.png" width="700">
 
-### Host & configure game server
+### Run & configure game servers
 <img src=".github/img/scl-hostserver.png" width="700">
 
 ### Join game servers
@@ -20,7 +23,7 @@
 - Select active campaign mod on server and client
 
 ## Known issues
-#### Windows application error when starting the server
+#### Windows application error appears when starting the server
 - Download and install vc_redist (x86) for 2013 and 2015-2022 from [Microsoft](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version).
 
 ## Details
