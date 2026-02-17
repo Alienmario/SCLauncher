@@ -75,11 +75,33 @@
         </TextBox>
 
         <Button DockPanel.Dock="Bottom" Name="ApiKeyButton"
-                Click="OnGenerateKeyClicked"
                 IsVisible="{Binding SteamWebApiKey, DataType=config:GlobalConfiguration, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                Classes="accent" FontSize="16"
-                Content="Get your Steam API Key to view the server list"/>
+                Classes="accent" FontSize="16" FontWeight="Bold"
+                Content="Enable Server Browser">
+            <Button.Flyout>
+                <Flyout Placement="Top" VerticalOffset="-20">
+                    <WrapPanel Orientation="Vertical" ItemSpacing="10" Width="400">
+                        <TextBlock VerticalAlignment="Center" TextWrapping="Wrap">
+                            <Run FontWeight="Medium" FontSize="16">Steam API Key is required</Run>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="Medium">Why</Run>
+                            <LineBreak/>
+                            <Run>The only way Steam lets any third-party app view the server list is by using a Steam Web API Key. There is currently no other known alternative.</Run>
+                            <LineBreak/><LineBreak/>
+                            <Run FontWeight="Medium">How</Run>
+                            <LineBreak/>
+                            <Run>Clicking the button below will redirect you to Steam, where you can login and generate your own key. Copy &amp; paste it into the launcher. This key will be saved locally and sent to Steam with all following server list requests.</Run>
+                            <LineBreak/><LineBreak/>
+                            <Run Foreground="{StaticResource Highlight}">API Key is not required when querying servers directly by IP or link.</Run>
+                        </TextBlock>
+                        <Button Name="ResetConfigConfirmButton" Content="Generate key on Steam" Click="OnGenerateKeyClicked"
+                                VerticalAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                Classes="accent"/>
+                    </WrapPanel>
+                </Flyout>
+            </Button.Flyout>
+        </Button>
 
         <DataGrid Name="ServerGrid" DockPanel.Dock="Bottom" x:DataType="serverbrowser:Server"
                   IsReadOnly="True" GridLinesVisibility="None"
