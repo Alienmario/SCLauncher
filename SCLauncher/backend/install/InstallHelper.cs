@@ -16,7 +16,7 @@ public class InstallHelper(HttpClient httpClient)
 {
 	public HttpClient HttpClient => httpClient;
 	
-	public GitHubClient GithubClient => new GitHubClient(new ProductHeaderValue("SourceCoopLauncher"));
+	public GitHubClient GithubClient => new GitHubClient(new ProductHeaderValue("SCLauncher"));
 
 	public async Task ExtractAsync(string archive, string destination, bool overwriteFiles,
 		CancellationToken ct = default)

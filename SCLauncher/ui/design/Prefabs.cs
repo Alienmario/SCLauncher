@@ -36,20 +36,17 @@ public class DServerConfiguration : ServerConfigurationHl2dm
 	}
 }
 
-public class DAppProfile : AppProfile
+public class DAppProfile(AppType appType) : AppProfile(appType)
 {
-	public static readonly DAppProfile Instance = new()
+	public static readonly DAppProfile Instance = new(AppType.BlackMesa)
 	{
 		Name = "Design Time Profile",
-		AppType = AppType.BlackMesa,
 		GameAppId = 362890,
 		ServerAppId = 346680,
 		GameInstallFolder = "Black Mesa",
 		ServerInstallFolder = "Black Mesa Dedicated Server",
 		ModFolder = "bms",
-		GameExecutable = new Dictionary<PlatformID, string>(),
-		ServerConfig = new ServerConfiguration(),
-		ClientConfig = new ClientConfigurationBlackMesa()
+		GameExecutable = new Dictionary<PlatformID, string>()
 	};
 }
 

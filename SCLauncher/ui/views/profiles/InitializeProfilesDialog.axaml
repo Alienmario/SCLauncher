@@ -1,0 +1,50 @@
+<controls:BaseDialogWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+        mc:Ignorable="d"
+        x:Class="SCLauncher.ui.views.profiles.InitializeProfilesDialog"
+        Title="Setup profiles"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="Height"
+        Width="525" Height="NaN"
+        CanResize="False"
+        ShowInTaskbar="True"
+        ApplyDropShadow="False">
+
+	<controls:BaseDialogWindow.MainContent>
+		<StackPanel Margin="20" Spacing="15">
+			<TextBlock Text="Which profiles would you like to start with?" FontSize="18" FontWeight="Bold"/>
+
+			<ListBox Name="ProfileListBox" SelectionMode="Multiple,Toggle" Background="Transparent">
+				<ListBox.ItemsPanel>
+					<ItemsPanelTemplate>
+						<UniformGrid Columns="2" ColumnSpacing="5" RowSpacing="5"/>
+					</ItemsPanelTemplate>
+				</ListBox.ItemsPanel>
+				<ListBox.Styles>
+					<Style Selector="ListBoxItem">
+						<Setter Property="HorizontalContentAlignment" Value="Center"/>
+						<Setter Property="CornerRadius" Value="50"/>
+						<Setter Property="FontSize" Value="12"/>
+						<Setter Property="BorderBrush" Value="{DynamicResource BackgroundPane2}"/>
+						<Setter Property="BorderThickness" Value="1"/>
+						<Setter Property="Padding" Value="10"/>
+					</Style>
+				</ListBox.Styles>
+			</ListBox>
+		</StackPanel>
+	</controls:BaseDialogWindow.MainContent>
+
+	<controls:BaseDialogWindow.FooterContent>
+		<DockPanel Margin="20" HorizontalSpacing="15">
+			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+				<Button Content="OK" Classes="action accent" HotKey="Enter"
+				        IsEnabled="{Binding #ProfileListBox.SelectedItems.Count, FallbackValue=False}"
+				        Click="OkClicked"/>
+			</StackPanel>
+		</DockPanel>
+	</controls:BaseDialogWindow.FooterContent>
+
+</controls:BaseDialogWindow>

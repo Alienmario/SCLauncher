@@ -28,15 +28,13 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 	{
 		persistence.Bind("profiles", profiles, JsonSourceGenerationContext.Default);
 
-		if (profiles.Count == 0)
-		{
-			profiles.Add(AppProfile.CreateDefaultBlackMesa());
-			profiles.Add(AppProfile.CreateDefaultHL2DM());
-		}
-
+		// Try to set active profile
 		if (globalConfig.ActiveProfile == null || !SetActiveProfile(globalConfig.ActiveProfile))
 		{
-			SetActiveProfile(profiles[0].Name);
+			if (profiles.Count > 0)
+			{
+				SetActiveProfile(profiles[0]);
+			}
 		}
 
 		UpdateProfilePaths(profiles);
@@ -44,18 +42,19 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 
 	public AppProfile CreateProfile(AppType appType, string name)
 	{
-		AppProfile profile = appType switch
-		{
-			AppType.BlackMesa => AppProfile.CreateDefaultBlackMesa(),
-			AppType.HL2DM => AppProfile.CreateDefaultHL2DM(),
-			_ => throw new ArgumentOutOfRangeException(nameof(appType), appType, null)
-		};
-
+		AppProfile profile = AppProfile.Create(appType);
 		profile.Name = name;
 		UpdateProfilePaths([profile]);
 
 		profiles.Add(profile);
 		ProfileAdded?.Invoke(this, profile);
+
+		// Ensure we have an active profile
+		if (profiles.Count == 1)
+		{
+			SetActiveProfile(profile);
+		}
+		
 		return profile;
 	}
 
@@ -73,7 +72,7 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 
 		if (activeProfile == profile)
 		{
-			SetActiveProfile(profiles[0].Name);
+			SetActiveProfile(profiles[0]);
 		}
 
 		ProfileDeleted?.Invoke(this, profile);
@@ -83,21 +82,23 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 	public bool SetActiveProfile(string name)
 	{
 		AppProfile? profile = profiles.FirstOrDefault(p => p.Name == name);
-		if (profile != null)
+		return profile != null && SetActiveProfile(profile);
+	}
+	
+	private bool SetActiveProfile(AppProfile profile)
+	{
+		if (activeProfile != profile)
 		{
-			if (activeProfile != profile)
-			{
-				activeProfile?.PropertyChanged -= ActiveProfilePropertyChanged;
-				globalConfig.ActiveProfile = profile.Name;
-				activeProfile = profile;
-				activeProfile.PropertyChanged += ActiveProfilePropertyChanged;
-				ProfileSwitched?.Invoke(this, activeProfile);
-				return true;
-			}
+			activeProfile?.PropertyChanged -= ActiveProfilePropertyChanged;
+			globalConfig.ActiveProfile = profile.Name;
+			activeProfile = profile;
+			activeProfile.PropertyChanged += ActiveProfilePropertyChanged;
+			ProfileSwitched?.Invoke(this, activeProfile);
+			return true;
 		}
 		return false;
 	}
-
+	
 	private void ActiveProfilePropertyChanged(object? sender, PropertyChangedEventArgs args)
 	{
 		if (args.PropertyName == nameof(AppProfile.Name))
@@ -106,7 +107,8 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 
 	private void UpdateProfilePaths(IEnumerable<AppProfile> profilesToUpdate)
 	{
-		if (!SteamUtils.IsValidSteamInstallDir(globalConfig.SteamPath))
+		string? steamPath = globalConfig.SteamPath;
+		if (!SteamUtils.IsValidSteamInstallDir(steamPath))
 			return;
 
 		Task.Run(async () =>
@@ -115,16 +117,14 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 			{
 				if (!Directory.Exists(profile.GamePath))
 				{
-					profile.GamePath =
-						await SteamUtils.FindAppPathAsync(globalConfig.SteamPath!, profile.GameAppId)
-						?? profile.GamePath;
+					profile.GamePath = await SteamUtils.FindAppPathAsync(steamPath!, profile.GameAppId)
+					                   ?? profile.GamePath;
 				}
 
 				if (!Directory.Exists(profile.ServerPath))
 				{
-					profile.ServerPath =
-						await SteamUtils.FindAppPathAsync(globalConfig.SteamPath!, profile.ServerAppId)
-						?? profile.ServerPath;
+					profile.ServerPath = await SteamUtils.FindAppPathAsync(steamPath!, profile.ServerAppId)
+					                     ?? profile.ServerPath;
 				}
 			}
 		}).Wait();

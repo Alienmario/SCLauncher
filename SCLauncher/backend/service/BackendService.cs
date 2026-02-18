@@ -4,7 +4,8 @@ using SCLauncher.model.config;
 
 namespace SCLauncher.backend.service;
 
-public class BackendService(GlobalConfiguration globalConfig, PersistenceService persistence,
+public class BackendService(
+	GlobalConfiguration globalConfig, PersistenceService persistence,
 	ServerControlService serverControlService, ProfilesService profilesService)
 {
 	// events

@@ -10,9 +10,9 @@ namespace SCLauncher.model.config;
 public partial class ServerConfiguration : INotifyPropertyChanged
 {
 
-	public string? ServerCfgFile { get; set; } = "coop.cfg";
+	public string? ServerCfgFile { get; set; } = "server.cfg";
 
-	public string? Hostname { get; set; } = "SourceCoop #" + Random.Shared.Next(1000, 9999);
+	public string? Hostname { get; set; } = "SCLauncher #" + Random.Shared.Next(1000, 9999);
 	
 	public string? Password { get; set; }
 	
@@ -59,13 +59,13 @@ public partial class ServerConfiguration : INotifyPropertyChanged
 		
 		// + params now
 		
-		if (ServerCfgFile != null)
+		if (!string.IsNullOrEmpty(ServerCfgFile))
 			list.AddRange(["+servercfgfile", ServerCfgFile]);
 		
-		if (Hostname != null)
+		if (!string.IsNullOrEmpty(Hostname))
 			list.AddRange(["+hostname", Hostname]);
 		
-		if (Password != null)
+		if (!string.IsNullOrEmpty(Password))
 			list.AddRange(["+sv_password", Password]);
 		
 		if (Lan)
@@ -76,7 +76,7 @@ public partial class ServerConfiguration : INotifyPropertyChanged
 		if (Teamplay != null)
 			list.AddRange(["+mp_teamplay", Teamplay.Value ? "1" : "0"]);
 
-		if (StartMap != null)
+		if (!string.IsNullOrEmpty(StartMap))
 			list.AddRange(["+map", StartMap]);
 		
 		foreach (CustomParam p in CustomParams)

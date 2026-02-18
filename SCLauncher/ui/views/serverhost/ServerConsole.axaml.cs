@@ -12,7 +12,6 @@ using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.backend.util;
 using SCLauncher.model;
-using SCLauncher.model.exception;
 using SCLauncher.ui.controls;
 
 namespace SCLauncher.ui.views.serverhost;
@@ -125,9 +124,9 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 				App.ShowFailure("Unable to launch the game.");
 			}
 		}
-		catch (InvalidGamePathException)
+		catch (Exception e)
 		{
-			App.ShowFailure("Configured game path is invalid.");
+			App.ShowFailure(e.Message);
 		}
 	}
 

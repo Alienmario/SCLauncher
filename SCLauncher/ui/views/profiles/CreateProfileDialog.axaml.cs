@@ -22,7 +22,6 @@ public partial class CreateProfileDialog : BaseDialogWindow
 		Activated += delegate
 		{
 			ProfileNameTextBox.Focus();
-			InvalidateArrange(); // SizeToContent bugfix
 		};
 	}
 

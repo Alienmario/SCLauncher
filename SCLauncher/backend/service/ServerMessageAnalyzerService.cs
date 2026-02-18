@@ -30,7 +30,7 @@ public partial class ServerMessageAnalyzerService
 	[GeneratedRegex(@"\[srccoop.*\.smx\] Could not obtain gamedata")]
 	private static partial Regex SourceCoopBadGamedataRegex();
 	
-	[GeneratedRegex(@"^\[STEAM\]\s+Public IP is (.+)\.$")]
+	[GeneratedRegex(@"^(?:\[STEAM\])?\s+Public IP is (.+)\.$")]
 	private static partial Regex PublicIpRegex();
 	
 	[GeneratedRegex(@"^Network: IP (.+), mode (?:.+), dedicated (?:Yes|No), ports (\d+) SV / (\d+) CL$")]

@@ -134,7 +134,7 @@ public class ServerBrowserService(ProfilesService profilesService, GlobalConfigu
 			Secure = src.Information.VacSecured,
 			Password = !src.Information.Visible,
 			Version = src.Information.Version,
-			Keywords = src.Information.Keywords.Trim(','),
+			Keywords = src.Information.Keywords?.Trim(',') ?? string.Empty,
 			SteamId = src.Information.SteamId,
 			Environment = src.Information.Environment.ToString(),
 			Ping = TimeSpan.Zero

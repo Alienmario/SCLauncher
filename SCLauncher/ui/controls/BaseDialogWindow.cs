@@ -20,7 +20,10 @@ public class BaseDialogWindow : Window
 
 	public static readonly StyledProperty<ScrollBarVisibility> VerticalScrollBarVisibilityProperty =
 		AvaloniaProperty.Register<BaseDialogWindow, ScrollBarVisibility>(nameof(VerticalScrollBarVisibility));
-
+	
+	public static readonly StyledProperty<bool> ApplyDropShadowProperty =
+		AvaloniaProperty.Register<BaseDialogWindow, bool>(nameof(ApplyDropShadow), defaultValue: true);
+	
 	public object? MainContent
 	{
 		get => GetValue(MainContentProperty);
@@ -38,5 +41,11 @@ public class BaseDialogWindow : Window
 		get => GetValue(VerticalScrollBarVisibilityProperty);
 		set => SetValue(VerticalScrollBarVisibilityProperty, value);
 	}
-	
+
+	public bool ApplyDropShadow
+	{
+		get => GetValue(ApplyDropShadowProperty);
+		set => SetValue(ApplyDropShadowProperty, value);
+	}
+
 }

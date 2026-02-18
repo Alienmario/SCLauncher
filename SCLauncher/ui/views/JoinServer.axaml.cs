@@ -275,8 +275,21 @@ public partial class JoinServer : UserControl
 			}
 		}
 
-		clientControlService.ConnectToServer(server.Endpoint, pw);
-		App.ShowSuccess("Joining server...");
+		try
+		{
+			if (clientControlService.ConnectToServer(server.Endpoint, pw))
+			{
+				App.ShowSuccess("Joining server...");
+			}
+			else
+			{
+				App.ShowFailure("Unable to launch the game.");
+			}
+		}
+		catch (Exception e)
+		{
+			App.ShowFailure(e.Message);
+		}
 	}
 	
 	private async void OnGridCellPointerPressed(object? sender, DataGridCellPointerPressedEventArgs args)

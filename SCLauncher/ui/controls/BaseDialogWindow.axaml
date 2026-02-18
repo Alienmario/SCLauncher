@@ -51,10 +51,15 @@
 							              Margin="{TemplateBinding Padding}"
 							              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
 							              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-							              VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}">
-								<ScrollViewer.Effect>
-									<DropShadowDirectionEffect BlurRadius="20" ShadowDepth="-10"/>
-								</ScrollViewer.Effect>
+							              VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"
+							              Classes.ApplyDropShadow="{TemplateBinding ApplyDropShadow}">
+								<ScrollViewer.Styles>
+									<Style Selector="ScrollViewer.ApplyDropShadow">
+										<Setter Property="Effect">
+											<DropShadowDirectionEffect BlurRadius="20" ShadowDepth="-10"/>
+										</Setter>
+									</Style>
+								</ScrollViewer.Styles>
 
 								<ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding MainContent}"/>
 							</ScrollViewer>

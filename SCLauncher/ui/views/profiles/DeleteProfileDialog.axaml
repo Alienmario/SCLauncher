@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         x:Class="SCLauncher.ui.views.profiles.DeleteProfileDialog"
         x:DataType="config:AppProfile"
-        Title="Confirm Delete"
+        Title="Delete Profile"
         CanResize="False">
 
 	<controls:BaseDialogWindow.MainContent>

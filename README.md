@@ -1,11 +1,13 @@
 
-# A self-contained GUI launcher for Source engine games and mods
+### Modern, minimalistic, self-contained, cross-platform graphical launcher for Source engine games and mods
 
 ## Features
-Modern cross-platform user interface focused on ease of use. Supports multiple games with customizable profiles for each.
+### Multi-game with customizable profiles
+- Supports `Black Mesa`, `Half-Life 2 Deathmatch`, `Team Fortress 2`, `Counter-Strike: Source`, `Day of Defeat: Source`, `Garry's Mod`, `Left 4 Dead`, `Left 4 Dead 2`, `Insurgency`, `Synergy`, `No More Room in Hell`, `Source SDK Base 2013`
 
 ### Install game servers
-- including supported addons [Metamod:Source](https://www.sourcemm.net/), [Sourcemod](https://www.sourcemod.net/), [SourceCoop](https://github.com/ampreeT/SourceCoop), [ModelChooser](https://github.com/Alienmario/ModelChooser)
+- Built-in support for addons like [Metamod:Source](https://www.sourcemm.net/), [SourceMod](https://www.sourcemod.net/), [SourceCoop](https://github.com/ampreeT/SourceCoop), [ModelChooser](https://github.com/Alienmario/ModelChooser)
+ 
 <img src=".github/img/scl-installserver.png" width="700">
 
 ### Run & configure game servers
@@ -23,7 +25,7 @@ Modern cross-platform user interface focused on ease of use. Supports multiple g
 - Select active campaign mod on server and client
 
 ## Known issues
-#### Windows application error appears when starting the server
+#### Windows application error appears when starting a server
 - Download and install vc_redist (x86) for 2013 and 2015-2022 from [Microsoft](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version).
 
 ## Details

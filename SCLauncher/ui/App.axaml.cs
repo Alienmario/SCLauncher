@@ -18,6 +18,7 @@ using SCLauncher.backend.util;
 using SCLauncher.model.config;
 using SCLauncher.ui.controls;
 using SCLauncher.ui.views;
+using SCLauncher.ui.views.profiles;
 using Application = Avalonia.Application;
 using Notification = Avalonia.Controls.Notifications.Notification;
 
@@ -38,28 +39,44 @@ public partial class App : Application
 	public override void OnFrameworkInitializationCompleted()
 	{
 		// Register all the services needed for the application to run
-		var services = new ServiceCollection();
-		services.AddBackendServices();
-		services.AddUIServices();
-		this.services = services.BuildServiceProvider();
+		var serviceCollection = new ServiceCollection();
+		serviceCollection.AddBackendServices();
+		serviceCollection.AddUIServices();
+		services = serviceCollection.BuildServiceProvider();
 		GetService<BackendService>().Initialize();
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
+			if (GetService<ProfilesService>().Profiles.Count == 0)
+			{
+				desktop.MainWindow = new InitializeProfilesDialog { ConfirmHandler = OnProfilesInitialized };
+			}
+			else
+			{
+				OnProfilesInitialized();
+			}
+		}
+		
+		base.OnFrameworkInitializationCompleted();
+	}
+
+	private void OnProfilesInitialized()
+	{
+		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+		{
 			MainWindow mainWindow = GetService<MainWindow>();
+			mainWindow.Show();
+			mainWindow.Focus();
 			desktop.MainWindow = mainWindow;
 
 			// Cache the MainWindow's notification manager
 			GetNotificationManager(mainWindow);
 
 			bool checkForUpdates = GetService<GlobalConfiguration>().CheckForUpdates;
-			
-			#if !DEBUG
+#if !DEBUG
 			if (checkForUpdates) CheckForUpdates();
-			#endif
+#endif
 		}
-		
-		base.OnFrameworkInitializationCompleted();
 	}
 
 	public static T GetService<T>() where T : class

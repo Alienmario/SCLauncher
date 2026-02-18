@@ -27,7 +27,7 @@ public partial class EditProfileDialog : BaseDialogWindow
 		};
 		if (Design.IsDesignMode)
 		{
-			DataContext = AppProfile.CreateDefaultBlackMesa();
+			DataContext = AppProfile.Create(AppType.BlackMesaCOOP);
 		}
 
 		CancelButton.Click += OnCancelClick;
@@ -55,9 +55,8 @@ public partial class EditProfileDialog : BaseDialogWindow
 
 	private bool SaveProfile(AppProfile profile)
 	{
-		var name = ProfileNameTextBox.Text?.Trim();
-
-		if (string.IsNullOrWhiteSpace(name))
+		string? name = ProfileNameTextBox.Text?.Trim();
+		if (string.IsNullOrEmpty(name))
 		{
 			ShowError("Please enter a profile name");
 			return false;
@@ -87,39 +86,28 @@ public partial class EditProfileDialog : BaseDialogWindow
 
 		// Validate required string fields
 		var gameInstallFolder = GameInstallFolderTextBox.Text?.Trim();
-		if (string.IsNullOrWhiteSpace(gameInstallFolder))
+		if (string.IsNullOrEmpty(gameInstallFolder))
 		{
 			ShowError("Please enter a game install folder");
 			return false;
 		}
 
 		var serverInstallFolder = ServerInstallFolderTextBox.Text?.Trim();
-		if (string.IsNullOrWhiteSpace(serverInstallFolder))
+		if (string.IsNullOrEmpty(serverInstallFolder))
 		{
 			ShowError("Please enter a server install folder");
 			return false;
 		}
 
 		var modFolder = ModFolderTextBox.Text?.Trim();
-		if (string.IsNullOrWhiteSpace(modFolder))
+		if (string.IsNullOrEmpty(modFolder))
 		{
 			ShowError("Please enter a mod folder");
 			return false;
 		}
 
 		var gameExecutableWin = GameExecutableWinTextBox.Text?.Trim();
-		if (string.IsNullOrWhiteSpace(gameExecutableWin))
-		{
-			ShowError("Please enter a Windows game executable");
-			return false;
-		}
-
 		var gameExecutableLinux = GameExecutableLinuxTextBox.Text?.Trim();
-		if (string.IsNullOrWhiteSpace(gameExecutableLinux))
-		{
-			ShowError("Please enter a Linux game executable");
-			return false;
-		}
 
 		try
 		{
@@ -129,19 +117,19 @@ public partial class EditProfileDialog : BaseDialogWindow
 			profile.GameInstallFolder = gameInstallFolder;
 			profile.ServerInstallFolder = serverInstallFolder;
 			profile.ModFolder = modFolder;
-			profile.GameExecutable = new Dictionary<PlatformID, string>
-			{
-				{ PlatformID.Win32NT, gameExecutableWin },
-				{ PlatformID.Unix, gameExecutableLinux }
-			};
+			profile.GameExecutable = new Dictionary<PlatformID, string>();
+			if (!string.IsNullOrEmpty(gameExecutableWin))
+				profile.GameExecutable.Add(PlatformID.Win32NT, gameExecutableWin);
+			if (!string.IsNullOrEmpty(gameExecutableLinux))
+				profile.GameExecutable.Add(PlatformID.Unix, gameExecutableLinux);
 			// profile.GamePath = GamePathTextBox.Text?.Trim();
 			// profile.ServerPath = ServerPathTextBox.Text?.Trim();
-
 			return true;
 		}
-		catch (Exception ex)
+		catch (Exception e)
 		{
-			ShowError($"Failed to update profile: {ex.Message}");
+			ShowError($"Failed to update profile: {e.Message}");
+			e.Log();
 			return false;
 		}
 	}

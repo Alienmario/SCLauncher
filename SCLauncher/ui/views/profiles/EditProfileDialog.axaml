@@ -13,58 +13,58 @@
 			<TextBlock Text="Edit Profile" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
 
 			<StackPanel Spacing="15" Orientation="Horizontal" Margin="0,0,0,10">
-				<TextBlock Text="App Type:" VerticalAlignment="Center"/>
+				<TextBlock Text="Type:" VerticalAlignment="Center"/>
 				<Label Name="AppTypeLabel" IsEnabled="False"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="Profile Name:"/>
+				<TextBlock Text="Profile Name"/>
 				<TextBox Name="ProfileNameTextBox" Watermark="Enter profile name"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="Game App ID:"/>
+				<TextBlock Text="Game App ID"/>
 				<TextBox Name="GameAppIdTextBox" Watermark="Enter game App ID"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="Server App ID:"/>
+				<TextBlock Text="Server App ID"/>
 				<TextBox Name="ServerAppIdTextBox" Watermark="Enter server App ID"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="Game Install Folder:"/>
+				<TextBlock Text="Game Install Folder"/>
 				<TextBox Name="GameInstallFolderTextBox" Watermark="Enter game install folder"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="Server Install Folder:"/>
+				<TextBlock Text="Server Install Folder"/>
 				<TextBox Name="ServerInstallFolderTextBox" Watermark="Enter server install folder"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="Mod Folder:"/>
+				<TextBlock Text="Mod Folder"/>
 				<TextBox Name="ModFolderTextBox" Watermark="Enter mod folder"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="Game Executable (Windows):"/>
+				<TextBlock Text="Game Executable (Windows)"/>
 				<TextBox Name="GameExecutableWinTextBox" Watermark="Enter Windows executable"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="Game Executable (Linux):"/>
+				<TextBlock Text="Game Executable (Linux)"/>
 				<TextBox Name="GameExecutableLinuxTextBox" Watermark="Enter Linux executable"/>
 			</StackPanel>
 
 			<!--
 			<StackPanel Spacing="5">
-				<TextBlock Text="Game Path:"/>
+				<TextBlock Text="Game Path"/>
 				<TextBox Name="GamePathTextBox" Watermark="Enter game path (optional)"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="Server Path:"/>
+				<TextBlock Text="Server Path"/>
 				<TextBox Name="ServerPathTextBox" Watermark="Enter server path (optional)"/>
 			</StackPanel>
 			-->

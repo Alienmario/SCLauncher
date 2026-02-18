@@ -6,7 +6,8 @@
         mc:Ignorable="d"
         x:Class="SCLauncher.ui.views.profiles.CreateProfileDialog"
         Title="Create New Profile"
-        SizeToContent="Height"
+        SizeToContent="Height" Height="NaN"
+        WindowStartupLocation="CenterOwner"
         CanResize="False">
 
 	<controls:BaseDialogWindow.MainContent>
@@ -14,13 +15,21 @@
 			<TextBlock Text="Create New Profile" FontSize="18" FontWeight="Bold"/>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="App Type:"/>
-				<ComboBox Name="AppTypeComboBox" SelectedIndex="0"/>
+				<TextBlock Text="Type"/>
+				<ComboBox Name="AppTypeComboBox" PlaceholderText="Select a type" PlaceholderForeground="{DynamicResource TextControlPlaceholderForeground}">
+					<ComboBox.Styles>
+						<Style Selector="ComboBox /template/ Popup#PART_Popup">
+							<Setter Property="Placement" Value="BottomEdgeAlignedLeft"/>
+						</Style>
+					</ComboBox.Styles>
+				</ComboBox>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
-				<TextBlock Text="Profile Name:"/>
-				<TextBox Name="ProfileNameTextBox" Watermark="Enter profile name"/>
+				<TextBlock Text="Name"/>
+				<TextBox Name="ProfileNameTextBox"
+				         IsEnabled="{Binding #AppTypeComboBox.SelectedItem, Mode=OneWay, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+				         Text="{Binding #AppTypeComboBox.SelectedItem, Mode=OneWay}"/>
 			</StackPanel>
 		</StackPanel>
 	</controls:BaseDialogWindow.MainContent>
@@ -29,7 +38,8 @@
 		<DockPanel Margin="20" HorizontalSpacing="15">
 			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
 				<Button Name="CancelButton" Content="Cancel" Classes="action" HotKey="Escape"/>
-				<Button Name="CreateButton" Content="Create" Classes="action accent" HotKey="Enter"/>
+				<Button Name="CreateButton" Content="Create" Classes="action accent" HotKey="Enter"
+				        IsEnabled="{Binding #AppTypeComboBox.SelectedItem, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 			</StackPanel>
 			
 			<TextBlock DockPanel.Dock="Left" Name="ErrorMessage" Foreground="Red" TextWrapping="Wrap" IsVisible="False"/>
