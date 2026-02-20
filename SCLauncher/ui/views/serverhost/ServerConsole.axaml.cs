@@ -75,6 +75,10 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		{
 			ConsoleViewer.AddMessage(new StatusMessage(string.Empty), jumpScroll: true);
 		}
+		else if (text.Equals("clear", StringComparison.OrdinalIgnoreCase))
+		{
+			ConsoleViewer.Clear();
+		}
 		else
 		{
 			svController.Command(text);

@@ -128,7 +128,7 @@
 			</Border>
 			
 			<!-- Console -->
-			<Border Background="Black" BorderBrush="{StaticResource SystemAccentColor}"
+			<Border Background="Black" BorderBrush="{DynamicResource SystemAccentColor}"
 			        BorderThickness="1" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 				<controls:StatusMessageViewer Name="ConsoleViewer" Limit="1000" DisplayTime="False"/>
 			</Border>

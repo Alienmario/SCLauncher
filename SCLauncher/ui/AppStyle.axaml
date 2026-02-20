@@ -119,15 +119,15 @@
 	</Style>
 	
 	<Style Selector="Button.Grow">
-		<Style Selector="^ > :is(Control) > :is(Control)">
+		<Style Selector="^ /template/ ContentPresenter">
 			<Setter Property="Transitions">
 				<Transitions>
-					<TransformOperationsTransition Easing="CubicEaseOut" Property="RenderTransform" Duration="0.3"/>
+					<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="CubicEaseOut"/>
 				</Transitions>
 			</Setter>
 		</Style>
 		<Style Selector="^:pointerover /template/ ContentPresenter">
-			<Setter Property="RenderTransform" Value="scale(1.2)"/>
+			<Setter Property="RenderTransform" Value="Scale(1.2)"/>
 		</Style>
 	</Style>
 	
