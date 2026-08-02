@@ -22,9 +22,10 @@
 	</Design.PreviewWith>
 	
 	<Styles.Resources>
-		<Color x:Key="HighlightColor">Orange</Color>
+		<Color x:Key="HighlightColor">#FFAA00</Color>
+		<Color x:Key="HighlightColor2">#AB7200</Color>
 		<Color x:Key="BackgroundColor">#292929</Color>
-		<Color x:Key="BackgroundPane">#15B9B9B9</Color>
+		<Color x:Key="BackgroundPane">#34595959</Color>
 		<Color x:Key="BackgroundPane2">#3E909090</Color>
 		<Color x:Key="BackgroundPane3">#F5232323</Color>
 
@@ -76,6 +77,18 @@
 	
 	<!-- Utility classes -->
 	
+	<Style Selector="TextBlock.SectionHeader">
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="LetterSpacing" Value="1.5"/>
+		<Setter Property="FontWeight" Value="Medium"/>
+		<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
+		<!-- <Setter Property="Opacity" Value="0.8"/> -->
+	</Style>
+	
+	<Style Selector="Border.SectionContent">
+		<Setter Property="CornerRadius" Value="4"/>
+	</Style>
+	
 	<Style Selector="Border.DashedUnderline">
 		<Setter Property="BorderThickness" Value="0 0 0 0.75"/>
 		<Setter Property="BorderBrush" Value="{StaticResource DashedLineBrush}"/>
@@ -86,7 +99,7 @@
 	<!-- Adds small margin between content and vertical scrollbar -->
 	<Style Selector="ScrollViewer.RightMargin">
 		<Setter Property="AllowAutoHide" Value="False"/>
-			
+		
 		<Style Selector="^ /template/ ScrollBar:vertical">
 			<Setter Property="Margin" Value="8 0 0 0"/>
 		</Style>
