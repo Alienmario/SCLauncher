@@ -5,7 +5,7 @@
              xmlns:custom="clr-namespace:SCLauncher.ui.controls"
              xmlns:ui="clr-namespace:SCLauncher.ui"
              xmlns:config="clr-namespace:SCLauncher.model.config"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="250"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="350"
              x:Class="SCLauncher.ui.views.Settings"
              x:DataType="config:AppProfile">
 
@@ -23,38 +23,28 @@
 		</TextBlock>
 		
 		<ScrollViewer DockPanel.Dock="Top" Classes="RightMargin" HorizontalScrollBarVisibility="Disabled">
-			<StackPanel>
+			<StackPanel Spacing="20" Margin="0 0 0 20">
 				<StackPanel.Styles>
-					<Style Selector="Label,CheckBox">
-						<Setter Property="VerticalAlignment" Value="Center"/>
-						<Setter Property="HorizontalAlignment" Value="Left"/>
-						<Setter Property="Margin" Value="0 10 0 0"/>
-					</Style>
-					<Style Selector="TextBlock.SectionHeader">
-						<Setter Property="Padding" Value="10 0 0 0"/>
-					</Style>
-					<Style Selector="Border.SectionContent">
+					<Style Selector="GroupBox">
 						<Setter Property="Background" Value="{DynamicResource BackgroundPane}"/>
-						<Setter Property="Margin" Value="0 0 0 10"/>
-						<Style Selector="^ StackPanel">
-							<Setter Property="Margin" Value="10 0 10 10"/>
-						</Style>
+						<Setter Property="CornerRadius" Value="10"/>
 					</Style>
 				</StackPanel.Styles>
-
-				<TextBlock Text="App settings" Classes="SectionHeader"/>
-
-				<Border Classes="SectionContent">
+				
+				<GroupBox>
+					<GroupBox.Header>
+						<TextBlock Text="Launcher settings" Classes="SectionHeader"/>
+					</GroupBox.Header>
 					<StackPanel x:DataType="config:GlobalConfiguration" Name="GlobalConfigContent">
 						<CheckBox IsChecked="{Binding CheckForUpdates}" Name="CheckForUpdatesCheckBox">
-							Notify for launcher updates
+							Notify me about launcher updates
 						</CheckBox>
 
-						<Label Content="Steam installation path"/>
+						<Label Content="Steam installation path" Margin="0 5 0 0"/>
 						<custom:FilePickerTextBox Mode="Folder" Title="Select Steam installation folder" Name="SteamPath"
 						                          Text="{Binding SteamPath}"/>
 
-						<Label Content="Steam Web API Key (for server browser)"/>
+						<Label Content="Steam Web API Key (for server browser)" Margin="0 10 0 0"/>
 						<TextBox Text="{Binding SteamWebApiKey}" Name="SteamApiKey">
 							<TextBox.InnerRightContent>
 								<HyperlinkButton NavigateUri="https://steamcommunity.com/dev/apikey" Name="SteamApiKeyLink">
@@ -65,21 +55,22 @@
 							</TextBox.InnerRightContent>
 						</TextBox>
 					</StackPanel>
-				</Border>
+				</GroupBox>
 
-				<TextBlock Text="Active profile settings" Classes="SectionHeader"/>
-				
-				<Border Classes="SectionContent">
+				<GroupBox>
+					<GroupBox.Header>
+						<TextBlock Text="Active profile settings" Classes="SectionHeader"/>
+					</GroupBox.Header>
 					<StackPanel>
 						<Label Content="Game path"/>
 						<custom:FilePickerTextBox Mode="Folder" Title="Select game path" Name="GamePath"
 						                          Text="{Binding GamePath}"/>
 
-						<Label Content="Server path"/>
+						<Label Content="Server path" Margin="0 10 0 0"/>
 						<custom:FilePickerTextBox Mode="Folder" Title="Select server path" Name="ServerPath"
 						                          Text="{Binding ServerPath}"/>
 					</StackPanel>
-				</Border>
+				</GroupBox>
 			</StackPanel>
 		</ScrollViewer>
 	</DockPanel>

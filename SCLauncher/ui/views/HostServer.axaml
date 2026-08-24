@@ -8,7 +8,7 @@
              xmlns:serverhost="clr-namespace:SCLauncher.ui.views.serverhost"
              xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia">
 	
-	<Grid Name="ContentParent" Margin="0 10 0 0">
+	<Grid Name="ContentParent">
 		
 		<DockPanel Name="LoadingPanel" IsVisible="False">
 			<Label Content="Analyzing server files" DockPanel.Dock="Bottom" HorizontalContentAlignment="Center"/>

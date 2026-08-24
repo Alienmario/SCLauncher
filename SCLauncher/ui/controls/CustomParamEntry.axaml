@@ -66,12 +66,12 @@
 				<DataTemplate>
 					<Grid ColumnDefinitions="*,Auto,*">
 						<TextBox Text="{Binding Key}" Grid.Column="0" Classes="CustomParamKey"
-						         Watermark="Parameter"
+						         PlaceholderText="Parameter"
 						         LostFocus="OnParamTextLostFocus"/>
 						<Button Grid.Column="1" Classes="DeleteButton" VerticalAlignment="Center" Focusable="False"
 						        Click="DeleteParameterClicked"/>
 						<TextBox Text="{Binding Value}" Grid.Column="2" Classes="CustomParamVal"
-						         Watermark="Value"
+						         PlaceholderText="Value"
 						         LostFocus="OnParamTextLostFocus"/>
 					</Grid>
 				</DataTemplate>

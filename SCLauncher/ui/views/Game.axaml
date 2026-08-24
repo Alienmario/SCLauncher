@@ -18,7 +18,7 @@
 		        Click="OnLaunchGameClicked"/>
 
 		<ScrollViewer DockPanel.Dock="Bottom" Classes="RightMargin" HorizontalScrollBarVisibility="Disabled">
-			<StackPanel Margin="2 10">
+			<StackPanel>
 				<StackPanel.Effect>
 					<DropShadowDirectionEffect BlurRadius="10" ShadowDepth="-5"/>
 				</StackPanel.Effect>

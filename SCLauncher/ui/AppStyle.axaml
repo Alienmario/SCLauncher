@@ -47,6 +47,8 @@
 		<!-- Fix title bar buttons Pressed bg -->
 		<SolidColorBrush x:Key="CaptionButtonBorderBrush" Color="{DynamicResource SystemBaseMediumLowColor}" />
 		
+		<SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="#2C4B4B4B" />
+		
 		<LinearGradientBrush x:Key="WindowBackground" StartPoint="0%,0%" EndPoint="0%,100%">
 			<GradientStop Color="#1D1D1D" Offset="0.0"/>
 			<GradientStop Color="{StaticResource BackgroundColor}" Offset="0.2"/>
@@ -66,15 +68,6 @@
 		<Setter Property="Width" Value="NaN"/>
 	</Style>
 	
-	<!-- Fix icon buttons -->
-	
-	<Style Selector="Button:disabled PathIcon">
-		<Setter Property="Foreground" Value="{DynamicResource ButtonForegroundDisabled}"/>
-	</Style>
-	<Style Selector="TabItem:pointerover .TabItemHeader PathIcon">
-		<Setter Property="Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselectedPointerOver}"/>
-	</Style>
-	
 	<!-- Utility classes -->
 	
 	<Style Selector="TextBlock.SectionHeader">
@@ -82,7 +75,6 @@
 		<Setter Property="LetterSpacing" Value="1.5"/>
 		<Setter Property="FontWeight" Value="Medium"/>
 		<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
-		<!-- <Setter Property="Opacity" Value="0.8"/> -->
 	</Style>
 	
 	<Style Selector="Border.SectionContent">
@@ -99,7 +91,6 @@
 	<!-- Adds small margin between content and vertical scrollbar -->
 	<Style Selector="ScrollViewer.RightMargin">
 		<Setter Property="AllowAutoHide" Value="False"/>
-		
 		<Style Selector="^ /template/ ScrollBar:vertical">
 			<Setter Property="Margin" Value="8 0 0 0"/>
 		</Style>
