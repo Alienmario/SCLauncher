@@ -6,7 +6,6 @@
 		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ApplicationIcon>ui\assets\logo-sc.ico</ApplicationIcon>
-		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
 		<DebugType>embedded</DebugType>
 		<PublishReadyToRun>true</PublishReadyToRun>
@@ -15,28 +14,27 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="11.3.10" />
-		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.10" />
-		<PackageReference Include="Avalonia.Desktop" Version="11.3.10" />
-		<PackageReference Include="Avalonia.Svg.Skia" Version="11.2.7" />
-		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.10" />
-		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.10" />
-		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-		<PackageReference Include="Avalonia.Diagnostics" Version="11.3.10">
+		<PackageReference Include="Avalonia" Version="12.2.999-cibuild0068472-alpha" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
+		<PackageReference Include="Avalonia.Desktop" Version="12.2.999-cibuild0068472-alpha" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="12.2.999-cibuild0068472-alpha" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="12.2.999-cibuild0068472-alpha" />
+		<!--Condition below is needed to remove AvaloniaUI.DiagnosticsSupport package from build output in Release configuration.-->
+		<PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
 			<IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
 			<PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
 		</PackageReference>
+		<PackageReference Include="Svg.Controls.Skia.Avalonia" Version="12.0.0.15" />
+		<PackageReference Include="Optris.LoadingIndicators.Avalonia" Version="12.0.4" />
 		<PackageReference Include="DepotDownloaderSubProcess" Version="3.4.0" />
-		<PackageReference Include="Fody" Version="6.9.1">
+		<PackageReference Include="Fody" Version="6.9.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="LoadingIndicators.Avalonia" Version="11.0.11.1" />
-		<PackageReference Include="Octokit" Version="14.0.0" />
 		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" PrivateAssets="All" />
+		<PackageReference Include="Octokit" Version="14.0.0" />
 		<PackageReference Include="Gameloop.Vdf" Version="0.6.2" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
-		<PackageReference Include="SkiaSharp" Version="2.88.9" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
 		<PackageReference Include="SteamQuery.NET" Version="2.0.2" />
 	</ItemGroup>
 

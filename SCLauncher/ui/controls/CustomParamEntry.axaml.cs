@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using SCLauncher.model.config;
@@ -42,12 +43,12 @@ public partial class CustomParamEntry : UserControl
 		}
 	}
 
-	private void OnParamTextLostFocus(object? sender, RoutedEventArgs e)
+	private void OnParamTextLostFocus(object? sender, FocusChangedEventArgs e)
 	{
 		if (e.Source is Control { DataContext: CustomParam p })
 		{
 			// check if new focus is on the same row
-			if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement()
+			if (TopLevel.GetTopLevel(this)?.FocusManager.GetFocusedElement()
 				    is not Control focusedElement || !ReferenceEquals(focusedElement.DataContext, p))
 			{
 				// remove row that just lost focus if it's empty

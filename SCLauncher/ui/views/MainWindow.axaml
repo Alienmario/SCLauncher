@@ -9,23 +9,20 @@
         x:Class="SCLauncher.ui.views.MainWindow"
         Title="SCLauncher"
         Icon="/ui/assets/logo-sc.ico"
-        ExtendClientAreaToDecorationsHint="{OnPlatform Windows=True, Default=False}"
-        TransparencyLevelHint="{OnPlatform Windows='Mica,AcrylicBlur', Default='None'}"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="{OnPlatform Linux=20, Default=-1}"
+        WindowDrawnDecorations.TitleBarDecorations="MinimizeButton, MaximizeButton, CloseButton"
+        TransparencyLevelHint="Mica,AcrylicBlur,None"
         WindowStartupLocation="CenterScreen"
-        Padding="{Binding $self.OffScreenMargin}"
         Width="700" Height="450"
         MinWidth="600" MinHeight="300">
 
 	<Window.Styles>
 		<Style Selector="Window">
-			<OnPlatform>
-				<OnPlatform.Windows>
-					<Setter Property="Background" Value="Transparent"/>
-				</OnPlatform.Windows>
-				<OnPlatform.Default>
-					<Setter Property="Background" Value="{StaticResource WindowBackground}"/>
-				</OnPlatform.Default>
-			</OnPlatform>
+			<Setter Property="Background" Value="{StaticResource WindowBackground}"/>
+		</Style>
+		<Style Selector="Window[ActualTransparencyLevel=Mica], Window[ActualTransparencyLevel=AcrylicBlur]">
+			<Setter Property="Background" Value="Transparent"/>
 		</Style>
 		
 		<Style Selector="TabItem">
@@ -59,28 +56,29 @@
 			</ExperimentalAcrylicBorder.Material>
 		</ExperimentalAcrylicBorder>
 		
-		<DockPanel Margin="0 5 0 0">
+		<DockPanel>
 			
 			<!-- Custom titlebar -->
-			<DockPanel DockPanel.Dock="Top" Margin="10 0" HorizontalSpacing="10">
-				<StackPanel Orientation="Horizontal" VerticalAlignment="Top" IsHitTestVisible="False">
+			<DockPanel DockPanel.Dock="Top" Margin="10 5" HorizontalSpacing="10"
+			           WindowDecorationProperties.ElementRole="TitleBar">
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 					<Border CornerRadius="4" ClipToBounds="True">
-						<Image Source="/ui/assets/logo-sc.ico" Width="20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+						<Image Source="/ui/assets/logo-sc.ico" Width="70" RenderOptions.BitmapInterpolationMode="HighQuality"/>
 					</Border>
-					<Label VerticalAlignment="Center" FontSize="14" Foreground="#EFEFEF">
-						Launcher
-					</Label>
 				</StackPanel>
-				<profiles:ProfileSwitcher HorizontalAlignment="{OnPlatform Default=Left, Linux=Right}"/>
+				<profiles:ProfileSwitcher WindowDecorationProperties.ElementRole="User" VerticalAlignment="Top"/>
 			</DockPanel>
 
 			<controls:UpdateNotification DockPanel.Dock="Bottom" Opacity="0.9"/>
 
-			<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="0 5 0 10">
+			<!-- Padding: ads extra space above content, preserves side spacing -->
+			<!-- Margin: corrects the header position with titlebar -->
+			<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="0 -5 0 0" Padding="10 15 10 10" ClipToBounds="False">
 				
 				<TabControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<DockPanel/>
+						<!-- Custom alignment of the header -->
+						<DockPanel Margin="85 -50 0 0"/>
 					</ItemsPanelTemplate>
 				</TabControl.ItemsPanel>
 				

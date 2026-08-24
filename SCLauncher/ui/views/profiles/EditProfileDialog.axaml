@@ -19,53 +19,53 @@
 
 			<StackPanel Spacing="5">
 				<TextBlock Text="Profile Name"/>
-				<TextBox Name="ProfileNameTextBox" Watermark="Enter profile name"/>
+				<TextBox Name="ProfileNameTextBox" PlaceholderText="Enter profile name"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
 				<TextBlock Text="Game App ID"/>
-				<TextBox Name="GameAppIdTextBox" Watermark="Enter game App ID"/>
+				<TextBox Name="GameAppIdTextBox" PlaceholderText="Enter game App ID"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
 				<TextBlock Text="Server App ID"/>
-				<TextBox Name="ServerAppIdTextBox" Watermark="Enter server App ID"/>
+				<TextBox Name="ServerAppIdTextBox" PlaceholderText="Enter server App ID"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
 				<TextBlock Text="Game Install Folder"/>
-				<TextBox Name="GameInstallFolderTextBox" Watermark="Enter game install folder"/>
+				<TextBox Name="GameInstallFolderTextBox" PlaceholderText="Enter game install folder"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
 				<TextBlock Text="Server Install Folder"/>
-				<TextBox Name="ServerInstallFolderTextBox" Watermark="Enter server install folder"/>
+				<TextBox Name="ServerInstallFolderTextBox" PlaceholderText="Enter server install folder"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
 				<TextBlock Text="Mod Folder"/>
-				<TextBox Name="ModFolderTextBox" Watermark="Enter mod folder"/>
+				<TextBox Name="ModFolderTextBox" PlaceholderText="Enter mod folder"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
 				<TextBlock Text="Game Executable (Windows)"/>
-				<TextBox Name="GameExecutableWinTextBox" Watermark="Enter Windows executable"/>
+				<TextBox Name="GameExecutableWinTextBox" PlaceholderText="Enter Windows executable"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
 				<TextBlock Text="Game Executable (Linux)"/>
-				<TextBox Name="GameExecutableLinuxTextBox" Watermark="Enter Linux executable"/>
+				<TextBox Name="GameExecutableLinuxTextBox" PlaceholderText="Enter Linux executable"/>
 			</StackPanel>
 
 			<!--
 			<StackPanel Spacing="5">
 				<TextBlock Text="Game Path"/>
-				<TextBox Name="GamePathTextBox" Watermark="Enter game path (optional)"/>
+				<TextBox Name="GamePathTextBox" PlaceholderText="Enter game path (optional)"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">
 				<TextBlock Text="Server Path"/>
-				<TextBox Name="ServerPathTextBox" Watermark="Enter server path (optional)"/>
+				<TextBox Name="ServerPathTextBox" PlaceholderText="Enter server path (optional)"/>
 			</StackPanel>
 			-->
 

@@ -5,58 +5,74 @@
              xmlns:custom="clr-namespace:SCLauncher.ui.controls"
              xmlns:ui="clr-namespace:SCLauncher.ui"
              xmlns:config="clr-namespace:SCLauncher.model.config"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="250"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="350"
              x:Class="SCLauncher.ui.views.Settings"
              x:DataType="config:AppProfile">
-	
+
 	<UserControl.Effect>
 		<DropShadowDirectionEffect BlurRadius="10" ShadowDepth="-5"/>
 	</UserControl.Effect>
-	
-	<ScrollViewer Classes="RightMargin" HorizontalScrollBarVisibility="Disabled">
-		<DockPanel Margin="0 10 0 0" VerticalSpacing="20">
-			<StackPanel DockPanel.Dock="Top">
 
-				<StackPanel x:DataType="config:GlobalConfiguration" Name="GlobalConfigContent">
-					<CheckBox IsChecked="{Binding CheckForUpdates}" Name="CheckForUpdatesCheckBox">
-						Check for launcher updates
-					</CheckBox>
-					
-					<Label Content="Steam installation" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 10 0 0"/>
-					<custom:FilePickerTextBox Mode="Folder" Title="Select Steam installation folder" Name="SteamPath"
-					                          Text="{Binding SteamPath}"/>
+	<DockPanel VerticalSpacing="10">
 
-					<Label Content="Steam Web API Key (for server browser)" VerticalAlignment="Center" HorizontalAlignment="Left"
-					       Margin="0 10 0 0"/>
-					<TextBox Text="{Binding SteamWebApiKey}" Name="SteamApiKey">
-						<TextBox.InnerRightContent>
-							<HyperlinkButton NavigateUri="https://steamcommunity.com/dev/apikey" Name="SteamApiKeyLink">
-								<PathIcon Data="{StaticResource open_folder_regular}"
-								          Foreground="{StaticResource Highlight}"
-								          Height="16"/>
-							</HyperlinkButton>
-						</TextBox.InnerRightContent>
-					</TextBox>
-				</StackPanel>
+		<!-- Version -->
+		<TextBlock DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Right"
+		           Foreground="{DynamicResource TextControlForegroundDisabled}" FontSize="12">
+			<Run>SCLauncher</Run>
+			<Run Text="{x:Static ui:App.Version}"/>
+		</TextBlock>
+		
+		<ScrollViewer DockPanel.Dock="Top" Classes="RightMargin" HorizontalScrollBarVisibility="Disabled">
+			<StackPanel Spacing="20" Margin="0 0 0 20">
+				<StackPanel.Styles>
+					<Style Selector="GroupBox">
+						<Setter Property="Background" Value="{DynamicResource BackgroundPane}"/>
+						<Setter Property="CornerRadius" Value="10"/>
+					</Style>
+				</StackPanel.Styles>
+				
+				<GroupBox>
+					<GroupBox.Header>
+						<TextBlock Text="Launcher settings" Classes="SectionHeader"/>
+					</GroupBox.Header>
+					<StackPanel x:DataType="config:GlobalConfiguration" Name="GlobalConfigContent">
+						<CheckBox IsChecked="{Binding CheckForUpdates}" Name="CheckForUpdatesCheckBox">
+							Notify me about launcher updates
+						</CheckBox>
 
-				<Label Content="Game path" VerticalAlignment="Center" HorizontalAlignment="Left"
-				       Margin="0 10 0 0"/>
-				<custom:FilePickerTextBox Mode="Folder" Title="Select game path" Name="GamePath"
-				                          Text="{Binding GamePath}"/>
+						<Label Content="Steam installation path" Margin="0 5 0 0"/>
+						<custom:FilePickerTextBox Mode="Folder" Title="Select Steam installation folder" Name="SteamPath"
+						                          Text="{Binding SteamPath}"/>
 
-				<Label Content="Server path" VerticalAlignment="Center" HorizontalAlignment="Left"
-				       Margin="0 10 0 0"/>
-				<custom:FilePickerTextBox Mode="Folder" Title="Select server path" Name="ServerPath"
-				                          Text="{Binding ServerPath}"/>
+						<Label Content="Steam Web API Key (for server browser)" Margin="0 10 0 0"/>
+						<TextBox Text="{Binding SteamWebApiKey}" Name="SteamApiKey">
+							<TextBox.InnerRightContent>
+								<HyperlinkButton NavigateUri="https://steamcommunity.com/dev/apikey" Name="SteamApiKeyLink">
+									<PathIcon Data="{StaticResource open_folder_regular}"
+									          Foreground="{StaticResource Highlight}"
+									          Height="16"/>
+								</HyperlinkButton>
+							</TextBox.InnerRightContent>
+						</TextBox>
+					</StackPanel>
+				</GroupBox>
+
+				<GroupBox>
+					<GroupBox.Header>
+						<TextBlock Text="Active profile settings" Classes="SectionHeader"/>
+					</GroupBox.Header>
+					<StackPanel>
+						<Label Content="Game path"/>
+						<custom:FilePickerTextBox Mode="Folder" Title="Select game path" Name="GamePath"
+						                          Text="{Binding GamePath}"/>
+
+						<Label Content="Server path" Margin="0 10 0 0"/>
+						<custom:FilePickerTextBox Mode="Folder" Title="Select server path" Name="ServerPath"
+						                          Text="{Binding ServerPath}"/>
+					</StackPanel>
+				</GroupBox>
 			</StackPanel>
-
-			<!-- Version -->
-			<TextBlock DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Right"
-			           Foreground="{DynamicResource TextControlForegroundDisabled}" FontSize="12">
-				<Run>SCLauncher</Run>
-				<Run Text="{x:Static ui:App.Version}"/>
-			</TextBlock>
-		</DockPanel>
-	</ScrollViewer>
+		</ScrollViewer>
+	</DockPanel>
 
 </UserControl>

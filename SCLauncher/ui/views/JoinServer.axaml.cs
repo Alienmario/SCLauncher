@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using SCLauncher.backend.service;
@@ -227,7 +228,7 @@ public partial class JoinServer : UserControl
 	protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs args)
 	{
 		base.OnDetachedFromVisualTree(args);
-		HotKeyManager.SetHotKey(RefreshButton, null!);
+		HotKeyManager.SetHotKey(RefreshButton, null);
 	}
 
 	private async void OnRefreshClicked(object? sender, RoutedEventArgs args)
