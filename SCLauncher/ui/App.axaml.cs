@@ -72,9 +72,17 @@ public partial class App : Application
 			// Cache the MainWindow's notification manager
 			GetNotificationManager(mainWindow);
 
-			bool checkForUpdates = GetService<GlobalConfiguration>().CheckForUpdates;
 #if !DEBUG
-			if (checkForUpdates) CheckForUpdates();
+			var config = GetService<GlobalConfiguration>();
+			if (config.CheckForUpdates) CheckForUpdates();
+			
+			config.PropertyChanged += (sender, args) =>
+			{
+				if (args.PropertyName == nameof(GlobalConfiguration.CheckForUpdates) && config.CheckForUpdates)
+				{
+					Dispatcher.UIThread.Post(CheckForUpdates);
+				}
+			};
 #endif
 		}
 	}
