@@ -5,7 +5,8 @@
              xmlns:serverinstallmodel="clr-namespace:SCLauncher.model.serverinstall"
              xmlns:serverinstallviews="clr-namespace:SCLauncher.ui.views.serverinstall"
              xmlns:design="clr-namespace:SCLauncher.ui.design"
-             xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
+             xmlns:li="using:LoadingIndicators.Avalonia"
+             xmlns:converters="clr-namespace:SCLauncher.ui.converters"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
              x:Class="SCLauncher.ui.views.serverinstall.InstallOverview"
              x:DataType="serverinstallmodel:ServerInstallParams">
@@ -41,33 +42,39 @@
 		      RowDefinitions="Auto, Auto, Auto"
 		      VerticalAlignment="Center"
 		      DockPanel.Dock="Top">
+
+			<Label Grid.Row="0" Grid.Column="0" Content="Install method" Classes="Key"/>
+			<SelectableTextBlock Grid.Row="0" Grid.Column="1" Classes="Value" Text="{Binding Method}"/>
 			
-			<Label Grid.Row="1" Grid.Column="0" Content="Install method" Classes="Key"/>
-			<SelectableTextBlock Grid.Row="1" Grid.Column="1" Classes="Value" Text="{Binding Method}"/>
-			
-			<Label Grid.Row="2" Grid.Column="0" Content="Install directory" Classes="Key"
-			       IsVisible="{Binding #PathText.IsVisible}"/>
-			<SelectableTextBlock Grid.Row="2" Grid.Column="1" Name="PathText" Classes="Value"
+			<Label Grid.Row="1" Grid.Column="0" Content="Install path" Classes="Key"
+			       IsVisible="{Binding #InstallPathText.IsVisible}"/>
+			<SelectableTextBlock Grid.Row="1" Grid.Column="1" Name="InstallPathText" Classes="Value"
 			           Text="{Binding Path, Mode=OneTime}"
 			           IsVisible="{Binding Method, Converter={x:Static ObjectConverters.Equal},
 						ConverterParameter={x:Static serverinstallmodel:ServerInstallMethod.External}}"/>
+			
+			<Label Grid.Row="2" Grid.Column="0" Content="Addons preset" Classes="Key"/>
+			<ComboBox Grid.Row="2" Grid.Column="1" Name="PresetComboBox" Classes="Value" HorizontalAlignment="Stretch"
+			          PlaceholderText="All"
+			          DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance},
+			           TargetNullValue='All'}"/>
 		</Grid>
 		
 		<!-- Installation components -->
-		<ScrollViewer AllowAutoHide="False" DockPanel.Dock="Bottom">
+		<ScrollViewer AllowAutoHide="False" DockPanel.Dock="Bottom" Name="ComponentsScrollViewer" Classes="RightMargin">
 			<ItemsControl Name="ComponentsGrid" ItemsSource="{Binding}" Margin="1 0">
 				<ItemsControl.ItemTemplate>
-					<DataTemplate DataType="serverinstallviews:OverviewComponentEntry">
+					<DataTemplate DataType="serverinstallviews:ComponentViewModel">
 						<DockPanel Margin="0 2">
 							
 							<DockPanel DockPanel.Dock="Right">
 								<SelectableTextBlock DockPanel.Dock="Right" VerticalAlignment="Center" TextWrapping="Wrap"
-								                     Text="{Binding Status}"/>
+								                     Text="{Binding Text}"/>
 							</DockPanel>
 							
 							<CheckBox DockPanel.Dock="Left" VerticalAlignment="Top"
-							          IsChecked="{Binding Install}"
-							          IsEnabled="{Binding InstallEditable}">
+							          IsChecked="{Binding Enabled}"
+							          IsEnabled="{Binding Editable}">
 							          
 								<TextBlock TextWrapping="Wrap" VerticalAlignment="Center">
 									<TextBlock.Effect>

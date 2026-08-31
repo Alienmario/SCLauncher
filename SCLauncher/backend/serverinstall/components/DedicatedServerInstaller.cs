@@ -43,7 +43,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 	public async IAsyncEnumerable<StatusMessage> InstallViaSteamClient(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
-		if (!SteamUtils.IsValidSteamInstallDir(globalConfig.SteamPath))
+		if (!SteamUtils.IsValidSteamInstallPath(globalConfig.SteamPath))
 		{
 			throw new InstallException("Steam not found! Install it or specify Steam path in settings, then retry.");
 		}
@@ -63,7 +63,6 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 			}
 			else if (info.Installed)
 			{
-				ctx.Params.Profile.ServerPath = info.Path;
 				break;
 			}
 		}
@@ -92,8 +91,6 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 		{
 			throw new InstallException("Dedicated server download failed");
 		}
-
-		ctx.Params.Profile.ServerPath = ctx.InstallPath;
 	}
 	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
@@ -101,11 +98,11 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
-			string? steamDir = globalConfig.SteamPath;
-			if (steamDir == null) // this is explicitly handled during install
+			string? steamPath = globalConfig.SteamPath;
+			if (steamPath == null) // this is explicitly handled during install
 				return ComponentInfo.ReadyToInstall;
 
-			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.Profile.ServerAppId, ct);
+			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamPath, ctx.Params.Profile.ServerAppId, ct);
 			if (manifest == null)
 				return ComponentInfo.ReadyToInstall;
 
@@ -153,6 +150,8 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 			{
 				try
 				{
+					// ToDo: GMOD - System.FormatException: The input string '2025.03.26' was not in a correct format.
+					// ToDo: NMRIH - System.FormatException: The input string '1.1.5.0' was not in a correct format.
 					var uintVersion = Convert.ToUInt32(version);
 					upgradeVersion = await SteamUpToDateCheckAsync(ctx.Params.Profile.ServerAppId, uintVersion, ct);
 				}

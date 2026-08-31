@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SCLauncher.model.config;
+using SCLauncher.model.definition;
 using SCLauncher.model.serverbrowser;
 using SCLauncher.model.serverinstall;
 

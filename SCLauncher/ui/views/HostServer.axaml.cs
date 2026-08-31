@@ -6,55 +6,75 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using SCLauncher.backend.service;
 using SCLauncher.model.serverinstall;
+using SCLauncher.ui.controls.wizard;
 using SCLauncher.ui.views.serverinstall;
 
 namespace SCLauncher.ui.views;
 
 public partial class HostServer : UserControl
 {
-	private readonly ServerControlService serverControlService;
-	private readonly ServerInstallService serverInstallService;
-	private readonly ProfilesService profilesService;
-	private CancellationTokenSource? cancellationTokenSource;
+	internal record LoadingViewModel;
+	internal record ServerNotFoundViewModel(string Message);
+	internal record InstallWizardViewModel(ServerInstallParams Params);
+	internal record UninstallWizardViewModel(ServerUninstallParams Params);
+	internal record ServerConsoleViewModel;
+	
+	private readonly ServerControlService _serverControlService;
+	private readonly ServerInstallService _serverInstallService;
+	private readonly ProfilesService _profilesService;
+	private CancellationTokenSource? _cancellationTokenSource;
 	
 	public HostServer()
 	{
 		InitializeComponent();
-		serverControlService = App.GetService<ServerControlService>();
-		serverInstallService = App.GetService<ServerInstallService>();
-		profilesService = App.GetService<ProfilesService>();
-		ServerInstallWizard.OnExit += OnServerInstallWizardExit;
-		ServerUninstallWizard.OnExit += OnServerInstallWizardExit;
-		profilesService.ProfileSwitched += (s, e) => Dispatcher.UIThread.Post(CheckAvailability);
+		_serverControlService = App.GetService<ServerControlService>();
+		_serverInstallService = App.GetService<ServerInstallService>();
+		_profilesService = App.GetService<ProfilesService>();
+		_profilesService.ProfileSwitched += delegate { Dispatcher.UIThread.Post(CheckAvailability); };
 	}
 
-	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs args)
 	{
-		Control? content = GetContent();
-		if (content == null
-		    || content == ServerNotFoundPanel
-		    || (content == ServerConsole && !serverControlService.IsRunning))
+		base.OnAttachedToVisualTree(args);
+		if (Design.IsDesignMode)
+		{
+			DataContext = new LoadingViewModel();
+			return;
+		}
+
+		if (DataContext == null
+		    || DataContext is ServerNotFoundViewModel
+		    || (DataContext is ServerConsoleViewModel && !_serverControlService.IsRunning))
 		{
 			CheckAvailability();
 		}
 	}
 
-	public void GoToServerInstallWizard()
+	public void StartInstallWizard()
 	{
-		SwitchContent(ServerInstallWizard);
-		ServerInstallWizard.Reset();
-		ServerInstallWizard.SetContent(new InstallMethodSelect());
-		ServerInstallWizard.DataContext = serverInstallService.NewInstallParams();
+		var installParams = _serverInstallService.NewInstallParams();
+		DataContext = new InstallWizardViewModel(installParams);
+		
+		if (installParams is { Method: not null, Path: not null })
+		{
+			WizardNavigator? wizard = this.FindDescendantOfType<WizardNavigator>();
+			if (installParams.Method == ServerInstallMethod.Steam)
+			{
+				wizard?.FastForward(new InstallOverview());
+			}
+			else
+			{
+				wizard?.FastForward(new InstallPathSelect(), new InstallOverview());
+			}
+		}
 	}
 
-	public void GoToServerUninstallWizard()
+	public void StartUninstallWizard()
 	{
-		SwitchContent(ServerUninstallWizard);
-		ServerUninstallWizard.Reset();
-		ServerUninstallWizard.SetContent(new UninstallOverview());
-		ServerUninstallWizard.DataContext = serverInstallService.NewUninstallParams();
+		DataContext = new UninstallWizardViewModel(_serverInstallService.NewUninstallParams());
 	}
 
 	private void OnLocateServerClicked(object? sender, RoutedEventArgs e)
@@ -68,7 +88,7 @@ public partial class HostServer : UserControl
 
 	private void OnInstallServerClicked(object? sender, RoutedEventArgs e)
 	{
-		GoToServerInstallWizard();
+		StartInstallWizard();
 	}
 
 	private void OnRecheckAvailabilityClicked(object? sender, RoutedEventArgs e)
@@ -76,34 +96,21 @@ public partial class HostServer : UserControl
 		CheckAvailability();
 	}
 	
-	private void OnServerInstallWizardExit(object? sender, EventArgs eventArgs)
+	private void OnInstallWizardExit(object? sender, EventArgs eventArgs)
 	{
 		CheckAvailability();
 	}
 
-	private void SwitchContent(Control content)
-	{
-		foreach (var control in ContentParent.Children)
-		{
-			control.IsVisible = control == content;
-		}
-	}
-
-	private Control? GetContent()
-	{
-		return ContentParent.Children.FirstOrDefault(control => control.IsVisible);
-	}
-
 	private void CheckAvailability()
 	{
-		cancellationTokenSource?.Cancel();
-		cancellationTokenSource?.Dispose();
-		cancellationTokenSource = new CancellationTokenSource();
-		var ct = cancellationTokenSource.Token;
+		_cancellationTokenSource?.Cancel();
+		_cancellationTokenSource?.Dispose();
+		_cancellationTokenSource = new CancellationTokenSource();
+		var ct = _cancellationTokenSource.Token;
 
-		SwitchContent(LoadingPanel);
+		DataContext = new LoadingViewModel();
 		
-		Task.Run(async () => await serverControlService.GetAvailabilityAsync(ct), ct).ContinueWith(task =>
+		Task.Run(async () => await _serverInstallService.GetAvailabilityAsync(ct), ct).ContinueWith(task =>
 		{
 			Dispatcher.UIThread.Post(() =>
 			{
@@ -113,20 +120,16 @@ public partial class HostServer : UserControl
 				if (!task.IsCompletedSuccessfully)
 				{
 					task.LogExceptions();
-					ServerNotFoundText.Text = "There was an issue verifying current installation...";
-					SwitchContent(ServerNotFoundPanel);
+					DataContext = new ServerNotFoundViewModel("There was an issue verifying current installation...");
+					return;
 				}
-				else if (task.Result == ServerAvailability.Available)
+				
+				DataContext = task.Result switch
 				{
-					SwitchContent(ServerConsole);
-				}
-				else
-				{
-					ServerNotFoundText.Text = task.Result == ServerAvailability.PartiallyInstalled
-						? "Some components are not installed..."
-						: "Server installation not found...";
-					SwitchContent(ServerNotFoundPanel);
-				}
+					ServerAvailability.Available => new ServerConsoleViewModel(),
+					ServerAvailability.PartiallyInstalled => new ServerNotFoundViewModel("Server found, please install required components"),
+					_ => new ServerNotFoundViewModel("Server installation not found...")
+				};
 			});
 		}, ct);
 	}

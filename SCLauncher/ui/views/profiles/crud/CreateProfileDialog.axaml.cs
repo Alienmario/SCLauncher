@@ -1,11 +1,12 @@
 using System;
 using System.Linq;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using SCLauncher.backend.service;
-using SCLauncher.model.config;
+using SCLauncher.model.definition;
 using SCLauncher.ui.controls;
 
-namespace SCLauncher.ui.views.profiles;
+namespace SCLauncher.ui.views.profiles.crud;
 
 public partial class CreateProfileDialog : BaseDialogWindow
 {
@@ -15,14 +16,25 @@ public partial class CreateProfileDialog : BaseDialogWindow
 	{
 		InitializeComponent();
 		profilesService = App.GetService<ProfilesService>();
+		
 		CancelButton.Click += OnCancelClick;
 		CreateButton.Click += OnCreateClick;
-		AppTypeComboBox.ItemsSource = Enum.GetValues<AppType>().Select(e => e.GetDescription());
+		
+		AppTypeComboBox.ItemsSource = Enum.GetValues<AppType>();
+		AppTypeComboBox.SelectionChanged += OnAppTypeChanged;
 		
 		Activated += delegate
 		{
-			ProfileNameTextBox.Focus();
+			AppTypeComboBox.Focus();
 		};
+	}
+
+	private void OnAppTypeChanged(object? sender, SelectionChangedEventArgs e)
+	{
+		// Populate presets
+		AppType appType = (AppType)AppTypeComboBox.SelectedItem!;
+		AppPresetComboBox.ItemsSource = AppDefinitions.Get(appType).AvailablePresets;
+		AppPresetComboBox.SelectedIndex = 0;
 	}
 
 	private void OnCancelClick(object? sender, RoutedEventArgs e)
@@ -30,10 +42,11 @@ public partial class CreateProfileDialog : BaseDialogWindow
 		Close(null);
 	}
 
-	private void OnCreateClick(object? sender, RoutedEventArgs e)
+	private void OnCreateClick(object? sender, RoutedEventArgs args)
 	{
 		string? name = ProfileNameTextBox.Text?.Trim();
-		AppType appType = (AppType)AppTypeComboBox.SelectedIndex;
+		AppType appType = (AppType)AppTypeComboBox.SelectedItem!;
+		AppPreset appPreset = (AppPreset)AppPresetComboBox.SelectedItem!;
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
@@ -49,12 +62,13 @@ public partial class CreateProfileDialog : BaseDialogWindow
 
 		try
 		{
-			var newProfile = profilesService.CreateProfile(appType, name);
+			var newProfile = profilesService.CreateProfile(appType, appPreset, name);
 			Close(newProfile);
 		}
-		catch (Exception ex)
+		catch (Exception e)
 		{
-			ShowError($"Failed to create profile: {ex.Message}");
+			ShowError($"Failed to create profile: {e.Message}");
+			e.Log();
 		}
 	}
 

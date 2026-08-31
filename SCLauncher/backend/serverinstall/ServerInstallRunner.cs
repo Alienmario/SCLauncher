@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using SCLauncher.backend.install;
 using SCLauncher.model;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
@@ -16,54 +17,67 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 	internal async IAsyncEnumerable<StatusMessage> Installer(ServerInstallParams installParams,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
-		yield return new StatusMessage("Installation started");
+		yield return new StatusMessage($"Installation started{Environment.NewLine}");
 		
 		ServerInstallContext ctx = new ServerInstallContext(installParams);
-		
-		// ensure server info is always available in the context
-		if (!ctx.Params.Components.Contains(ServerInstallComponent.Server))
+
+		try
 		{
-			var serverInstaller = installers.First(installer => installer.Component == ServerInstallComponent.Server);
-			ctx.ComponentInfos[ServerInstallComponent.Server] = await serverInstaller.GatherInfoAsync(ctx, false, ct);
+			foreach (var component in ctx.Params.Components.OrderBy(component => component.InstallOrder))
+			{
+				async Task GatherInfoRecursive(ServerInstallComponent c)
+				{
+					foreach (var dependency in c.Dependencies)
+					{
+						await GatherInfoRecursive(dependency);
+					}
+					if (!ctx.ComponentInfos.ContainsKey(c))
+					{
+						ct.ThrowIfCancellationRequested();
+						ctx.ComponentInfos[c] = await installers.Single(i => i.Component == c)
+							.GatherInfoAsync(ctx, false, ct);
+					}
+				}
+
+				await GatherInfoRecursive(component);
+
+				if (!ctx.ComponentInfos[component].Installable)
+				{
+					yield return new StatusMessage($"Component <{component}> is not installable, skipping");
+					continue;
+				}
+
+				ct.ThrowIfCancellationRequested();
+
+				yield return new StatusMessage($"Installing component <{component}>");
+
+				var installer = installers.Single(i => i.Component == component);
+				await foreach (var message in installer.Install(ctx, ct))
+				{
+					yield return message;
+				}
+
+				ct.ThrowIfCancellationRequested();
+
+				ctx.ComponentInfos[component] = await installer.GatherInfoAsync(ctx, false, ct);
+				if (!ctx.ComponentInfos[component].Installed)
+				{
+					yield return new StatusMessage($"Failed to validate component installation <{component}>",
+						MessageStatus.Error);
+					throw new InstallException();
+				}
+
+				yield return new StatusMessage($"Component <{component}> installed{Environment.NewLine}");
+			}
 		}
-
-		foreach (var component in ctx.Params.Components.OrderBy(component => component.InstallOrder))
+		finally
 		{
-			var installer = installers.FirstOrDefault(i => i.Component == component);
-			if (installer == null)
+			// Save install path in the profile - even when install fails
+			try
 			{
-				yield return new StatusMessage($"Component <{component}> has no corresponding installer!", MessageStatus.Error);
-				continue;
+				ctx.Params.Profile.ServerPath = ctx.InstallPath;
 			}
-
-			ct.ThrowIfCancellationRequested();
-
-			ctx.ComponentInfos[component] = await installer.GatherInfoAsync(ctx, false, ct);
-			if (!ctx.ComponentInfos[component].Installable)
-			{
-				yield return new StatusMessage($"Component <{component}> is not installable, skipping");
-				continue;
-			}
-			
-			ct.ThrowIfCancellationRequested();
-			
-			yield return new StatusMessage($"Installing component <{component}>");
-			await foreach (var message in installer.Install(ctx, ct))
-			{
-				yield return message;
-			}
-
-			ct.ThrowIfCancellationRequested();
-			
-			ctx.ComponentInfos[component] = await installer.GatherInfoAsync(ctx, false, ct);
-			if (!ctx.ComponentInfos[component].Installed)
-			{
-				yield return new StatusMessage($"Failed to validate component installation <{component}>",
-					MessageStatus.Error);
-				throw new InstallException();
-			}
-			
-			yield return new StatusMessage($"Component <{component}> installed");
+			catch (UnsetInstallPathException) {}
 		}
 
 		yield return new StatusMessage("Installation finished successfully", MessageStatus.Success);

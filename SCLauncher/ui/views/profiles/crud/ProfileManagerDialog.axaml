@@ -5,8 +5,9 @@
                            xmlns:converters="clr-namespace:SCLauncher.ui.converters"
                            xmlns:profiles="clr-namespace:SCLauncher.ui.views.profiles"
                            xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+                           xmlns:crud="clr-namespace:SCLauncher.ui.views.profiles.crud"
                            mc:Ignorable="d"
-                           x:Class="SCLauncher.ui.views.profiles.ProfileManager"
+                           x:Class="SCLauncher.ui.views.profiles.crud.ProfileManagerDialog"
                            Title="Profile Manager"
                            Width="600" Height="450"
                            CanResize="False"
@@ -20,7 +21,7 @@
 			        CornerRadius="4">
 				<ListBox Name="ProfilesListBox" DoubleTapped="OnDoubleTapped">
 					<ListBox.ItemTemplate>
-						<DataTemplate DataType="profiles:ProfileManagerEntry">
+						<DataTemplate DataType="crud:ProfileManagerEntry">
 							<Grid ColumnDefinitions="*,Auto" Margin="8">
 								<StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
 									<TextBlock Text="{Binding Profile.Name}" FontWeight="SemiBold"

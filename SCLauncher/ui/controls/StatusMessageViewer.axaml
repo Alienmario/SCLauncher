@@ -77,7 +77,7 @@
 			<ItemsControl ItemsSource="{Binding}">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<StackPanel Spacing="2"/>
+						<VirtualizingStackPanel/>
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 			</ItemsControl>
@@ -102,13 +102,27 @@
 				           FontFamily="Consolas, Courier New, monospace"/>
 
 				<SelectableTextBlock
-					Foreground="{Binding Status, Converter={x:Static converters:MessageStatusColorConverter.Instance}}"
+					Classes.status-w="{Binding Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static model:MessageStatus.Warning}}"
+					Classes.status-s="{Binding Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static model:MessageStatus.Success}}"
+					Classes.status-e="{Binding Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static model:MessageStatus.Error}}"
 					TextDecorations="{Binding Details, Converter={StaticResource DetailMessageDecorator}}"
 					Cursor="{Binding Details, Converter={x:Static converters:SetCursorIfNotNullConverter.Hand}}"
 					TextWrapping="Wrap"
 					FontFamily="Consolas, Courier New, monospace"
 					Tapped="Message_PointerTapped"
 					Text="{Binding Text}">
+					
+					<SelectableTextBlock.Styles>
+						<Style Selector="SelectableTextBlock.status-w">
+							<Setter Property="Foreground" Value="Orange"/>
+						</Style>
+						<Style Selector="SelectableTextBlock.status-s">
+							<Setter Property="Foreground" Value="GreenYellow"/>
+						</Style>
+						<Style Selector="SelectableTextBlock.status-e">
+							<Setter Property="Foreground" Value="Red"/>
+						</Style>
+					</SelectableTextBlock.Styles>
 
 					<FlyoutBase.AttachedFlyout>
 						<Flyout Placement="TopEdgeAlignedLeft" ShowMode="TransientWithDismissOnPointerMoveAway"

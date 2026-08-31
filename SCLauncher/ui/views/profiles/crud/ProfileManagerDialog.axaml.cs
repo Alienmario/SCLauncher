@@ -7,7 +7,7 @@ using SCLauncher.backend.service;
 using SCLauncher.model.config;
 using SCLauncher.ui.controls;
 
-namespace SCLauncher.ui.views.profiles;
+namespace SCLauncher.ui.views.profiles.crud;
 
 internal record ProfileManagerEntry(AppProfile Profile, bool IsActive)
 {
@@ -22,11 +22,11 @@ internal record ProfileManagerEntry(AppProfile Profile, bool IsActive)
 	}
 }
 
-public partial class ProfileManager : BaseDialogWindow
+public partial class ProfileManagerDialog : BaseDialogWindow
 {
 	private readonly ProfilesService profilesService;
 
-	public ProfileManager()
+	public ProfileManagerDialog()
 	{
 		InitializeComponent();
 		profilesService = App.GetService<ProfilesService>();

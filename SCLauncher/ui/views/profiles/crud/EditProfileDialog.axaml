@@ -3,8 +3,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+        xmlns:config="clr-namespace:SCLauncher.model.config"
+        xmlns:converters="clr-namespace:SCLauncher.ui.converters"
         mc:Ignorable="d"
-        x:Class="SCLauncher.ui.views.profiles.EditProfileDialog"
+        x:Class="SCLauncher.ui.views.profiles.crud.EditProfileDialog"
+        x:DataType="config:AppProfile"
         Title="Edit Profile"
         Width="500" Height="600">
 
@@ -14,7 +17,10 @@
 
 			<StackPanel Spacing="15" Orientation="Horizontal" Margin="0,0,0,10">
 				<TextBlock Text="Type:" VerticalAlignment="Center"/>
-				<Label Name="AppTypeLabel" IsEnabled="False"/>
+				<Label Name="AppTypeLabel" IsEnabled="False" VerticalAlignment="Center"/>
+				<ComboBox Name="AppPresetComboBox" VerticalAlignment="Center"
+				          BorderBrush="Transparent" Background="Transparent"
+				          DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance}}"/>
 			</StackPanel>
 
 			<StackPanel Spacing="5">

@@ -1,9 +1,9 @@
 using Avalonia.Controls;
-using SCLauncher.ui.controls;
+using SCLauncher.ui.controls.wizard;
 
 namespace SCLauncher.ui.views.serverinstall;
 
-public partial class UninstallOverview : UserControl, WizardNavigator.IWizardContent
+public partial class UninstallOverview : UserControl, IWizardPage
 {
 	
 	public UninstallOverview()
@@ -18,7 +18,7 @@ public partial class UninstallOverview : UserControl, WizardNavigator.IWizardCon
 
 	public void OnNextPageRequest(WizardNavigator wizard)
 	{
-		wizard.SetContent(new UninstallConsole());
+		wizard.SetPageContent(new UninstallConsole());
 	}
 
 }

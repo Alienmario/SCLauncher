@@ -6,13 +6,13 @@ using SCLauncher.backend.service;
 using SCLauncher.model;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
-using SCLauncher.ui.controls;
+using SCLauncher.ui.controls.wizard;
 
 namespace SCLauncher.ui.views.serverinstall;
 
-public partial class UninstallConsole : UserControl, WizardNavigator.IWizardContent
+public partial class UninstallConsole : UserControl, IWizardPage
 {
-	private bool postDetach;
+	private bool _postDetach;
 	
 	public UninstallConsole()
 	{
@@ -27,7 +27,7 @@ public partial class UninstallConsole : UserControl, WizardNavigator.IWizardCont
 
 	public void OnDetachedFromWizard(WizardNavigator wizard, bool stacked)
 	{
-		postDetach = true;
+		_postDetach = true;
 	}
 
 	private async void RunInstaller(WizardNavigator wizard)
@@ -36,11 +36,12 @@ public partial class UninstallConsole : UserControl, WizardNavigator.IWizardCont
 		{
 			var cancellation = new CancellationTokenSource();
 			EventHandler cancelOnExitHandler = (sender, args) => cancellation.Cancel();
-			wizard.OnExit += cancelOnExitHandler;
+			wizard.Exit += cancelOnExitHandler;
 			
 			try
 			{
-				wizard.ShowProgressBar = true;
+				CancellableNavBar navbar = (CancellableNavBar)wizard.NavBar!;
+				navbar.ShowProgressBar = true;
 				
 				var installService = App.GetService<ServerInstallService>();
 				await foreach (var msg in installService.GetUninstaller(data).WithCancellation(cancellation.Token))
@@ -58,17 +59,19 @@ public partial class UninstallConsole : UserControl, WizardNavigator.IWizardCont
 				}
 				else if (e is not OperationCanceledException)
 				{
+					e.Log();
 					AppendMessage(new StatusMessage(
 						"Application error occured (let a dev know!)\nStack trace:\n" + e, MessageStatus.Error));
 				}
 			}
 			finally
 			{
-				wizard.OnExit -= cancelOnExitHandler;
-				if (!postDetach)
+				wizard.Exit -= cancelOnExitHandler;
+				if (!_postDetach)
 				{
-					wizard.Completed = true;
-					wizard.ShowProgressBar = false;
+					CancellableNavBar navbar = (CancellableNavBar)wizard.NavBar!;
+					navbar.ShowProgressBar = false;
+					navbar.Completed = true;
 				}
 			}
 		}

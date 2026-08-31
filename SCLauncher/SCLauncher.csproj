@@ -24,6 +24,7 @@
 			<IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
 			<PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
 		</PackageReference>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="Svg.Controls.Skia.Avalonia" Version="12.0.0.15" />
 		<PackageReference Include="Optris.LoadingIndicators.Avalonia" Version="12.0.4" />
 		<PackageReference Include="DepotDownloaderSubProcess" Version="3.4.0" />

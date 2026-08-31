@@ -1,0 +1,57 @@
+<controls:BaseDialogWindow xmlns="https://github.com/avaloniaui"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+                           xmlns:converters="clr-namespace:SCLauncher.ui.converters"
+                           xmlns:config="clr-namespace:SCLauncher.model.config"
+                           mc:Ignorable="d"
+                           x:Class="SCLauncher.ui.views.profiles.crud.CreateProfileDialog"
+                           x:DataType="config:AppProfile"
+                           Title="Create New Profile"
+                           SizeToContent="Height" Height="NaN"
+                           WindowStartupLocation="CenterOwner"
+                           CanResize="False">
+
+	<controls:BaseDialogWindow.MainContent>
+		<StackPanel Margin="20" Spacing="15">
+			<TextBlock Text="Create New Profile" FontSize="18" FontWeight="Bold"/>
+
+			<!-- App Type -->
+			<StackPanel Spacing="5">
+				<TextBlock Text="Type"/>
+				<ComboBox Name="AppTypeComboBox" PlaceholderText="Select a game"
+				          DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance}}"/>
+			</StackPanel>
+
+			<!-- App Preset -->
+			<StackPanel Spacing="5">
+				<TextBlock Text="Preset"/>
+				<ComboBox Name="AppPresetComboBox"
+				          DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance}}"
+				          IsEnabled="{Binding #AppTypeComboBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+			</StackPanel>
+
+			<!-- Name -->
+			<StackPanel Spacing="5">
+				<TextBlock Text="Name"/>
+				<TextBox Name="ProfileNameTextBox"
+				         IsEnabled="{Binding #AppTypeComboBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+				         Text="{Binding #AppTypeComboBox.Text, Mode=OneWay}"/>
+			</StackPanel>
+		</StackPanel>
+	</controls:BaseDialogWindow.MainContent>
+
+	<controls:BaseDialogWindow.FooterContent>
+		<DockPanel Margin="20" HorizontalSpacing="15">
+			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+				<Button Name="CancelButton" Content="Cancel" Classes="action" HotKey="Escape"/>
+				<Button Name="CreateButton" Content="Create" Classes="action accent" HotKey="Enter"
+				        IsEnabled="{Binding #AppTypeComboBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+			</StackPanel>
+
+			<TextBlock DockPanel.Dock="Left" Name="ErrorMessage" Foreground="Red" TextWrapping="Wrap" IsVisible="False"/>
+		</DockPanel>
+	</controls:BaseDialogWindow.FooterContent>
+
+</controls:BaseDialogWindow>

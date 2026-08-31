@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SCLauncher.backend.util;
 using SCLauncher.model.config;
+using SCLauncher.model.definition;
 
 namespace SCLauncher.backend.service;
 
@@ -40,9 +41,9 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 		UpdateProfilePaths(profiles);
 	}
 
-	public AppProfile CreateProfile(AppType appType, string name)
+	public AppProfile CreateProfile(AppType type, AppPreset preset, string name)
 	{
-		AppProfile profile = AppProfile.Create(appType);
+		AppProfile profile = AppProfile.Create(type, preset);
 		profile.Name = name;
 		UpdateProfilePaths([profile]);
 
@@ -108,7 +109,7 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 	private void UpdateProfilePaths(IEnumerable<AppProfile> profilesToUpdate)
 	{
 		string? steamPath = globalConfig.SteamPath;
-		if (!SteamUtils.IsValidSteamInstallDir(steamPath))
+		if (!SteamUtils.IsValidSteamInstallPath(steamPath))
 			return;
 
 		Task.Run(async () =>
