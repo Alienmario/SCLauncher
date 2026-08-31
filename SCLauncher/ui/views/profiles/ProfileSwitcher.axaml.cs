@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.model.config;
+using SCLauncher.ui.views.profiles.crud;
 
 namespace SCLauncher.ui.views.profiles;
 
@@ -70,12 +71,12 @@ public partial class ProfileSwitcher : UserControl
 		}
 	}
 
-	private async void OpenProfileManager()
+	private static async void OpenProfileManager()
 	{
 		try
 		{
 			var mainWindow = App.GetService<MainWindow>();
-			var profileManager = new ProfileManager();
+			var profileManager = new ProfileManagerDialog();
 			await profileManager.ShowDialog(mainWindow);
 		}
 		catch (Exception e)

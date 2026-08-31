@@ -6,13 +6,13 @@ namespace SCLauncher.model.serverinstall;
 
 public partial class ServerInstallParams : INotifyPropertyChanged
 {
-	/// App definition
+	/// Current app context
 	public required AppProfile Profile { get; init; }
 
-	/// Steam, External
+	/// Steam, Standalone
 	public ServerInstallMethod? Method { get; set; }
 
-	/// Only used with external method
+	/// Only used with standalone method
 	public string? Path { get; set; }
 
 	/// Create a subfolder under Path using AppInfo?

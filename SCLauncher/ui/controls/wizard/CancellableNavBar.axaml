@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:SCLauncher.ui.converters"
+             xmlns:wizard="clr-namespace:SCLauncher.ui.controls.wizard"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="100"
+             x:Class="SCLauncher.ui.controls.wizard.CancellableNavBar"
+             x:Name="root">
+	
+	<Button Command="{Binding $parent[wizard:WizardNavigator].CancelClicked}"
+	        HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+	        VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
+	        CornerRadius="0" Padding="-0.5">
+		<Panel>
+			<ProgressBar IsIndeterminate="True"
+			             IsVisible="{Binding #root.ShowProgressBar}"
+			             CornerRadius="0" Background="Transparent" Opacity="0.75"
+			             VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+			<Label VerticalAlignment="Center" HorizontalAlignment="Center"
+			       Content="{Binding #root.Completed, Converter={x:Static converters:BoolToStringConverter.Instance},
+							ConverterParameter='Close|Cancel'}"/>
+		</Panel>
+	</Button>
+	
+</UserControl>

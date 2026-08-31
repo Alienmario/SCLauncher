@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SCLauncher.model.config;
+using SCLauncher.model.definition;
 using SCLauncher.model.serverbrowser;
 using SCLauncher.model.serverinstall;
 
@@ -11,7 +12,7 @@ public class DServerInstallParams : ServerInstallParams
 	public DServerInstallParams()
 	{
 		Profile = DAppProfile.Instance;
-		Method = ServerInstallMethod.External;
+		Method = ServerInstallMethod.Standalone;
 		Path = @"C:\Program Files\Program Files\Program Files\Program Files\Program Files\Program Files\Server";
 	}
 }

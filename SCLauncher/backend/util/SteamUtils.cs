@@ -71,14 +71,14 @@ public static class SteamUtils
 	}
 	
 	// Credits to DasDarki/JBPPP2
-	public static async Task<SteamAppManifest?> FindAppManifestAsync(string steamDir, uint appId, CancellationToken ct = default)
+	public static async Task<SteamAppManifest?> FindAppManifestAsync(string steamPath, uint appId, CancellationToken ct = default)
 	{
-		if (string.IsNullOrEmpty(steamDir))
+		if (string.IsNullOrEmpty(steamPath))
 		{
 			return null;
 		}
 
-		var path = Path.Combine(steamDir, "steamapps", "libraryfolders.vdf");
+		var path = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
 
 		if (!File.Exists(path))
 		{
@@ -124,13 +124,13 @@ public static class SteamUtils
 		return null;
 	}
 
-	public static async Task<string?> FindAppPathAsync(string steamDir, uint appId, CancellationToken ct = default)
+	public static async Task<string?> FindAppPathAsync(string steamPath, uint appId, CancellationToken ct = default)
 	{
-		var manifest = await FindAppManifestAsync(steamDir, appId, ct);
+		var manifest = await FindAppManifestAsync(steamPath, appId, ct);
 		return manifest?.GetAbsInstallPath();
 	}
 
-	public static string? FindSteamInstallDir()
+	public static string? FindSteamInstallPath()
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
@@ -165,9 +165,13 @@ public static class SteamUtils
 		return null;
 	}
 
-	public static bool IsValidSteamInstallDir(string? path)
+	public static bool IsValidSteamInstallPath(string? path)
 	{
 		return !string.IsNullOrWhiteSpace(path) && File.Exists(Path.Join(path, "steamapps", "libraryfolders.vdf"));
 	}
 
+	public static bool IsPathSteamApp(string? path, uint appId)
+	{
+		return File.Exists(Path.Join(path, $"../../appmanifest_{appId}.acf"));
+	}
 }

@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:SCLauncher.ui.converters"
+             xmlns:init="clr-namespace:SCLauncher.ui.views.profiles.init"
+             xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
+             mc:Ignorable="d" d:DesignWidth="525" d:DesignHeight="400"
+             x:Class="SCLauncher.ui.views.profiles.init.Page2"
+             x:DataType="{x:Type generic:IEnumerable, x:TypeArguments=init:Page2+Item}">
+	
+	<DockPanel VerticalSpacing="20" MaxHeight="400">
+		<TextBlock DockPanel.Dock="Top" FontSize="18" FontWeight="Bold"
+		           Text="Which presets do you prefer?"/>
+		
+		<ScrollViewer VerticalAlignment="Center" VerticalContentAlignment="Center">
+			<!-- Outer list (Items) -->
+			<ItemsControl ItemsSource="{Binding}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<WrapPanel LineSpacing="15" ItemSpacing="30" ItemsAlignment="Center"/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<StackPanel>
+							<TextBlock FontSize="16" FontWeight="Bold" TextAlignment="Center"
+							           Text="{Binding AppType, Converter={x:Static converters:EnumDescriptionConverter.Instance}}"/>
+							
+							<!-- Inner list (Presets) -->
+							<ListBox Background="Transparent" HorizontalAlignment="Center"
+							         ItemsSource="{Binding Presets}"
+							         SelectedItem="{Binding SelectedPreset}">
+								<ListBox.ItemsPanel>
+									<ItemsPanelTemplate>
+										<WrapPanel ItemSpacing="10" LineSpacing="10" Margin="10"/>
+									</ItemsPanelTemplate>
+								</ListBox.ItemsPanel>
+								<ListBox.Styles>
+									<Style Selector="ListBoxItem">
+										<Setter Property="CornerRadius" Value="50"/>
+										<Setter Property="FontSize" Value="12"/>
+										<Setter Property="BorderBrush" Value="{DynamicResource BackgroundPane2}"/>
+										<Setter Property="BorderThickness" Value="1"/>
+										<Setter Property="Padding" Value="10"/>
+									</Style>
+								</ListBox.Styles>
+							</ListBox>
+						</StackPanel>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+	</DockPanel>
+	
+</UserControl>

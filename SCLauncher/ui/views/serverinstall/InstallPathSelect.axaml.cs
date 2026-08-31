@@ -3,43 +3,29 @@ using System.IO;
 using Avalonia.Controls;
 using SCLauncher.backend.service;
 using SCLauncher.model.serverinstall;
-using SCLauncher.ui.controls;
+using SCLauncher.ui.controls.wizard;
 
 namespace SCLauncher.ui.views.serverinstall;
 
-public partial class InstallPathSelect : UserControl, WizardNavigator.IWizardContent
+public partial class InstallPathSelect : UserControl, IWizardPage
 {
+	private WizardNavigator? _wizard;
+
 	public InstallPathSelect()
 	{
 		InitializeComponent();
 		
-		DataContextChanged += (sender, args) =>
+		InstallPath.TextChanged += delegate
 		{
-			if (DataContext is ServerInstallParams p && string.IsNullOrWhiteSpace(p.Path))
-			{
-				var profilesService = App.GetService<ProfilesService>();
-				var configPath = profilesService.ActiveProfile.ServerPath;
-				if (!string.IsNullOrWhiteSpace(configPath))
-				{
-					p.Path = configPath;
-					p.CreateSubfolder = false;
-				}
-			}
+			if (_wizard?.PageContent == this)
+				_wizard.SetControls(forward: IsValid());
 		};
 	}
 
 	public void OnAttachedToWizard(WizardNavigator wizard, bool unstacked)
 	{
+		_wizard = wizard;
 		wizard.SetControls(forward: IsValid(), back: true);
-		
-		if (unstacked)
-			return;
-
-		InstallPath.TextChanged += (sender, args) =>
-		{
-			if (wizard.GetContent() == this)
-				wizard.SetControls(forward: IsValid());
-		};
 	}
 
 	private bool IsValid()
@@ -61,7 +47,7 @@ public partial class InstallPathSelect : UserControl, WizardNavigator.IWizardCon
 
 	public void OnNextPageRequest(WizardNavigator wizard)
 	{
-		wizard.SetContent(new InstallOverview());
+		wizard.SetPageContent(new InstallOverview());
 	}
 
 }

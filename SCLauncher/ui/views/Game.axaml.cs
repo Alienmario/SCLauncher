@@ -52,7 +52,7 @@ public partial class Game : UserControl
     
     private void OnConfiguratorResetClicked(object? sender, RoutedEventArgs args)
     {
-        DataContext = profilesService.ActiveProfile.NewClientConfig();
+        DataContext = profilesService.ActiveProfile.ResetClientConfig();
         ResetConfigButton?.Flyout?.Hide();
     }
 

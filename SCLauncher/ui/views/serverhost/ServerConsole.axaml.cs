@@ -13,11 +13,10 @@ using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.backend.util;
 using SCLauncher.model;
-using SCLauncher.ui.controls;
-
+using SCLauncher.ui.controls.wizard;
 namespace SCLauncher.ui.views.serverhost;
 
-public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
+public partial class ServerConsole : UserControl, IWizardPage
 {
 	private readonly ServerControlService svController;
 	private readonly ClientControlService clController;
@@ -74,7 +73,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	{
 		if (string.IsNullOrWhiteSpace(text))
 		{
-			ConsoleViewer.AddMessage(new StatusMessage(string.Empty), jumpScroll: true);
+			ConsoleViewer.AddMessage(new StatusMessage(string.Empty), true);
 		}
 		else if (text.Equals("clear", StringComparison.OrdinalIgnoreCase))
 		{
@@ -206,7 +205,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		
 		if (App.GetService<MainWindow>().HostServerTab.Content is HostServer hs)
 		{
-			hs.GoToServerInstallWizard();
+			hs.StartInstallWizard();
 		}
 	}
 
@@ -220,7 +219,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 		
 		if (App.GetService<MainWindow>().HostServerTab.Content is HostServer hs)
 		{
-			hs.GoToServerUninstallWizard();
+			hs.StartUninstallWizard();
 		}
 	}
 

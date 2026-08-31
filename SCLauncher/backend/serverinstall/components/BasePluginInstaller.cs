@@ -123,8 +123,9 @@ public class BasePluginInstaller(InstallHelper helper) : IServerComponentInstall
 		return helper.GithubClient.Repository.Release.GetLatest(GithubOwner, GithubRepo);
 	}
 
-	private static (string url, string filename) GetDownload(ServerInstallContext ctx, Release release)
+	protected virtual (string url, string filename) GetDownload(ServerInstallContext ctx, Release release)
 	{
+		// ToDo: Support supplying regex patterns in subclasses
 		foreach (ReleaseAsset asset in release.Assets)
 		{
 			if (asset.Name.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase)

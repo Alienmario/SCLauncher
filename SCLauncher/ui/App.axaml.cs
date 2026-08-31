@@ -18,7 +18,7 @@ using SCLauncher.backend.util;
 using SCLauncher.model.config;
 using SCLauncher.ui.controls;
 using SCLauncher.ui.views;
-using SCLauncher.ui.views.profiles;
+using SCLauncher.ui.views.profiles.init;
 using Application = Avalonia.Application;
 using Notification = Avalonia.Controls.Notifications.Notification;
 
@@ -71,9 +71,9 @@ public partial class App : Application
 
 			// Cache the MainWindow's notification manager
 			GetNotificationManager(mainWindow);
-
-#if !DEBUG
+			
 			var config = GetService<GlobalConfiguration>();
+#if !DEBUG
 			if (config.CheckForUpdates) CheckForUpdates();
 			
 			config.PropertyChanged += (sender, args) =>

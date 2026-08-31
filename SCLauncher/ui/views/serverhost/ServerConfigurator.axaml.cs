@@ -27,7 +27,7 @@ public partial class ServerConfigurator : UserControl
 
 	public void ResetToDefaults()
 	{
-		DataContext = profilesService.ActiveProfile.NewServerConfig();
+		DataContext = profilesService.ActiveProfile.ResetServerConfig();
 	}
 	
 }

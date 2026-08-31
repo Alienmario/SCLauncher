@@ -64,8 +64,14 @@
 		
 	</Styles.Resources>
 	
+	<!-- full width notification -->
 	<Style Selector="NotificationCard">
 		<Setter Property="Width" Value="NaN"/>
+	</Style>
+	
+	<!-- this makes ComboBox popups left align when popup width > collapsed width -->
+	<Style Selector="ComboBox /template/ Popup#PART_Popup">
+		<Setter Property="Placement" Value="BottomEdgeAlignedLeft"/>
 	</Style>
 	
 	<!-- Utility classes -->

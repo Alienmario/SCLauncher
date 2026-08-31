@@ -5,9 +5,11 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using SCLauncher.backend.service;
 using SCLauncher.model.config;
+using SCLauncher.model.definition;
 using SCLauncher.ui.controls;
+using SCLauncher.ui.design;
 
-namespace SCLauncher.ui.views.profiles;
+namespace SCLauncher.ui.views.profiles.crud;
 
 public partial class EditProfileDialog : BaseDialogWindow
 {
@@ -17,26 +19,29 @@ public partial class EditProfileDialog : BaseDialogWindow
 	{
 		InitializeComponent();
 		profilesService = App.GetService<ProfilesService>();
-
-		DataContextChanged += (sender, args) =>
+		
+		CancelButton.Click += OnCancelClick;
+		SaveButton.Click += OnSaveClick;
+		
+		DataContextChanged += delegate
 		{
 			if (DataContext is AppProfile profile)
 			{
 				LoadProfile(profile);
 			}
 		};
+		
 		if (Design.IsDesignMode)
 		{
-			DataContext = AppProfile.Create(AppType.BlackMesaCOOP);
+			DataContext = DAppProfile.Instance;
 		}
-
-		CancelButton.Click += OnCancelClick;
-		SaveButton.Click += OnSaveClick;
 	}
 
 	private void LoadProfile(AppProfile profile)
 	{
 		AppTypeLabel.Content = profile.AppType.GetDescription();
+		AppPresetComboBox.ItemsSource = AppDefinitions.Get(profile.AppType).AvailablePresets;
+		AppPresetComboBox.SelectedItem = profile.AppPreset;
 		ProfileNameTextBox.Text = profile.Name;
 		GameAppIdTextBox.Text = profile.GameAppId.ToString();
 		ServerAppIdTextBox.Text = profile.ServerAppId.ToString();
@@ -48,7 +53,7 @@ public partial class EditProfileDialog : BaseDialogWindow
 			.TryGetValue(PlatformID.Win32NT, out var winExe) ? winExe : string.Empty;
 		GameExecutableLinuxTextBox.Text = profile.GameExecutable
 			.TryGetValue(PlatformID.Unix, out var linuxExe) ? linuxExe : string.Empty;
-
+		
 		// GamePathTextBox.Text = profile.GamePath ?? string.Empty;
 		// ServerPathTextBox.Text = profile.ServerPath ?? string.Empty;
 	}
@@ -111,6 +116,7 @@ public partial class EditProfileDialog : BaseDialogWindow
 
 		try
 		{
+			profile.AppPreset = (AppPreset)AppPresetComboBox.SelectedItem!;
 			profile.Name = name;
 			profile.GameAppId = gameAppId;
 			profile.ServerAppId = serverAppId;
@@ -134,12 +140,12 @@ public partial class EditProfileDialog : BaseDialogWindow
 		}
 	}
 	
-	private void OnCancelClick(object? sender, RoutedEventArgs e)
+	private void OnCancelClick(object? sender, RoutedEventArgs args)
 	{
 		Close(null);
 	}
 
-	private void OnSaveClick(object? sender, RoutedEventArgs e)
+	private void OnSaveClick(object? sender, RoutedEventArgs args)
 	{
 		if (DataContext is AppProfile profile)
 		{
