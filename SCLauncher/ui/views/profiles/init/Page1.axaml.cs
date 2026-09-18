@@ -26,7 +26,6 @@ public partial class Page1 : UserControl, IWizardPage
 	public void OnAttachedToWizard(WizardNavigator wizard, bool unstacked)
 	{
 		_wizard = wizard;
-		(wizard.NavBar as TextNavBar)?.Text = "1 / 2";
 		UpdateWizardControls();
 	}
 

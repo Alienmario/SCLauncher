@@ -172,6 +172,7 @@ public static class SteamUtils
 
 	public static bool IsPathSteamApp(string? path, uint appId)
 	{
-		return File.Exists(Path.Join(path, $"../../appmanifest_{appId}.acf"));
+		return !string.IsNullOrWhiteSpace(path)
+		       && File.Exists(Path.Join(path, $"../../appmanifest_{appId}.acf"));
 	}
 }

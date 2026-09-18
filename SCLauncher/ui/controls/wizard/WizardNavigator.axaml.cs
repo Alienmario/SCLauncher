@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -80,6 +81,11 @@ public partial class WizardNavigator : UserControl
 	public void SetPageContent(object? content, bool stackOldPage = true)
 	{
 		SetPageContent(content, stackOldPage, false);
+	}
+
+	public IObservable<object?> GetPageContentObservable()
+	{
+		return ContentControl.GetObservable(ContentProperty);
 	}
 
 	public void FastForward(params object[] pages)
@@ -163,14 +169,14 @@ public partial class WizardNavigator : UserControl
 	{
 		if (args.InitialPressMouseButton == MouseButton.XButton1)
 		{
-			if (_allowBack)
+			if (BackButton.IsEnabled)
 			{
 				BackClicked(sender, args);
 			}
 		}
 		else if (args.InitialPressMouseButton == MouseButton.XButton2)
 		{
-			if (_allowForward && !ForwardButtonRunsAction)
+			if (ForwardButton.IsEnabled && !ForwardButtonRunsAction)
 			{
 				ForwardClicked(sender, args);
 			}

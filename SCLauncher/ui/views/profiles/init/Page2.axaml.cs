@@ -42,7 +42,6 @@ public partial class Page2 : UserControl, IWizardPage
 
 	public void OnAttachedToWizard(WizardNavigator wizard, bool unstacked)
 	{
-		(wizard.NavBar as TextNavBar)?.Text = "2 / 2";
 		wizard.ForwardButtonRunsAction = true;
 	}
 

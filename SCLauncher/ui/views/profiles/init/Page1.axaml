@@ -4,12 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:converters="clr-namespace:SCLauncher.ui.converters"
              xmlns:definition="clr-namespace:SCLauncher.model.definition"
+             xmlns:wizard="clr-namespace:SCLauncher.ui.controls.wizard"
              mc:Ignorable="d" d:DesignWidth="525" d:DesignHeight="450"
-             x:Class="SCLauncher.ui.views.profiles.init.Page1">
+             x:Class="SCLauncher.ui.views.profiles.init.Page1"
+             wizard:TextNavBar.Text="Add some games, then click next ->">
 	
-	<StackPanel Spacing="15">
-		<TextBlock Text="Which game profiles would you like to start with?" FontSize="18" FontWeight="Bold"/>
-
+	<StackPanel>
 		<ListBox Name="ProfileListBox" SelectionMode="Multiple,Toggle" Background="Transparent"
 		         x:DataType="definition:AppType"
 		         DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance}}">

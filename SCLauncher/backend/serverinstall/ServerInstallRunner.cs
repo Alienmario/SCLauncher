@@ -49,7 +49,7 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 				
 				if (!ctx.ComponentInfos[component].Installable)
 				{
-					yield return new StatusMessage($"Component <{component}> is not installable, skipping");
+					yield return new StatusMessage($"Component \"{component}\" is not installable, skipping");
 					continue;
 				}
 				
@@ -64,9 +64,7 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 				ctx.ComponentInfos[component] = await installer.GatherInfoAsync(ctx, false, ct);
 				if (!ctx.ComponentInfos[component].Installed)
 				{
-					yield return new StatusMessage($"Failed to validate component installation <{component}>",
-						MessageStatus.Error);
-					throw new InstallException();
+					throw new InstallException($"Failed to validate component installation: {component}");
 				}
 
 				yield return new StatusMessage($"{component} installed{Environment.NewLine}");
@@ -91,7 +89,7 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 	{
 		ServerUninstallContext ctx = new ServerUninstallContext(uninstallParams);
 		
-		yield return new ProgressUpdate { Text = "Uninstallation started", NumSteps = installers.Count() + 1 };
+		yield return new ProgressUpdate { Text = "Uninstallation started", NumSteps = installers.Count() + 2 };
 		yield return new StatusMessage($"Uninstaller started{Environment.NewLine}");
 		int step = 1;
 
@@ -123,16 +121,19 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 
 		if (!Directory.Exists(ctx.Params.Path))
 		{
-			throw new InstallException("Server directory is not valid");
+			throw new InstallException("Server directory does not exist");
 		}
 		
 		yield return new StatusMessage("Deleting server directory");
+		yield return new ProgressUpdate { Text = "Deleting server directory", Step = step++ };
+		
 		try
 		{
 			Directory.Delete(ctx.Params.Path, true);
 		}
 		catch (Exception e)
 		{
+			e.Log();
 			throw new InstallException("Unable to delete the server directory", e);
 		}
 

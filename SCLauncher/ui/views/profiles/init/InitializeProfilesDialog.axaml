@@ -13,7 +13,7 @@
         CanResize="False"
         ShowInTaskbar="True">
 
-		<wizard:WizardNavigator Name="Wizard" Margin="20" Exit="OnWizardExit">
+		<wizard:WizardNavigator Name="Wizard" Margin="10 20 10 10" Exit="OnWizardExit">
 			<wizard:WizardNavigator.NavBar>
 				<wizard:TextNavBar/>
 			</wizard:WizardNavigator.NavBar>
