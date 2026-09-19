@@ -24,20 +24,6 @@
 		<Style Selector="Window[ActualTransparencyLevel=Mica], Window[ActualTransparencyLevel=AcrylicBlur]">
 			<Setter Property="Background" Value="Transparent"/>
 		</Style>
-		
-		<Style Selector="TabItem">
-			<Style Selector="^ PathIcon#SettingsCog">
-				<Setter Property="RenderTransform" Value="rotate(0)"/>
-				<Setter Property="Transitions">
-					<Transitions>
-						<TransformOperationsTransition Property="RenderTransform" Duration="0:0:1" Easing="CubicEaseOut"/>
-					</Transitions>
-				</Setter>
-			</Style>
-			<Style Selector="^:pointerover PathIcon#SettingsCog">
-				<Setter Property="RenderTransform" Value="rotate(120deg)"/>
-			</Style>
-		</Style>
 	</Window.Styles>
 	
 	<Panel>
@@ -71,9 +57,16 @@
 
 			<controls:UpdateNotification DockPanel.Dock="Bottom" Opacity="0.9"/>
 
-			<!-- Padding: ads extra space above content, preserves side spacing -->
-			<!-- Margin: corrects the header position with titlebar -->
-			<TabControl DockPanel.Dock="Top" Name="Tabs" Margin="0 -5 0 0" Padding="10 15 10 10" ClipToBounds="False">
+			<!-- Padding: adds extra space above inner content, preserves side spacing -->
+			<TabControl DockPanel.Dock="Top" Name="Tabs" Padding="10 15 10 10" ClipToBounds="False">
+				<TabControl.ItemContainerTheme>
+					<ControlTheme TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
+						<Setter Property="VerticalAlignment" Value="Center"/>
+						<!-- Sets the clickable height along with active tab pipe position -->
+						<Setter Property="MinHeight" Value="43"/>
+						<Setter Property="MaxHeight" Value="43"/>
+					</ControlTheme>
+				</TabControl.ItemContainerTheme>
 				
 				<TabControl.ItemsPanel>
 					<ItemsPanelTemplate>
@@ -100,10 +93,21 @@
 				
 				<TabItem Name="SettingsTab" HorizontalAlignment="Right">
 					<TabItem.Header>
-						<Panel Classes="TabItemHeader">
-							<PathIcon Name="SettingsCog" Data="{StaticResource settings_regular}"/>
-						</Panel>
+						<PathIcon Name="SettingsCog" Data="{StaticResource settings_regular}"/>
 					</TabItem.Header>
+					<TabItem.Styles>
+						<Style Selector="TabItem PathIcon#SettingsCog">
+							<Setter Property="RenderTransform" Value="rotate(0)"/>
+							<Setter Property="Transitions">
+								<Transitions>
+									<TransformOperationsTransition Property="RenderTransform" Duration="0:0:1" Easing="CubicEaseOut"/>
+								</Transitions>
+							</Setter>
+						</Style>
+						<Style Selector="TabItem:pointerover PathIcon#SettingsCog">
+							<Setter Property="RenderTransform" Value="rotate(120deg)"/>
+						</Style>
+					</TabItem.Styles>
 					<views:Settings/>
 				</TabItem>
 				
