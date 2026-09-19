@@ -12,19 +12,22 @@
         Width="500" Height="600">
 
 	<controls:BaseDialogWindow.MainContent>
-		<StackPanel Margin="20" Spacing="10">
+		<StackPanel Margin="20" Spacing="10" HorizontalAlignment="Stretch">
 			<TextBlock Text="Edit Profile" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+			
+			<StackPanel Spacing="5" HorizontalAlignment="Stretch">
+				<TextBlock Text="Type and preset"/>
+				
+				<UniformGrid ColumnSpacing="10" Rows="1">
+					<TextBox Name="ProfileTypeTextBox" VerticalAlignment="Center" IsEnabled="False"/>
 
-			<StackPanel Spacing="15" Orientation="Horizontal" Margin="0,0,0,10">
-				<TextBlock Text="Type:" VerticalAlignment="Center"/>
-				<Label Name="AppTypeLabel" IsEnabled="False" VerticalAlignment="Center"/>
-				<ComboBox Name="AppPresetComboBox" VerticalAlignment="Center"
-				          BorderBrush="Transparent" Background="Transparent"
-				          DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance}}"/>
+					<ComboBox Name="AppPresetComboBox" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+					          DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance}}"/>
+				</UniformGrid>
 			</StackPanel>
-
+			
 			<StackPanel Spacing="5">
-				<TextBlock Text="Profile Name"/>
+				<TextBlock Text="Name"/>
 				<TextBox Name="ProfileNameTextBox" PlaceholderText="Enter profile name"/>
 			</StackPanel>
 

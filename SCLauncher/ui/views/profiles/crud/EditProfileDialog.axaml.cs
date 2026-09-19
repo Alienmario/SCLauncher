@@ -39,7 +39,7 @@ public partial class EditProfileDialog : BaseDialogWindow
 
 	private void LoadProfile(AppProfile profile)
 	{
-		AppTypeLabel.Content = profile.AppType.GetDescription();
+		ProfileTypeTextBox.Text = profile.AppType.GetDescription();
 		AppPresetComboBox.ItemsSource = AppDefinitions.Get(profile.AppType).AvailablePresets;
 		AppPresetComboBox.SelectedItem = profile.AppPreset;
 		ProfileNameTextBox.Text = profile.Name;

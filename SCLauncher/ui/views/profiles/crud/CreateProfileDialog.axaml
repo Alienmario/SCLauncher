@@ -20,14 +20,14 @@
 			<!-- App Type -->
 			<StackPanel Spacing="5">
 				<TextBlock Text="Type"/>
-				<ComboBox Name="AppTypeComboBox" PlaceholderText="Select a game"
+				<ComboBox Name="AppTypeComboBox" PlaceholderText="Select a game" HorizontalAlignment="Stretch"
 				          DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance}}"/>
 			</StackPanel>
 
 			<!-- App Preset -->
 			<StackPanel Spacing="5">
 				<TextBlock Text="Preset"/>
-				<ComboBox Name="AppPresetComboBox"
+				<ComboBox Name="AppPresetComboBox" HorizontalAlignment="Stretch"
 				          DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance}}"
 				          IsEnabled="{Binding #AppTypeComboBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"/>
 			</StackPanel>
