@@ -31,6 +31,7 @@
 					</Style>
 				</StackPanel.Styles>
 				
+				<!-- Launcher settings -->
 				<GroupBox>
 					<GroupBox.Header>
 						<TextBlock Text="Launcher settings" Classes="SectionHeader"/>
@@ -54,9 +55,16 @@
 								</HyperlinkButton>
 							</TextBox.InnerRightContent>
 						</TextBox>
+						
+						<Label Content="Local data" Margin="0 10 0 0"/>
+						<StackPanel Orientation="Horizontal" Spacing="5">
+							<Button Content="Browse" Click="OnBrowseLocalDataClicked"/>
+							<Button Classes="danger" Content="Erase all" Click="OnEraseAllDataClicked"/>
+						</StackPanel>
 					</StackPanel>
 				</GroupBox>
 
+				<!-- Active profile settings -->
 				<GroupBox>
 					<GroupBox.Header>
 						<TextBlock Text="Active profile settings" Classes="SectionHeader"/>
@@ -71,6 +79,7 @@
 						                          Text="{Binding ServerPath}"/>
 					</StackPanel>
 				</GroupBox>
+				
 			</StackPanel>
 		</ScrollViewer>
 	</DockPanel>
