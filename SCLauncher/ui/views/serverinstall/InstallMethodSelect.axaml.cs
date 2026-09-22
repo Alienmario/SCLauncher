@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using SCLauncher.model.serverinstall;
-using SCLauncher.ui.controls;
 using SCLauncher.ui.controls.wizard;
 
 namespace SCLauncher.ui.views.serverinstall;

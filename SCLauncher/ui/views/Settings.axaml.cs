@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using SCLauncher.backend.service;
 using SCLauncher.model.config;
+using SCLauncher.ui.views.settings;
 
 namespace SCLauncher.ui.views;
 

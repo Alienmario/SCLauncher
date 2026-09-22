@@ -1,7 +1,7 @@
 using Avalonia.Interactivity;
 using SCLauncher.ui.controls;
 
-namespace SCLauncher.ui.views;
+namespace SCLauncher.ui.views.settings;
 
 public partial class EraseDataDialog : BaseDialogWindow
 {

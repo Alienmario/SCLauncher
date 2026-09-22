@@ -1,8 +1,6 @@
 using System;
 using System.IO;
 using Avalonia.Controls;
-using SCLauncher.backend.service;
-using SCLauncher.model.serverinstall;
 using SCLauncher.ui.controls.wizard;
 
 namespace SCLauncher.ui.views.serverinstall;

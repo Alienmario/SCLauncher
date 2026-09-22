@@ -1,10 +1,12 @@
-using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Octokit;
+using SCLauncher.ui.views;
 
 namespace SCLauncher.ui.controls;
 
@@ -12,24 +14,26 @@ public partial class UpdateNotification : UserControl
 {
 
 	private const int MsDelay = 15_000;
-	private CancellationTokenSource? _dismissCts;
-
-	public string? Url { get; set; }
-
+	
 	public bool IsOpen => TransformControl.Classes.Contains("show");
 
+	private IEnumerable<Release>? _releases;
+
+	private CancellationTokenSource? _dismissCts;
+	
 	public UpdateNotification()
 	{
 		InitializeComponent();
 		
 		if (Design.IsDesignMode)
 		{
-			Show();
+			Show([]);
 		}
 	}
 
-	public void Show()
+	public void Show(IEnumerable<Release> releases)
 	{
+		_releases = releases;
 		CancelDismissTimer();
 		
 		TransformControl.Classes.Add("show");
@@ -62,11 +66,7 @@ public partial class UpdateNotification : UserControl
 
 	private void OnClick(object? sender, RoutedEventArgs e)
 	{
-		if (Url != null)
-		{
-			TopLevel.GetTopLevel(this)!.Launcher.LaunchUriAsync(new Uri(Url));
-		}
-
+		new UpdateOverlay(_releases!).Open(App.GetService<MainWindow>());
 		Dismiss();
 	}
 

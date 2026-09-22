@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:SCLauncher.ui.controls"
         mc:Ignorable="d"
-        x:Class="SCLauncher.ui.views.EraseDataDialog"
+        x:Class="SCLauncher.ui.views.settings.EraseDataDialog"
         Title="Erase Local Data"
         CanResize="False">
 

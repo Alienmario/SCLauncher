@@ -55,7 +55,7 @@
 				<profiles:ProfileSwitcher WindowDecorationProperties.ElementRole="User" VerticalAlignment="Top"/>
 			</DockPanel>
 
-			<controls:UpdateNotification DockPanel.Dock="Bottom" Opacity="0.9"/>
+			<controls:UpdateNotification DockPanel.Dock="Bottom" Name="UpdateNotification" Opacity="0.9"/>
 
 			<!-- Padding: adds extra space above inner content, preserves side spacing -->
 			<TabControl DockPanel.Dock="Top" Name="Tabs" Padding="10 15 10 10" ClipToBounds="False">
