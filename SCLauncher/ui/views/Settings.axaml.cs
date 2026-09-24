@@ -51,7 +51,7 @@ public partial class Settings : UserControl
 	private async void OnEraseAllDataClicked(object? sender, RoutedEventArgs args)
 	{
 		var confirmDialog = new EraseDataDialog();
-		if (await confirmDialog.ShowDialog<bool>(App.GetService<MainWindow>()))
+		if (await confirmDialog.ShowDialog<bool>(App.MainWindow))
 		{
 			try
 			{

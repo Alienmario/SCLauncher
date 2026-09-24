@@ -6,7 +6,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Octokit;
-using SCLauncher.ui.views;
 
 namespace SCLauncher.ui.controls;
 
@@ -66,7 +65,7 @@ public partial class UpdateNotification : UserControl
 
 	private void OnClick(object? sender, RoutedEventArgs e)
 	{
-		new UpdateOverlay(_releases!).Open(App.GetService<MainWindow>());
+		new UpdateOverlay(_releases!).Open(App.MainWindow);
 		Dismiss();
 	}
 

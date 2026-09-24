@@ -78,7 +78,7 @@ public partial class HostServer : UserControl
 
 	private void OnLocateServerClicked(object? sender, RoutedEventArgs e)
 	{
-		var mainWindow = App.GetService<MainWindow>();
+		var mainWindow = App.MainWindow;
 		mainWindow.GoToSettings();
 		Settings settings = (mainWindow.SettingsTab.Content as Settings)!;
 		settings.ServerPath.SelectAll();

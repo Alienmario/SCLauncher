@@ -14,6 +14,7 @@ using SCLauncher.backend.service;
 using SCLauncher.backend.util;
 using SCLauncher.model;
 using SCLauncher.ui.controls.wizard;
+
 namespace SCLauncher.ui.views.serverhost;
 
 public partial class ServerConsole : UserControl, IWizardPage
@@ -203,7 +204,7 @@ public partial class ServerConsole : UserControl, IWizardPage
 			return;
 		}
 		
-		if (App.GetService<MainWindow>().HostServerTab.Content is HostServer hs)
+		if (App.MainWindow.HostServerTab.Content is HostServer hs)
 		{
 			hs.StartInstallWizard();
 		}
@@ -217,7 +218,7 @@ public partial class ServerConsole : UserControl, IWizardPage
 			return;
 		}
 		
-		if (App.GetService<MainWindow>().HostServerTab.Content is HostServer hs)
+		if (App.MainWindow.HostServerTab.Content is HostServer hs)
 		{
 			hs.StartUninstallWizard();
 		}

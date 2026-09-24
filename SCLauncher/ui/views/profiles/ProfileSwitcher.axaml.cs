@@ -75,9 +75,8 @@ public partial class ProfileSwitcher : UserControl
 	{
 		try
 		{
-			var mainWindow = App.GetService<MainWindow>();
 			var profileManager = new ProfileManagerDialog();
-			await profileManager.ShowDialog(mainWindow);
+			await profileManager.ShowDialog(App.MainWindow);
 		}
 		catch (Exception e)
 		{

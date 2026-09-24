@@ -268,7 +268,7 @@ public partial class JoinServer : UserControl
 				if (server.Password != false)
 				{
 					var passwordDialog = new ServerPasswordDialog(server.Password == true);
-					if (null == (pw = await passwordDialog.ShowDialog<string?>(App.GetService<MainWindow>())))
+					if (null == (pw = await passwordDialog.ShowDialog<string?>(App.MainWindow)))
 					{
 						return; // window closed
 					}
@@ -335,7 +335,7 @@ public partial class JoinServer : UserControl
 					{
 						DataContext = newServer
 					};
-					detailsDialog.Show(App.GetService<MainWindow>());
+					detailsDialog.Show(App.MainWindow);
 				}
 				else App.ShowFailure($"Unable to retrieve details for {server.Name}");
 			}
@@ -396,7 +396,7 @@ public partial class JoinServer : UserControl
 
 	private void OnGenerateKeyClicked(object? sender, RoutedEventArgs e)
 	{
-		var mainWindow = App.GetService<MainWindow>();
+		var mainWindow = App.MainWindow;
 		mainWindow.GoToSettings();
 		Settings settings = (mainWindow.SettingsTab.Content as Settings)!;
 		mainWindow.Launcher.LaunchUriAsync(settings.SteamApiKeyLink.NavigateUri!);
