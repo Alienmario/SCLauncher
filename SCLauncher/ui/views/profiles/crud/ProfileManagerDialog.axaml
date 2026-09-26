@@ -38,7 +38,7 @@
 								</StackPanel>
 								
 								<!-- Activation button -->
-								<Button Grid.Column="1" FontSize="14" IsEnabled="{Binding !IsActive}"
+								<Button Grid.Column="1" FontSize="12" IsEnabled="{Binding !IsActive}"
 								        Classes="accent" ClipToBounds="False" BorderThickness="10" Width="100"
 								        HorizontalContentAlignment="Center"
 								        Content="{Binding IsActive, Converter={x:Static converters:BoolToStringConverter.Instance},
@@ -60,10 +60,26 @@
 
 	<controls:BaseDialogWindow.FooterContent>
 		<DockPanel Margin="20" HorizontalSpacing="10">
-			<Button Name="AddButton" Content="New" Classes="action" HotKey="N"/>
-			<Button Name="EditButton" Content="Edit" IsEnabled="False" Classes="action" HotKey="E"/>
-			<Button Name="DeleteButton" Content="Delete" IsEnabled="False" Classes="action" HotKey="Delete"/>
-			<Button Name="CloseButton" Content="Close" Classes="action" HotKey="Escape" HorizontalAlignment="Right"/>
+			<Button Name="AddButton" Classes="action" HotKey="N">
+				<StackPanel Spacing="6">
+					<PathIcon Data="{StaticResource add_regular}" Width="16"/>
+					<TextBlock Text="New" FontSize="10"/>
+				</StackPanel>
+			</Button>
+			<Button Name="EditButton" IsEnabled="False" Classes="action" HotKey="E">
+				<StackPanel Spacing="6">
+					<PathIcon Data="{StaticResource settings_regular}" Width="16"/>
+					<TextBlock Text="Edit" FontSize="10"/>
+				</StackPanel>
+			</Button>
+			<Button Name="DeleteButton" IsEnabled="False" Classes="action" HotKey="Delete">
+				<StackPanel Spacing="6">
+					<PathIcon Data="{StaticResource delete_regular}" Width="16"/>
+					<TextBlock Text="Delete" FontSize="10"/>
+				</StackPanel>
+			</Button>
+			<Button Name="CloseButton" Content="Close" Classes="action" HotKey="Escape"
+			        HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
 		</DockPanel>
 	</controls:BaseDialogWindow.FooterContent>
 
