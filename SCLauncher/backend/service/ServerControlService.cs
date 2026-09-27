@@ -1,12 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using SCLauncher.backend.serverinstall.components;
-using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.service;
 
@@ -16,14 +13,12 @@ public class ServerControlService
 	public event DataReceivedEventHandler? ErrorReceived;
 	public event EventHandler<bool>? StateChanged;
 
-	private readonly ProfilesService profilesService;
-	private readonly ServerInstallService installService;
-	private Process? serverProcess;
+	private readonly ProfilesService _profilesService;
+	private Process? _serverProcess;
 
-	public ServerControlService(ProfilesService profilesService, ServerInstallService installService)
+	public ServerControlService(ProfilesService profilesService)
 	{
-		this.profilesService = profilesService;
-		this.installService = installService;
+		_profilesService = profilesService;
 
 		AppDomain.CurrentDomain.ProcessExit += (sender, args) => Stop();
 	}
@@ -34,7 +29,7 @@ public class ServerControlService
 		{
 			try
 			{
-				return serverProcess != null && !serverProcess.HasExited;
+				return _serverProcess != null && !_serverProcess.HasExited;
 			}
 			catch (Exception)
 			{
@@ -45,7 +40,7 @@ public class ServerControlService
 
 	public bool Start()
 	{
-		if (profilesService.ActiveProfile.ServerPath == null)
+		if (_profilesService.ActiveProfile.ServerPath == null)
 			return false;
 		if (IsRunning)
 			return false;
@@ -53,7 +48,7 @@ public class ServerControlService
 		string executable;
 		try
 		{
-			executable = Path.Join(profilesService.ActiveProfile.ServerPath, SrcdsFixInstaller.GetExecForCurrentPlatform());
+			executable = Path.Join(_profilesService.ActiveProfile.ServerPath, SrcdsFixInstaller.GetExecForCurrentPlatform());
 		}
 		catch (PlatformNotSupportedException e)
 		{
@@ -71,7 +66,7 @@ public class ServerControlService
 		
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 		{
-			string srcdsLinux = Path.Join(profilesService.ActiveProfile.ServerPath, "srcds_linux");
+			string srcdsLinux = Path.Join(_profilesService.ActiveProfile.ServerPath, "srcds_linux");
 			try
 			{
 				File.SetUnixFileMode(executable, File.GetUnixFileMode(executable) | UnixFileMode.UserExecute);
@@ -86,13 +81,13 @@ public class ServerControlService
 		
 		try
 		{
-			serverProcess = new Process
+			_serverProcess = new Process
 			{
 				EnableRaisingEvents = true,
 				StartInfo = new ProcessStartInfo
 				{
 					FileName = executable,
-					WorkingDirectory = profilesService.ActiveProfile.ServerPath,
+					WorkingDirectory = _profilesService.ActiveProfile.ServerPath,
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
@@ -101,27 +96,27 @@ public class ServerControlService
 				}
 			};
 
-			var args = serverProcess.StartInfo.ArgumentList;
-			var appInfo = profilesService.ActiveProfile;
+			var args = _serverProcess.StartInfo.ArgumentList;
+			var appInfo = _profilesService.ActiveProfile;
 			args.Add("-console");
 			args.Add("-nocrashdialog");
 			args.Add("-game");
 			args.Add(appInfo.ModFolder);
-			foreach (string arg in profilesService.ActiveProfile.ServerConfig.ToLaunchParams())
+			foreach (string arg in _profilesService.ActiveProfile.ServerConfig.ToLaunchParams())
 			{
 				args.Add(arg);
 			}
 			
-			serverProcess.OutputDataReceived += (s, e) => OutputReceived?.Invoke(s, e);
-			serverProcess.ErrorDataReceived += (s, e) => ErrorReceived?.Invoke(s, e);
-			serverProcess.Start();
+			_serverProcess.OutputDataReceived += (s, e) => OutputReceived?.Invoke(s, e);
+			_serverProcess.ErrorDataReceived += (s, e) => ErrorReceived?.Invoke(s, e);
+			_serverProcess.Start();
 			
 			if (IsRunning)
 			{
 				StateChanged?.Invoke(this, true);
-				serverProcess.Exited += (sender, _) => StateChanged?.Invoke(sender, false);
-				serverProcess.BeginOutputReadLine();
-				serverProcess.BeginErrorReadLine();
+				_serverProcess.Exited += (sender, _) => StateChanged?.Invoke(sender, false);
+				_serverProcess.BeginOutputReadLine();
+				_serverProcess.BeginErrorReadLine();
 				
 				return true;
 			}
@@ -137,12 +132,12 @@ public class ServerControlService
 
 	public void Stop()
 	{
-		if (serverProcess == null)
+		if (_serverProcess == null)
 			return;
 		
 		try
 		{
-			Process process = serverProcess;
+			Process process = _serverProcess;
 			try
 			{
 				process.Kill(true);
@@ -157,7 +152,7 @@ public class ServerControlService
 				process.WaitForExit();
 				process.Dispose();
 			});
-			serverProcess = null;
+			_serverProcess = null;
 		}
 		catch (Exception e)
 		{
@@ -169,31 +164,8 @@ public class ServerControlService
 	{
 		if (IsRunning)
 		{
-			serverProcess!.StandardInput.WriteLine(cmd);
+			_serverProcess!.StandardInput.WriteLine(cmd);
 		}
-	}
-
-	public async Task<ServerAvailability> GetAvailabilityAsync(CancellationToken ct = default)
-	{
-		if (string.IsNullOrWhiteSpace(profilesService.ActiveProfile.ServerPath))
-			return ServerAvailability.Unavailable;
-
-		var p = new ServerInstallParams
-		{
-			Profile = profilesService.ActiveProfile,
-			Method = ServerInstallMethod.External,
-			Path = profilesService.ActiveProfile.ServerPath,
-			CreateSubfolder = false
-		};
-		
-		var infos = await installService.GatherComponentInfosAsync(p, false, ct);
-		bool installIncomplete = infos.Any(info => info is { Value: { Installable: true, Installed: false }, Key.Optional: false });
-		bool installPartial = infos.Any(info => info is { Value : { Installable: true, Installed: true }, Key.Optional: false })
-		                      && installIncomplete;
-		
-		return installIncomplete
-			? installPartial ? ServerAvailability.PartiallyInstalled : ServerAvailability.Unavailable
-			: ServerAvailability.Available;
 	}
 
 }

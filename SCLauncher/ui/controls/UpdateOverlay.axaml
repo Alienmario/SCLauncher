@@ -1,0 +1,75 @@
+<Popup xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+        xmlns:mv="using:MarkView.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="SCLauncher.ui.controls.UpdateOverlay"
+        Placement="Custom">
+
+	<!-- Backdrop -->
+	<Panel Background="#CC000000" PointerPressed="OnBackdropPressed">
+		
+		<!-- Content card centered, sized via code-behind -->
+		<Border Name="ContentCard" Background="{StaticResource BackgroundPane3}"
+		        CornerRadius="8" BorderBrush="{StaticResource FlyoutBorderThemeBrush}" BorderThickness="1"
+		        HorizontalAlignment="Center" VerticalAlignment="Center"
+		        PointerPressed="OnCardPressed">
+			
+			<DockPanel>
+				
+				<!-- Header -->
+				<DockPanel DockPanel.Dock="Top" Margin="10 8 6 0">
+					<Button DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="8"
+					        Background="Transparent" Click="OnCloseClicked" VerticalAlignment="Top">
+						<PathIcon Data="{StaticResource dismiss_regular}" Height="12" Width="12"/>
+					</Button>
+					<TextBlock Text="Release notes" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+				</DockPanel>
+				
+				<Panel DockPanel.Dock="Bottom">
+					<!-- Footer: Update button -->
+					<Button Name="UpdateButton" Classes="accent" Margin="10 8 10 8"
+					        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+					        FontSize="16" FontWeight="Bold"
+					        Click="OnUpdateNowClicked">
+						<StackPanel Orientation="Horizontal" Spacing="8">
+							<PathIcon Name="UpdateButtonIcon" Data="{StaticResource arrow_download_regular}" Height="16" Width="16"/>
+							<TextBlock Name="StatusText" Text="Update now" VerticalAlignment="Center"/>
+						</StackPanel>
+					</Button>
+					
+					<WindowNotificationManager Name="NotificationManager" Position="BottomCenter"/>
+				</Panel>
+				
+				<!-- Separator -->
+				<Border DockPanel.Dock="Top" Height="1" Background="{StaticResource FlyoutBorderThemeBrush}" Margin="10 6 10 0"/>
+				
+				<!-- Release notes list -->
+				<ScrollViewer Classes="RightMargin" Margin="10 6 6 0"
+				              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+					<ItemsControl Name="ItemsControl">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate DataType="controls:UpdateOverlay+ReleaseViewModel">
+								<StackPanel Margin="0 2 0 6">
+									<Button Classes="Transparent" Cursor="Hand"
+									        Padding="0" BorderThickness="0"
+									        HorizontalAlignment="Left"
+									        Click="OnReleaseTitleClicked">
+										<TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold"
+										           Foreground="{StaticResource Highlight}"/>
+									</Button>
+									<mv:MarkdownViewer Markdown="{Binding Body}" Margin="0 3 0 0" FontSize="13"/>
+									<Border Height="1" Background="#33FFFFFF" Margin="0 6 0 0"/>
+								</StackPanel>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
+				
+			</DockPanel>
+			
+		</Border>
+	</Panel>
+</Popup>

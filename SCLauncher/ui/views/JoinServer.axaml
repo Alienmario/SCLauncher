@@ -62,9 +62,9 @@
         </Style>
     </UserControl.Styles>
     
-	<DockPanel Margin="0 10 0 0" VerticalSpacing="10">
+	<DockPanel VerticalSpacing="10">
         
-        <TextBox DockPanel.Dock="Top" Watermark="Filter / IP / Join link" Padding="15 10" CornerRadius="20"
+        <TextBox DockPanel.Dock="Top" PlaceholderText="Filter / IP / Join link" Padding="15 10" CornerRadius="20"
                  Name="FilterTextBox" TextChanged="OnFilterTextChanged">
             <TextBox.InnerRightContent>
                 <Button Name="RefreshButton" Click="OnRefreshClicked" Classes="Transparent Highlight" Focusable="False">
@@ -75,7 +75,7 @@
         </TextBox>
 
         <Button DockPanel.Dock="Bottom" Name="ApiKeyButton"
-                IsVisible="{Binding SteamWebApiKey, DataType=config:GlobalConfiguration, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                IsVisible="{Binding SteamWebApiKey, x:DataType=config:GlobalConfiguration, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                 Classes="accent" FontSize="16" FontWeight="Bold"
                 Content="Enable Server Browser">

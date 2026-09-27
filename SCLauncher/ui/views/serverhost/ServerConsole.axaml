@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:SCLauncher.ui.controls"
-             xmlns:li="clr-namespace:LoadingIndicators.Avalonia;assembly=LoadingIndicators.Avalonia"
+             xmlns:li="using:LoadingIndicators.Avalonia"
              xmlns:serverhost="clr-namespace:SCLauncher.ui.views.serverhost"
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="300"
              x:Class="SCLauncher.ui.views.serverhost.ServerConsole">
@@ -19,31 +19,6 @@
 				<Setter Property="Foreground" Value="DeepSkyBlue"/>
 				<Setter Property="SpeedRatio" Value="0.25"/>
 			</Style>
-		</Style>
-		
-		<Style Selector="Button#StartButton">
-			<Setter Property="Background">
-				<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-					<GradientStop Color="#A3006432" Offset="0.0"/>
-					<GradientStop Color="#A3004532" Offset="1.0"/>
-				</LinearGradientBrush>
-			</Setter>
-		</Style>
-		
-		<Style Selector="Button#StopButton">
-			<Setter Property="Background">
-				<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-					<GradientStop Color="#A38B0000" Offset="0.0"/>
-					<GradientStop Color="#A34E000B" Offset="1.0"/>
-				</LinearGradientBrush>
-			</Setter>
-		</Style>
-		
-		<Style Selector="Button#StopButton, Button#StartButton">
-			<Setter Property="Padding" Value="30 2"/>
-			<Setter Property="VerticalAlignment" Value="Center"/>
-			<Setter Property="HorizontalContentAlignment" Value="Center"/>
-			<Setter Property="CornerRadius" Value="10 0"/>
 		</Style>
 
 	</UserControl.Styles>
@@ -88,38 +63,113 @@
 		<DockPanel>
 			
 			<!-- Header - status/actions row -->
-			<Grid DockPanel.Dock="Top" Margin="0 0 5 0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+			<DockPanel DockPanel.Dock="Top" Margin="0 0 5 0" HorizontalSpacing="8">
+				
 				<!-- Aligned left -->
-				<Viewbox Stretch="UniformToFill" Height="25">
+				<Viewbox Stretch="UniformToFill" Height="25" Width="25">
 					<li:LoadingIndicator Name="StatusIndicator" Mode="DoubleBounce"/>
 				</Viewbox>
-				<TextBlock Grid.Column="1" Name="StatusIndicatorLabel" VerticalAlignment="Center"
-				           TextTrimming="{x:Static TextTrimming.CharacterEllipsis}"/>
-				<!-- Aligned right -->
-				<StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-					<Button Name="StartButton" Content="Start"/>
-					<Button Name="StopButton" Content="Stop"/>
-					<Button Margin="15 0 0 0" Background="Transparent">
-						<PathIcon Data="{StaticResource more_regular}" Height="10" Width="15"/>
-						<Button.Flyout>
-							<MenuFlyout Placement="BottomEdgeAlignedRight" VerticalOffset="3" HorizontalOffset="4">
-								<MenuItem Header="Join now" Click="OnMenuJoinClicked"/>
-								<MenuItem Header="Copy join link" Click="OnMenuCopyLinkClicked"/>
-								<MenuItem Header="Copy server IP" Click="OnMenuCopyIpClicked"/>
-								<MenuItem Header="-"/>
-								<MenuItem Header="Configure server" Click="OnMenuConfigureServerClicked"/>
-								<MenuItem Header="Browse server files" Click="OnMenuBrowseServerFolderClicked"/>
-								<MenuItem Header="Show time in console" ToggleType="CheckBox" StaysOpenOnClick="True"
-								          Click="OnMenuToggleTimeDisplayClicked"
-								          IsChecked="{Binding #ConsoleViewer.DisplayTime}"/>
-								<MenuItem Header="-"/>
-								<MenuItem Header="Install..." Click="OnMenuInstallClicked"/>
-								<MenuItem Header="Uninstall..." Click="OnMenuUninstallClicked"/>
-							</MenuFlyout>
-						</Button.Flyout>
-					</Button>
-				</StackPanel>
-			</Grid>
+				<TextBlock Name="StatusIndicatorLabel" VerticalAlignment="Center"
+				            TextTrimming="{x:Static TextTrimming.CharacterEllipsis}"/>
+				
+				<!-- Right aligned CommandBar -->
+				<CommandBar Background="Transparent" DefaultLabelPosition="Right" ItemWidthRight="70"
+				            IsDynamicOverflowEnabled="True" Name="CommandBar">
+					
+					<CommandBar.Resources>
+						<x:Double x:Key="CommandBarButtonMinHeight">0</x:Double>
+						<x:Double x:Key="CommandBarMinHeight">0</x:Double>
+					</CommandBar.Resources>
+					
+					<CommandBar.Styles>
+						<Style Selector="CommandBar[IsOpen=True] /template/ Popup">
+							<Style Selector="^> Border">
+								<Setter Property="Background" Value="{StaticResource BackgroundPane3}"/>
+							</Style>
+							<Setter Property="Placement" Value="BottomEdgeAlignedRight"/>
+							<Setter Property="HorizontalOffset" Value="7"/>
+							<Setter Property="VerticalOffset" Value="3"/>
+						</Style>
+						<Style Selector="CommandBar[IsVisible=True] /template/ ItemsControl#PART_PrimaryCommands">
+							<Setter Property="ItemsPanel">
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal" Spacing="-8"/>
+								</ItemsPanelTemplate>
+							</Setter>
+						</Style>
+						<Style Selector="CommandBarButton[IsInOverflow=False]">
+							<Setter Property="CornerRadius" Value="10 0"/>
+							<Setter Property="Margin" Value="5 0"/>
+							<Setter Property="MinWidth" Value="80"/>
+							<Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrush}"/>
+							<Setter Property="BorderThickness" Value="1 1 1 0"/>
+							<Setter Property="Background" Value="{StaticResource BackgroundPane2}"/>
+							<Setter Property="LetterSpacing" Value="0.5"/>
+							<Setter Property="FontSize" Value="14"/>
+						</Style>
+					</CommandBar.Styles>
+					
+					<CommandBar.PrimaryCommands>
+						
+						<CommandBarButton Name="StartButton" Label="Start" MinWidth="120">
+							<CommandBarButton.Icon>
+								<PathIcon Data="{StaticResource play_circle_regular}" Width="14" Margin="0 0 2 0"/>
+							</CommandBarButton.Icon>
+							<CommandBarButton.Background>
+								<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+									<GradientStop Color="#A300644C" Offset="0"/>
+									<GradientStop Color="#A3003F45" Offset="1"/>
+								</LinearGradientBrush>
+							</CommandBarButton.Background>
+						</CommandBarButton>
+						
+						<CommandBarButton Name="StopButton" Label="Stop" MinWidth="120">
+							<CommandBarButton.Icon>
+								<PathIcon Data="{StaticResource power_regular}" Width="14" Margin="0 0 2 0"/>
+							</CommandBarButton.Icon>
+							<CommandBarButton.Background>
+								<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+									<GradientStop Color="#A38B0000" Offset="0"/>
+									<GradientStop Color="#A34E000B" Offset="1"/>
+								</LinearGradientBrush>
+							</CommandBarButton.Background>
+						</CommandBarButton>
+						
+						<CommandBarButton Label="Connect" Click="OnMenuConnectClicked"
+						                  IsVisible="{Binding #StopButton.IsVisible}">
+							<CommandBarButton.Icon>
+								<PathIcon Data="{StaticResource window_play_regular}" Width="12" Margin="0 0 2 0"/>
+							</CommandBarButton.Icon>
+						</CommandBarButton>
+						
+						<CommandBarButton Label="Configure" Click="OnMenuConfigureServerClicked"
+						                  IsVisible="{Binding !#ConfiguratorSplitView.IsPaneOpen}">
+							<CommandBarButton.Icon>
+								<PathIcon Data="{StaticResource wrench_regular}" Width="12" Margin="0 0 2 0"/>
+							</CommandBarButton.Icon>
+						</CommandBarButton>
+					</CommandBar.PrimaryCommands>
+					
+					<CommandBar.SecondaryCommands>
+						<CommandBarButton Label="Copy join link" Click="OnMenuCopyLinkClicked"/>
+						<CommandBarButton Label="Copy server IP" Click="OnMenuCopyIpClicked"/>
+						<CommandBarSeparator/>
+						
+						<CommandBarButton Label="Browse server files" Click="OnMenuBrowseServerFolderClicked"/>
+						<CommandBarToggleButton Label="Show time in console" Background="Transparent"
+						                        IsChecked="{Binding #ConsoleViewer.DisplayTime}">
+							<CommandBarToggleButton.Icon>
+								<CheckBox IsChecked="{Binding $parent.IsChecked}" Margin="-2 0 0 0"
+								          ClipToBounds="False"/>
+							</CommandBarToggleButton.Icon>
+						</CommandBarToggleButton>
+						<CommandBarSeparator/>
+						
+						<CommandBarButton Label="Install..." Click="OnMenuInstallClicked"/>
+						<CommandBarButton Label="Uninstall..." Click="OnMenuUninstallClicked"/>
+					</CommandBar.SecondaryCommands>
+				</CommandBar>
+			</DockPanel>
 			
 			<!-- Footer - command input row -->
 			<Border DockPanel.Dock="Bottom" CornerRadius="5"

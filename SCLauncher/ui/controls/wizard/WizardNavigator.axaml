@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="100"
+             x:Class="SCLauncher.ui.controls.wizard.WizardNavigator">
+	<DockPanel>
+		
+		<DockPanel Margin="0 10 0 0" DockPanel.Dock="Bottom" Name="NavBarHost">
+			<Button Name="BackButton" DockPanel.Dock="Left" Margin="0 0 10 0">
+				<PathIcon Name="BackButtonIcon" Data="{StaticResource chevron_left_regular}"/>
+			</Button>
+			<Button Name="ForwardButton" DockPanel.Dock="Right" Margin="10 0 0 0">
+				<PathIcon Name="ForwardButtonIcon" Data="{StaticResource chevron_right_regular}"/>
+			</Button>
+			
+			<ContentControl Name="NavBarContentControl"/>
+		</DockPanel>
+		
+		<TransitioningContentControl Name="ContentControl">
+			<TransitioningContentControl.PageTransition>
+				<!-- FillMode="None" - workaround for invisible content bug in AV12 -->
+				<CrossFade Duration="0:00:00.150" FillMode="None"/>
+			</TransitioningContentControl.PageTransition>
+		</TransitioningContentControl>
+		
+	</DockPanel>
+</UserControl>

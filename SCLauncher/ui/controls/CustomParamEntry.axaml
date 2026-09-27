@@ -53,8 +53,10 @@
 		</Style>
 	</UserControl.Styles>
 	
-	<StackPanel>
-		<ItemsControl ItemsSource="{Binding .}">
+	<StackPanel Spacing="10">
+		
+		<!-- Parameter list -->
+		<ItemsControl ItemsSource="{Binding .}" IsVisible="{Binding Count}">
 			<ItemsControl.ItemsPanel>
 				<ItemsPanelTemplate>
 					<StackPanel Spacing="5"/>
@@ -64,23 +66,27 @@
 				<DataTemplate>
 					<Grid ColumnDefinitions="*,Auto,*">
 						<TextBox Text="{Binding Key}" Grid.Column="0" Classes="CustomParamKey"
-						         Watermark="Parameter"
+						         PlaceholderText="Parameter"
 						         LostFocus="OnParamTextLostFocus"/>
 						<Button Grid.Column="1" Classes="DeleteButton" VerticalAlignment="Center" Focusable="False"
 						        Click="DeleteParameterClicked"/>
 						<TextBox Text="{Binding Value}" Grid.Column="2" Classes="CustomParamVal"
-						         Watermark="Value"
+						         PlaceholderText="Value"
 						         LostFocus="OnParamTextLostFocus"/>
 					</Grid>
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
 		</ItemsControl>
 		
-		<ContentControl IsVisible="{Binding $parent[controls:CustomParamEntry].ShowHint}">
-			<TextBlock FontSize="12" HorizontalAlignment="Center"
-			           IsVisible="{Binding Count}"
-			           Margin="0 15 0 0"
-			           Foreground="{DynamicResource TextControlForegroundFocused}">
+		<!-- Hint -->
+		<ContentControl>
+			<ContentControl.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+					<Binding Path="!!Count"/>
+					<Binding Path="$parent[controls:CustomParamEntry].ShowHint"/>
+				</MultiBinding>
+			</ContentControl.IsVisible>
+			<TextBlock FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource TextControlForegroundFocused}">
 				<Run>Start with - (dash) for launch parameters</Run>
 				<LineBreak/>
 				<Run>Start with + (plus) for console commands</Run>
@@ -88,7 +94,8 @@
 		</ContentControl>
 		
 		<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-		        Margin="0 10 0 0" Padding="55 5" CornerRadius="20"
+		        Padding="55 5" CornerRadius="20"
 		        Content="Add new parameter" Click="AddNewParameterClicked" Name="AddParameterButton"/>
+		
 	</StackPanel>
 </UserControl>

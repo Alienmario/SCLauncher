@@ -11,7 +11,7 @@ public class ServerInstallContext
 	public ServerInstallContext(ServerInstallParams p)
 	{
 		Params = p;
-		if (p.Method == ServerInstallMethod.External)
+		if (p.Method == ServerInstallMethod.Standalone)
 		{
 			InstallPath =
 				p.CreateSubfolder

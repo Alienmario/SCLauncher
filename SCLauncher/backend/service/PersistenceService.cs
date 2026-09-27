@@ -9,18 +9,20 @@ namespace SCLauncher.backend.service;
 
 public class PersistenceService
 {
-	private readonly string dir;
+	private readonly string _dir;
 
-	private readonly Dictionary<string, (object Instance, JsonSerializerContext? Context)> persistedObjects = new();
+	private readonly Dictionary<string, (object Instance, JsonSerializerContext? Context)> _persistedObjects = new();
 
-	private readonly JsonSerializerOptions serializerOptions = new();
+	private readonly JsonSerializerOptions _serializerOptions = new();
 
-	public bool Available { get; }
+	public bool Available { get; private set; }
+
+	public string? DataDirectory => Available ? _dir : null;
 
 	public bool PrettyPrint
 	{
-		get => serializerOptions.WriteIndented;
-		set => serializerOptions.WriteIndented = value;
+		get => _serializerOptions.WriteIndented;
+		set => _serializerOptions.WriteIndented = value;
 	}
 	
 	public PersistenceService()
@@ -29,22 +31,22 @@ public class PersistenceService
 		
 		try
 		{
-			dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+			_dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 		}
 		catch (Exception e)
 		{
 			e.Log();
 		}
 		
-		if (string.IsNullOrWhiteSpace(dir))
+		if (string.IsNullOrWhiteSpace(_dir))
 		{
-			dir = ".";
+			_dir = ".";
 		}
 		
-		dir = Path.Join(dir, "SCLauncher");
+		_dir = Path.Join(_dir, "SCLauncher");
 		try
 		{
-			Directory.CreateDirectory(dir);
+			Directory.CreateDirectory(_dir);
 			Available = true;
 		}
 		catch (Exception e)
@@ -62,7 +64,7 @@ public class PersistenceService
 
 	public void Bind(string name, object instance, JsonSerializerContext? context = null, bool loadNow = true)
 	{
-	    persistedObjects[name] = (instance, context);
+	    _persistedObjects[name] = (instance, context);
 		if (loadNow)
 		{
 	        LoadAndMerge(name, instance, context);
@@ -71,12 +73,12 @@ public class PersistenceService
 	
 	public bool Forget(string name)
 	{
-		return persistedObjects.Remove(name);
+		return _persistedObjects.Remove(name);
 	}
 
 	public void SaveAll()
 	{
-		foreach (var (name, (instance, context)) in persistedObjects)
+		foreach (var (name, (instance, context)) in _persistedObjects)
 		{
 		    Save(name, instance, context);
 		}
@@ -84,7 +86,7 @@ public class PersistenceService
 	
 	public void LoadAll()
 	{
-		foreach (var (name, (instance, context)) in persistedObjects)
+		foreach (var (name, (instance, context)) in _persistedObjects)
 		{
 		    LoadAndMerge(name, instance, context);
 		}
@@ -95,12 +97,12 @@ public class PersistenceService
 		if (!Available)
 			return false;
 		
-		string json = JsonSerializer.Serialize(o, new JsonSerializerOptions(serializerOptions)
+		string json = JsonSerializer.Serialize(o, new JsonSerializerOptions(_serializerOptions)
 		{
 			TypeInfoResolver = context
 		});
 		
-		string path = Path.Join(dir, name + ".json");
+		string path = Path.Join(_dir, name + ".json");
 		try
 		{
 			File.WriteAllText(path, json);
@@ -142,11 +144,11 @@ public class PersistenceService
 		if (!Available)
 			return null;
 		
-		string path = Path.Join(dir, name + ".json");
+		string path = Path.Join(_dir, name + ".json");
 		try
 		{
 			string json = File.ReadAllText(path);
-			return JsonSerializer.Deserialize(json, type, new JsonSerializerOptions(serializerOptions)
+			return JsonSerializer.Deserialize(json, type, new JsonSerializerOptions(_serializerOptions)
 			{
 				TypeInfoResolver = context
 			});
@@ -172,6 +174,28 @@ public class PersistenceService
 				targetProp.SetValue(target, prop.GetValue(source));
 			}
 		}
+	}
+
+	/// <summary>
+	/// Deletes all files and subdirectories within the data persistence directory.
+	/// Marks persistence as unavailable.
+	/// </summary>
+	public void EraseAll()
+	{
+		if (!Available)
+			throw new Exception("Persistence unavailable");
+		
+		var dirInfo = new DirectoryInfo(_dir);
+		foreach (var file in dirInfo.GetFiles())
+		{
+			file.Delete();
+		}
+		foreach (var subDir in dirInfo.GetDirectories())
+		{
+			subDir.Delete(true);
+		}
+		
+		Available = false;
 	}
 	
 }

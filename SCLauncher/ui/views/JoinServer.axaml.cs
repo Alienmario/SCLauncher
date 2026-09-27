@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using SCLauncher.backend.service;
@@ -227,7 +228,7 @@ public partial class JoinServer : UserControl
 	protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs args)
 	{
 		base.OnDetachedFromVisualTree(args);
-		HotKeyManager.SetHotKey(RefreshButton, null!);
+		HotKeyManager.SetHotKey(RefreshButton, null);
 	}
 
 	private async void OnRefreshClicked(object? sender, RoutedEventArgs args)
@@ -267,7 +268,7 @@ public partial class JoinServer : UserControl
 				if (server.Password != false)
 				{
 					var passwordDialog = new ServerPasswordDialog(server.Password == true);
-					if (null == (pw = await passwordDialog.ShowDialog<string?>(App.GetService<MainWindow>())))
+					if (null == (pw = await passwordDialog.ShowDialog<string?>(App.MainWindow)))
 					{
 						return; // window closed
 					}
@@ -334,7 +335,7 @@ public partial class JoinServer : UserControl
 					{
 						DataContext = newServer
 					};
-					detailsDialog.Show(App.GetService<MainWindow>());
+					detailsDialog.Show(App.MainWindow);
 				}
 				else App.ShowFailure($"Unable to retrieve details for {server.Name}");
 			}
@@ -395,7 +396,7 @@ public partial class JoinServer : UserControl
 
 	private void OnGenerateKeyClicked(object? sender, RoutedEventArgs e)
 	{
-		var mainWindow = App.GetService<MainWindow>();
+		var mainWindow = App.MainWindow;
 		mainWindow.GoToSettings();
 		Settings settings = (mainWindow.SettingsTab.Content as Settings)!;
 		mainWindow.Launcher.LaunchUriAsync(settings.SteamApiKeyLink.NavigateUri!);

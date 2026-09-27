@@ -19,6 +19,7 @@
 		<StyleInclude Source="AppIcons.axaml"/>
 		<StyleInclude Source="AppStyle.axaml"/>
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+		<StyleInclude Source="avares://MarkView.Avalonia/Themes/MarkdownTheme.axaml"/>
 	</Application.Styles>
 
 </Application>

@@ -8,14 +8,6 @@
              x:Class="SCLauncher.ui.views.Game"
              x:DataType="config:ClientConfiguration">
 
-	<UserControl.Styles>
-		<Style Selector="TextBlock.SectionHeader">
-			<Setter Property="FontSize" Value="15"/>
-			<Setter Property="FontWeight" Value="Medium"/>
-			<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
-		</Style>
-	</UserControl.Styles>
-
 	<DockPanel VerticalSpacing="10">
 
 		<Button DockPanel.Dock="Bottom"
@@ -24,52 +16,67 @@
 		        Content="Launch game"
 		        Name="LaunchButton"
 		        Click="OnLaunchGameClicked"/>
-		
-		<ScrollViewer DockPanel.Dock="Bottom">
-			<StackPanel Margin="2 10" Spacing="10">
+
+		<ScrollViewer DockPanel.Dock="Bottom" Classes="RightMargin" HorizontalScrollBarVisibility="Disabled">
+			<StackPanel>
 				<StackPanel.Effect>
 					<DropShadowDirectionEffect BlurRadius="10" ShadowDepth="-5"/>
 				</StackPanel.Effect>
-				
-				<Border Background="{StaticResource BackgroundPane}" Padding="10" CornerRadius="5">
-					<DockPanel>
-						<TextBlock Text="Launch options" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
-						<Button Classes="Transparent Grow" Name="ResetConfigButton"
-						        HorizontalAlignment="Right" VerticalAlignment="Center">
-							<PathIcon Data="{StaticResource arrow_undo_regular}"
-							          Height="12" Width="12" Foreground="Firebrick"/>
-							<Button.Flyout>
-								<Flyout Placement="Left">
-									<StackPanel>
-										<Label>Reset all options?</Label>
-										<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Classes="danger"
-										        Name="ResetConfigConfirmButton" Content="Reset" Click="OnConfiguratorResetClicked"/>
-									</StackPanel>
-								</Flyout>
-							</Button.Flyout>
-						</Button>
-					</DockPanel>
+				<StackPanel.Styles>
+					<Style Selector="Label,CheckBox">
+						<Setter Property="VerticalAlignment" Value="Center"/>
+						<Setter Property="HorizontalAlignment" Value="Left"/>
+						<Setter Property="Margin" Value="0 10 0 0"/>
+					</Style>
+					<Style Selector="TextBlock.SectionHeader">
+						<Setter Property="Padding" Value="10 0 0 0"/>
+					</Style>
+					<Style Selector="Border.SectionContent">
+						<Setter Property="Background" Value="{DynamicResource BackgroundPane}"/>
+						<Setter Property="Margin" Value="0 0 0 10"/>
+						<Style Selector="^ > StackPanel">
+							<Setter Property="Margin" Value="10 0 10 10"/>
+						</Style>
+					</Style>
+				</StackPanel.Styles>
+
+				<DockPanel Margin="10 0 10 10">
+					<TextBlock Text="Launch options" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+					<Button Classes="Transparent Grow" Name="ResetConfigButton"
+					        HorizontalAlignment="Right" VerticalAlignment="Center">
+						<PathIcon Data="{StaticResource arrow_undo_regular}"
+						          Height="12" Width="12" Foreground="Firebrick"/>
+						<Button.Flyout>
+							<Flyout Placement="Left">
+								<StackPanel>
+									<TextBlock Text="Reset launch options?" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+									<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Classes="danger"
+									        Name="ResetConfigConfirmButton" Content="Reset" Click="OnConfiguratorResetClicked"/>
+								</StackPanel>
+							</Flyout>
+						</Button.Flyout>
+					</Button>
+				</DockPanel>
+
+				<!-- Common/engine -->
+				<TextBlock Text="Engine" Classes="SectionHeader"/>
+				<Border Classes="SectionContent">
+					<StackPanel>
+						<UniformGrid VerticalAlignment="Top" Columns="4" RowSpacing="5">
+							<CheckBox Content="Insecure (VAC off)" IsChecked="{Binding Insecure}"/>
+							<CheckBox Content="Developer mode" IsChecked="{Binding Dev}"/>
+							<CheckBox Content="Multiple instances" IsChecked="{Binding Multirun}"/>
+							<ComboBox Name="WindowModeCombo" SelectedIndex="{Binding WindowMode}" Margin="0 10 0 0"/>
+						</UniformGrid>
+					</StackPanel>
 				</Border>
 
-				<StackPanel Margin="5">
+				<!-- Game specific -->
+				<ContentControl Content="{Binding}"/>
 
-					<!-- Common -->
-					<TextBlock Text="Engine" Classes="SectionHeader"/>
-					<UniformGrid VerticalAlignment="Top" Columns="4" RowSpacing="5">
-						<CheckBox Content="Insecure (VAC off)" IsChecked="{Binding Insecure}"/>
-						<CheckBox Content="Developer mode" IsChecked="{Binding Dev}"/>
-						<CheckBox Content="Multiple instances" IsChecked="{Binding Multirun}"/>
-						<ComboBox Name="WindowModeCombo" SelectedIndex="{Binding WindowMode}"/>
-					</UniformGrid>
-
-					<!-- Game specific -->
-					<ContentControl Content="{Binding}"/>
-
-					<!-- Custom entry -->
-					<TextBlock Text="Custom Parameters" Classes="SectionHeader" Margin="0 10 0 5" FontSize="14"/>
-					<controls:CustomParamEntry DataContext="{Binding CustomParams}" ShowHint="False"
-					                           Margin="0 0 0 5"/>
-				</StackPanel>
+				<!-- Custom entry -->
+				<TextBlock Text="Custom" Classes="SectionHeader"/>
+				<controls:CustomParamEntry DataContext="{Binding CustomParams}" ShowHint="False" Margin="0 5 0 0"/>
 			</StackPanel>
 		</ScrollViewer>
 	</DockPanel>
@@ -77,15 +84,20 @@
 	<!-- Game specific templates -->
 	<UserControl.DataTemplates>
 
+		<!-- BlackMesa -->
 		<DataTemplate DataType="config:ClientConfigurationBlackMesa">
 			<StackPanel>
-				<TextBlock Text="Black Mesa" Classes="SectionHeader" Margin="0 10 0 0"/>
-				<UniformGrid VerticalAlignment="Top" Columns="4">
-					<CheckBox Content="Workshop" IsChecked="{Binding Workshop}"/>
-					<CheckBox Content="Force Direct3D 9" IsChecked="{Binding ForceUiD3D9}"/>
-					<CheckBox Content="DXVK" IsChecked="{Binding DXVK}"/>
-					<CheckBox Content="Old UI" IsChecked="{Binding OldUI}"/>
-				</UniformGrid>
+				<TextBlock Text="Black Mesa" Classes="SectionHeader"/>
+				<Border Classes="SectionContent">
+					<StackPanel>
+						<UniformGrid VerticalAlignment="Top" Columns="4">
+							<CheckBox Content="Workshop" IsChecked="{Binding Workshop}"/>
+							<CheckBox Content="Force Direct3D 9" IsChecked="{Binding ForceUiD3D9}"/>
+							<CheckBox Content="DXVK" IsChecked="{Binding DXVK}"/>
+							<CheckBox Content="Old UI" IsChecked="{Binding OldUI}"/>
+						</UniformGrid>
+					</StackPanel>
+				</Border>
 			</StackPanel>
 		</DataTemplate>
 

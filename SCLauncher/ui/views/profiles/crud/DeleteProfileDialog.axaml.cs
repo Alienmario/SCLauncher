@@ -3,7 +3,7 @@ using Avalonia.Interactivity;
 using SCLauncher.ui.controls;
 using SCLauncher.ui.design;
 
-namespace SCLauncher.ui.views.profiles;
+namespace SCLauncher.ui.views.profiles.crud;
 
 public partial class DeleteProfileDialog : BaseDialogWindow
 {

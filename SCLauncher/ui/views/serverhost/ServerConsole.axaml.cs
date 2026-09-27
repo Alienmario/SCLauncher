@@ -6,17 +6,18 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.backend.util;
 using SCLauncher.model;
-using SCLauncher.ui.controls;
+using SCLauncher.ui.controls.wizard;
 
 namespace SCLauncher.ui.views.serverhost;
 
-public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
+public partial class ServerConsole : UserControl, IWizardPage
 {
 	private readonly ServerControlService svController;
 	private readonly ClientControlService clController;
@@ -73,7 +74,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	{
 		if (string.IsNullOrWhiteSpace(text))
 		{
-			ConsoleViewer.AddMessage(new StatusMessage(string.Empty), jumpScroll: true);
+			ConsoleViewer.AddMessage(new StatusMessage(string.Empty), true);
 		}
 		else if (text.Equals("clear", StringComparison.OrdinalIgnoreCase))
 		{
@@ -88,16 +89,19 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 
 	private void OnStartServerClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		svController.Start();
 	}
 	
 	private void OnStopServerClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		svController.Stop();
 	}
 	
-	private void OnMenuJoinClicked(object? sender, RoutedEventArgs args)
+	private void OnMenuConnectClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		if (!svController.IsRunning)
 		{
 			App.ShowFailure("Server is not running.");
@@ -136,6 +140,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 
 	private async void OnMenuCopyLinkClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		try
 		{
 			if (analyzer.PublicIp == null || analyzer.ServerPort == null)
@@ -158,6 +163,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	
 	private async void OnMenuCopyIpClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		try
 		{
 			if (analyzer.PublicIp == null || analyzer.ServerPort == null)
@@ -178,6 +184,7 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 
 	private async void OnMenuBrowseServerFolderClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		try
 		{
 			if (profilesService.ActiveProfile.ServerPath == null)
@@ -197,39 +204,37 @@ public partial class ServerConsole : UserControl, WizardNavigator.IWizardContent
 	
 	private void OnMenuInstallClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		if (svController.IsRunning)
 		{
 			App.ShowFailure("Server has to be stopped first.");
 			return;
 		}
 		
-		if (App.GetService<MainWindow>().HostServerTab.Content is HostServer hs)
+		if (App.MainWindow.HostServerTab.Content is HostServer hs)
 		{
-			hs.GoToServerInstallWizard();
+			hs.StartInstallWizard();
 		}
 	}
 
 	private void OnMenuUninstallClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		if (svController.IsRunning)
 		{
 			App.ShowFailure("Server has to be stopped first.");
 			return;
 		}
 		
-		if (App.GetService<MainWindow>().HostServerTab.Content is HostServer hs)
+		if (App.MainWindow.HostServerTab.Content is HostServer hs)
 		{
-			hs.GoToServerUninstallWizard();
+			hs.StartUninstallWizard();
 		}
 	}
 
-	private void OnMenuToggleTimeDisplayClicked(object? sender, RoutedEventArgs args)
-	{
-		ConsoleViewer.DisplayTime = !ConsoleViewer.DisplayTime;
-	}
-	
 	private void OnMenuConfigureServerClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		ConfiguratorSplitView.IsPaneOpen = !ConfiguratorSplitView.IsPaneOpen;
 	}
 	

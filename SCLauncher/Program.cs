@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -12,9 +12,16 @@ namespace SCLauncher;
 static class Program
 {
 	// Avalonia configuration, don't remove; also used by visual designer.
+	#pragma warning disable AVALONIA_X11_CSD
 	public static AppBuilder BuildAvaloniaApp()
 		=> AppBuilder.Configure<App>()
 			.UsePlatformDetect()
+			.With(new X11PlatformOptions
+			{
+				// Let Avalonia draw the decorations, so windows opting in via
+				// ExtendClientAreaToDecorationsHint get a custom titlebar instead of the WM one.
+				EnableDrawnDecorations = true
+			})
 			.WithInterFont()
 			.LogToTrace();
 
