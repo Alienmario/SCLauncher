@@ -89,16 +89,19 @@ public partial class ServerConsole : UserControl, IWizardPage
 
 	private void OnStartServerClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		svController.Start();
 	}
 	
 	private void OnStopServerClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		svController.Stop();
 	}
 	
-	private void OnMenuJoinClicked(object? sender, RoutedEventArgs args)
+	private void OnMenuConnectClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		if (!svController.IsRunning)
 		{
 			App.ShowFailure("Server is not running.");
@@ -137,6 +140,7 @@ public partial class ServerConsole : UserControl, IWizardPage
 
 	private async void OnMenuCopyLinkClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		try
 		{
 			if (analyzer.PublicIp == null || analyzer.ServerPort == null)
@@ -159,6 +163,7 @@ public partial class ServerConsole : UserControl, IWizardPage
 	
 	private async void OnMenuCopyIpClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		try
 		{
 			if (analyzer.PublicIp == null || analyzer.ServerPort == null)
@@ -179,6 +184,7 @@ public partial class ServerConsole : UserControl, IWizardPage
 
 	private async void OnMenuBrowseServerFolderClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		try
 		{
 			if (profilesService.ActiveProfile.ServerPath == null)
@@ -198,6 +204,7 @@ public partial class ServerConsole : UserControl, IWizardPage
 	
 	private void OnMenuInstallClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		if (svController.IsRunning)
 		{
 			App.ShowFailure("Server has to be stopped first.");
@@ -212,6 +219,7 @@ public partial class ServerConsole : UserControl, IWizardPage
 
 	private void OnMenuUninstallClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		if (svController.IsRunning)
 		{
 			App.ShowFailure("Server has to be stopped first.");
@@ -224,13 +232,9 @@ public partial class ServerConsole : UserControl, IWizardPage
 		}
 	}
 
-	private void OnMenuToggleTimeDisplayClicked(object? sender, RoutedEventArgs args)
-	{
-		ConsoleViewer.DisplayTime = !ConsoleViewer.DisplayTime;
-	}
-	
 	private void OnMenuConfigureServerClicked(object? sender, RoutedEventArgs args)
 	{
+		CommandBar.IsOpen = false;
 		ConfiguratorSplitView.IsPaneOpen = !ConfiguratorSplitView.IsPaneOpen;
 	}
 	
