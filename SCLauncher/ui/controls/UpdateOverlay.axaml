@@ -9,7 +9,7 @@
         Placement="Custom">
 
 	<!-- Backdrop -->
-	<Panel Background="#CC000000" PointerPressed="OnBackdropPressed">
+	<Panel Background="{StaticResource BackdropColor}" PointerPressed="OnBackdropPressed">
 		
 		<!-- Content card centered, sized via code-behind -->
 		<Border Name="ContentCard" Background="{StaticResource BackgroundPane3}"

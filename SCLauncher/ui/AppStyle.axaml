@@ -22,12 +22,13 @@
 	</Design.PreviewWith>
 	
 	<Styles.Resources>
-		<Color x:Key="HighlightColor">#FFAA00</Color>
-		<Color x:Key="HighlightColor2">#AB7200</Color>
-		<Color x:Key="BackgroundColor">#292929</Color>
-		<Color x:Key="BackgroundPane">#34595959</Color>
-		<Color x:Key="BackgroundPane2">#3E909090</Color>
-		<Color x:Key="BackgroundPane3">#F5232323</Color>
+		<Color x:Key="HighlightColor">#FFAA00</Color> <!-- Themed highlight color -->
+		<Color x:Key="HighlightColor2">#AB7200</Color> <!-- Themed highlight color (secondary) -->
+		<Color x:Key="BackgroundColor">#292929</Color> <!-- Gray without transparency-->
+		<Color x:Key="BackdropColor">#CC000000</Color> <!-- Black with transparency -->
+		<Color x:Key="BackgroundPane">#34595959</Color> <!-- Translucent panels -->
+		<Color x:Key="BackgroundPane2">#3E909090</Color> <!-- Translucent panels -->
+		<Color x:Key="BackgroundPane3">#F5232323</Color> <!-- Translucent panels -->
 
 		<SolidColorBrush x:Key="Highlight" Color="{StaticResource HighlightColor}"/>
 		<!--Flyout-->

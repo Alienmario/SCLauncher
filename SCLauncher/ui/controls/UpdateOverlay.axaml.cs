@@ -36,8 +36,13 @@ public partial class UpdateOverlay : Popup
 
 		if (Design.IsDesignMode)
 		{
-			Open();
-			Dispatcher.Post(() => App.ShowInfo("Test notification", TopLevel.GetTopLevel(this)));
+			Dispatcher.Post(() =>
+			{
+				var topLevel = TopLevel.GetTopLevel(this);
+				PlacementTarget = topLevel;
+				Open();
+				App.ShowInfo("Test notification", topLevel);
+			});
 		}
 	}
 
