@@ -4,15 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Primitives.PopupPositioning;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Octokit;
 
 namespace SCLauncher.ui.controls;
 
-public partial class UpdateOverlay : Popup
+public partial class UpdateOverlay : BaseOverlay
 {
 	private readonly IEnumerable<Release> _releases;
 	private CancellationTokenSource? _cts;
@@ -31,58 +28,20 @@ public partial class UpdateOverlay : Popup
 			Url = r.HtmlUrl
 		}).ToList();
 
-		CustomPopupPlacementCallback += OnPlacementCallback;
 		Closed += OnClosed;
 
 		if (Design.IsDesignMode)
 		{
 			Dispatcher.Post(() =>
 			{
-				var topLevel = TopLevel.GetTopLevel(this);
-				PlacementTarget = topLevel;
-				Open();
-				App.ShowInfo("Test notification", topLevel);
+				App.ShowInfo("Test notification", TopLevel.GetTopLevel(this));
 			});
-		}
-	}
-
-	public void Open(Control target)
-	{
-		PlacementTarget = target;
-		OverlayLayer.GetOverlayLayer(target)?.Children.Add(this);
-		Open();
-	}
-
-	private void OnPlacementCallback(CustomPopupPlacement parameters)
-	{
-		if (PlacementTarget is not null)
-		{
-			Width = PlacementTarget.Bounds.Width;
-			Height = PlacementTarget.Bounds.Height;
-			ContentCard.Width = Width * 0.9;
-			ContentCard.Height = Height * 0.9;
 		}
 	}
 	
 	private void OnClosed(object? sender, EventArgs e)
 	{
 		_cts?.Cancel();
-	}
-	
-	private void OnBackdropPressed(object? sender, PointerPressedEventArgs e)
-	{
-		Close();
-	}
-
-	private void OnCardPressed(object? sender, PointerPressedEventArgs e)
-	{
-		// Prevent backdrop from closing when clicking inside the card
-		e.Handled = true;
-	}
-
-	private void OnCloseClicked(object? sender, RoutedEventArgs e)
-	{
-		Close();
 	}
 
 	private void OnReleaseTitleClicked(object? sender, RoutedEventArgs e)

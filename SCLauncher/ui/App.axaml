@@ -9,6 +9,7 @@
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceInclude Source="avares://LoadingIndicators.Avalonia/LoadingIndicators.axaml"/>
 				<ResourceInclude Source="controls/BaseDialogWindow.axaml"/>
+				<ResourceInclude Source="controls/BaseOverlay.axaml"/>
 				<ResourceInclude Source="controls/WindowNotificationManager.axaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>

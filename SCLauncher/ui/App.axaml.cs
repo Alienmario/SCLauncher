@@ -128,13 +128,31 @@ public class App : Application
 				throw new InvalidOperationException("No topLevel available for notifications");
 			}
 		}
+		
+		WindowNotificationManager? manager;
+		
+		// Search in overlays
+		var overlayLayer = OverlayLayer.GetOverlayLayer(topLevel);
+		if (overlayLayer != null)
+		{
+			manager = overlayLayer.FindLogicalDescendantOfType<WindowNotificationManager>();
+			if (manager != null)
+				return manager;
+		}
 
-		// Special handling for popups with custom placement
+		// Search in popups
 		foreach (Popup popup in topLevel.OpenedPopups.Reverse())
 		{
-			var popupManager = popup.FindLogicalDescendantOfType<WindowNotificationManager>();
-			if (popupManager != null)
-				return popupManager;
+			manager = popup.FindLogicalDescendantOfType<WindowNotificationManager>();
+			if (manager != null)
+				return manager;
+		}
+		
+		// Search in logical tree
+		manager = topLevel.FindLogicalDescendantOfType<WindowNotificationManager>();
+		if (manager != null)
+		{
+			return manager;
 		}
 
 		// Check if we already have or add a notification manager for this topLevel

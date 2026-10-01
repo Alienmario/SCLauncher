@@ -1,0 +1,35 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+                    x:ClassModifier="internal">
+	
+	<Design.PreviewWith>
+		<Panel Background="White" Width="800" Height="450">
+			<controls:BaseOverlay>
+				<TextBlock Text="Base overlay" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+			</controls:BaseOverlay>
+		</Panel>
+	</Design.PreviewWith>
+	
+	<ControlTheme x:Key="{x:Type controls:BaseOverlay}" TargetType="controls:BaseOverlay">
+		<Setter Property="Padding" Value="50 50"/>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<!-- Backdrop -->
+				<Panel Name="PART_Backdrop" Background="{StaticResource BackdropColor}">
+					<!-- Content card, sized via code -->
+					<Border Name="PART_ContentCard"
+					        Background="{StaticResource BackgroundPane3}"
+					        BorderBrush="{StaticResource FlyoutBorderThemeBrush}"
+					        BorderThickness="1" CornerRadius="8"
+					        Margin="{TemplateBinding Padding}"
+					        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+						<ContentPresenter Name="PART_ContentPresenter"
+						                  Content="{TemplateBinding Content}"
+						                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+					</Border>
+				</Panel>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+</ResourceDictionary>
