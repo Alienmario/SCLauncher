@@ -44,8 +44,6 @@ public class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
-		Updater.CleanupExecutableBackup();
-		
 		MarkdownViewerDefaults.Pipeline = new MarkdownPipelineBuilder()
 			.UseSupportedExtensions()
 			.Build();

@@ -39,12 +39,12 @@ public partial class UpdateOverlay : BaseOverlay
 		}
 	}
 	
-	private void OnClosed(object? sender, EventArgs e)
+	private void OnClosed(object? sender, EventArgs args)
 	{
 		_cts?.Cancel();
 	}
 
-	private void OnReleaseTitleClicked(object? sender, RoutedEventArgs e)
+	private void OnReleaseTitleClicked(object? sender, RoutedEventArgs args)
 	{
 		if (sender is Control { DataContext: ReleaseViewModel vm })
 		{
@@ -52,7 +52,7 @@ public partial class UpdateOverlay : BaseOverlay
 		}
 	}
 
-	private async void OnUpdateNowClicked(object? sender, RoutedEventArgs e)
+	private async void OnUpdateNowClicked(object? sender, RoutedEventArgs args)
 	{
 		_cts = new CancellationTokenSource();
 		UpdateButton.IsEnabled = false;
@@ -67,13 +67,13 @@ public partial class UpdateOverlay : BaseOverlay
 				StatusText.Text = progressUpdate.Text;
 			}
 		}
-		catch (Exception ex)
+		catch (Exception e)
 		{
-			if (ex is OperationCanceledException)
+			if (e is OperationCanceledException)
 				return;
 
-			ex.Log();
-			App.ShowFailure($"Update failed: {ex.Message}");
+			e.Log();
+			App.ShowFailure($"Update failed: {e.Message}");
 
 			UpdateButton.IsEnabled = true;
 			UpdateButtonIcon.IsVisible = true;

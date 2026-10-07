@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SCLauncher.backend.install;
@@ -38,7 +39,7 @@ public static class ServiceConfig
 		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, SourceCoopInstaller>();
 		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, ModelChooserInstaller>();
 
-		collection.AddSingleton(new HttpClient());
+		collection.AddSingleton(new HttpClient { Timeout = TimeSpan.FromSeconds(20) });
 		collection.AddSingleton<InstallHelper>();
 	}
 	
