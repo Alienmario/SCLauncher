@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
@@ -107,15 +108,16 @@ public partial class ServerConsole : UserControl, IWizardPage
 			App.ShowFailure("Server is not running.");
 			return;
 		}
-		
-		if (analyzer.ServerPort == null)
+
+		int? port = analyzer.LocalServerPort;
+		if (port == null)
 		{
 			App.ShowFailure("Server information is not available.");
 			return;
 		}
 
-		string? localIp = analyzer.LocalIp ?? FindLocalIp();
-		if (localIp == null)
+		string? ip = analyzer.LocalIp ?? FindLocalIp();
+		if (ip == null)
 		{
 			App.ShowFailure("Server information is not available.");
 			return;
@@ -123,7 +125,7 @@ public partial class ServerConsole : UserControl, IWizardPage
 
 		try
 		{
-			if (clController.ConnectToServer(localIp + ":" + analyzer.ServerPort, profilesService.ActiveProfile.ServerConfig.Password))
+			if (clController.ConnectToServer(ip + ":" + port, profilesService.ActiveProfile.ServerConfig.Password))
 			{
 				App.ShowSuccess("Joining local server...");
 			}
@@ -138,22 +140,42 @@ public partial class ServerConsole : UserControl, IWizardPage
 		}
 	}
 
-	private async void OnMenuCopyLinkClicked(object? sender, RoutedEventArgs args)
+	private async void OnMenuCopyPublicLinkClicked(object? sender, RoutedEventArgs args)
 	{
 		CommandBar.IsOpen = false;
 		try
 		{
-			if (analyzer.PublicIp == null || analyzer.ServerPort == null)
+			string? ip = analyzer.PublicIp;
+			int? port = analyzer.PublicServerPort;
+			bool isFakeIp = analyzer.IsFakeIp;
+			if (ip == null || port == null)
 			{
 				App.ShowFailure("Server information is not available.");
 				return;
 			}
 
-			var link = SteamUtils.GetConnectLink(analyzer.PublicIp + ":" + analyzer.ServerPort,
-				profilesService.ActiveProfile.GameAppId, profilesService.ActiveProfile.ServerConfig.Password);
+			var pw = profilesService.ActiveProfile.ServerConfig.Password;
+			var link = SteamUtils.GetConnectLink(ip + ":" + port, profilesService.ActiveProfile.GameAppId, pw);
 		
 			await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(link);
-			App.ShowSuccess("Public join link copied to clipboard.");
+			
+			var delay = TimeSpan.FromSeconds(2);
+			App.ShowSuccess($"Public join link{(string.IsNullOrEmpty(pw) ? "" : " (incl. password)")} copied to clipboard.",
+				expiration: delay);
+			await Task.Delay(delay);
+			
+			if (isFakeIp)
+			{
+				App.ShowWarning("You have Steam Networking enabled - copied link is a \"fake\" and Steam will not resolve it!" +
+				                "\nFor best experience, players should join via in-game server browser.",
+					expiration: TimeSpan.FromSeconds(25));
+			}
+			else
+			{
+				App.ShowInfo("Please note that port forwarding may be required." +
+				             $"\nEnsure your network is not blocking port {port}.",
+					expiration: TimeSpan.FromSeconds(25));
+			}
 		}
 		catch (Exception e)
 		{
@@ -161,20 +183,66 @@ public partial class ServerConsole : UserControl, IWizardPage
 		}
 	}
 	
-	private async void OnMenuCopyIpClicked(object? sender, RoutedEventArgs args)
+	private async void OnMenuCopyPublicIpClicked(object? sender, RoutedEventArgs args)
 	{
 		CommandBar.IsOpen = false;
 		try
 		{
-			if (analyzer.PublicIp == null || analyzer.ServerPort == null)
+			string? ip = analyzer.PublicIp;
+			int? port = analyzer.PublicServerPort;
+			bool isFakeIp = analyzer.IsFakeIp;
+			if (ip == null || port == null)
 			{
 				App.ShowFailure("Server information is not available.");
 				return;
 			}
 
-			var ip = analyzer.PublicIp + ":" + analyzer.ServerPort;
-			await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(ip);
-			App.ShowSuccess("Public IP copied to clipboard.");
+			await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(ip + ":" + port);
+
+			var delay = TimeSpan.FromSeconds(2);
+			App.ShowSuccess("Public server address copied to clipboard.", expiration: delay);
+			await Task.Delay(delay);
+			
+			if (isFakeIp)
+			{
+				App.ShowWarning("You have Steam networking enabled - copied IP is a \"fake\"." +
+				                "\nFor best experience, players should join via in-game server browser.",
+					expiration: TimeSpan.FromSeconds(25));
+			}
+			else
+			{
+				App.ShowInfo("Please note that port forwarding may be required." +
+				             $"\nEnsure your network is not blocking port {port}.",
+					expiration: TimeSpan.FromSeconds(25));
+			}
+		}
+		catch (Exception e)
+		{
+			e.Log();
+		}
+	}
+
+	private async void OnMenuCopyLocalIpClicked(object? sender, RoutedEventArgs args)
+	{
+		CommandBar.IsOpen = false;
+		try
+		{
+			int? port = analyzer.LocalServerPort;
+			if (port == null)
+			{
+				App.ShowFailure("Server information is not available.");
+				return;
+			}
+
+			string? ip = analyzer.LocalIp ?? FindLocalIp();
+			if (ip == null)
+			{
+				App.ShowFailure("Server information is not available.");
+				return;
+			}
+
+			await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(ip + ":" + port);
+			App.ShowSuccess("Local server address copied to clipboard.");
 		}
 		catch (Exception e)
 		{

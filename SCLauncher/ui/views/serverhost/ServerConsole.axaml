@@ -69,7 +69,7 @@
 				<Viewbox Stretch="UniformToFill" Height="25" Width="25">
 					<li:LoadingIndicator Name="StatusIndicator" Mode="DoubleBounce"/>
 				</Viewbox>
-				<TextBlock Name="StatusIndicatorLabel" VerticalAlignment="Center"
+				<SelectableTextBlock Name="StatusIndicatorLabel" VerticalAlignment="Center"
 				            TextTrimming="{x:Static TextTrimming.CharacterEllipsis}"/>
 				
 				<!-- Right aligned CommandBar -->
@@ -151,8 +151,9 @@
 					</CommandBar.PrimaryCommands>
 					
 					<CommandBar.SecondaryCommands>
-						<CommandBarButton Label="Copy join link" Click="OnMenuCopyLinkClicked"/>
-						<CommandBarButton Label="Copy server IP" Click="OnMenuCopyIpClicked"/>
+						<CommandBarButton Label="Copy public join link" Click="OnMenuCopyPublicLinkClicked"/>
+						<CommandBarButton Label="Copy public IP" Click="OnMenuCopyPublicIpClicked"/>
+						<CommandBarButton Label="Copy local IP" Click="OnMenuCopyLocalIpClicked"/>
 						<CommandBarSeparator/>
 						
 						<CommandBarButton Label="Browse server files" Click="OnMenuBrowseServerFolderClicked"/>

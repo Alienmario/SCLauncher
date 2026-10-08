@@ -160,22 +160,28 @@ public class App : Application
 		});
 	}
 
-	public static void ShowSuccess(string msg, TopLevel? topLevel = null)
+	public static void ShowSuccess(string msg, TopLevel? topLevel = null, TimeSpan? expiration = null)
 	{
 		var manager = Current.GetNotificationManager(topLevel);
-		manager.Show(new Notification("Success", msg, NotificationType.Information, TimeSpan.FromSeconds(2)));
+		manager.Show(new Notification("Success", msg, NotificationType.Information, expiration ?? TimeSpan.FromSeconds(5)));
 	}
 
-	public static void ShowFailure(string msg, TopLevel? topLevel = null)
+	public static void ShowFailure(string msg, TopLevel? topLevel = null, TimeSpan? expiration = null)
 	{
 		var manager = Current.GetNotificationManager(topLevel);
-		manager.Show(new Notification("Failed", msg, NotificationType.Error, TimeSpan.FromSeconds(4)));
+		manager.Show(new Notification("Failed", msg, NotificationType.Error, expiration ?? TimeSpan.FromSeconds(8)));
 	}
 	
-	public static void ShowInfo(string msg, TopLevel? topLevel = null)
+	public static void ShowWarning(string msg, TopLevel? topLevel = null, TimeSpan? expiration = null)
 	{
 		var manager = Current.GetNotificationManager(topLevel);
-		manager.Show(new Notification("Info", msg, NotificationType.Information, TimeSpan.FromSeconds(4)));
+		manager.Show(new Notification("Warning", msg, NotificationType.Warning, expiration ?? TimeSpan.FromSeconds(8)));
+	}
+	
+	public static void ShowInfo(string msg, TopLevel? topLevel = null, TimeSpan? expiration = null)
+	{
+		var manager = Current.GetNotificationManager(topLevel);
+		manager.Show(new Notification("Info", msg, NotificationType.Information, expiration ?? TimeSpan.FromSeconds(8)));
 	}
 	
 	public static async void CheckForUpdates()
