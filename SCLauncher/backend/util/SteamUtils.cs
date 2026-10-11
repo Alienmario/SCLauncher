@@ -175,4 +175,9 @@ public static class SteamUtils
 		return !string.IsNullOrWhiteSpace(path)
 		       && File.Exists(Path.Join(path, $"../../appmanifest_{appId}.acf"));
 	}
+
+	public static bool IsFakeIp(string address)
+	{
+		return address.StartsWith("169.254.");
+	}
 }

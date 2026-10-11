@@ -87,7 +87,7 @@
                             <LineBreak/><LineBreak/>
                             <Run FontWeight="Medium">Why</Run>
                             <LineBreak/>
-                            <Run>The only way Steam lets any third-party app view the server list is by using a Steam Web API Key. There is currently no other known alternative.</Run>
+                            <Run>The only means Steam lets third-party apps view the server list is by using a Steam Web API Key. No better alternatives are currently known.</Run>
                             <LineBreak/><LineBreak/>
                             <Run FontWeight="Medium">How</Run>
                             <LineBreak/>
@@ -154,16 +154,18 @@
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate DataType="serverbrowser:Server">
                     <WrapPanel Margin="5 0" ItemsAlignment="Center">
-                        <controls:BadgeButton Content="{Binding Endpoint, StringFormat='IP {0}'}"
-                                              CopySource="{Binding Endpoint}"/>
+                        <controls:BadgeButton Content="{Binding Address, StringFormat='IP {0}'}"
+                                              CopySource="{Binding Address}"/>
                         <controls:BadgeButton IsVisible="{Binding NumBots}"
                                               Content="{Binding NumBots, ConverterParameter='Bot',
                                               Converter={x:Static converters:PluralizationConverter.Instance}}"/>
                         <controls:BadgeButton Content="{Binding GameDescription}"/>
                         <controls:BadgeButton Content="{Binding Type}"/>
                         <controls:BadgeButton Content="{Binding Environment}"/>
-                        <controls:BadgeButton Content="{Binding Version, StringFormat='Version {0}'}"/>
+                        <controls:BadgeButton Content="{Binding Version, StringFormat='Version {0}'}"
+                                              IsVisible="{Binding Version, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                         <controls:BadgeButton Content="{Binding Keywords, StringFormat='Tags: {0}'}"
+                                              IsVisible="{Binding Keywords, Converter={x:Static ObjectConverters.IsNotNull}}"
                                               CopySource="{Binding Keywords}"/>
                     </WrapPanel>
                 </DataTemplate>

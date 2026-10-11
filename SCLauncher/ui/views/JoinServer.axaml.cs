@@ -155,13 +155,13 @@ public partial class JoinServer : UserControl
 		if (server.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
 			return true;
 		
-		if (server.Keywords.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+		if (server.Keywords != null && server.Keywords.Contains(filterText, StringComparison.OrdinalIgnoreCase))
 			return true;
 		
-		if (server.Map.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+		if (server.Map != null && server.Map.Contains(filterText, StringComparison.OrdinalIgnoreCase))
 			return true;
 		
-		if (server.Endpoint.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+		if (server.Address.Contains(filterText, StringComparison.OrdinalIgnoreCase))
 			return true;
 
 		return false;
@@ -258,7 +258,7 @@ public partial class JoinServer : UserControl
 				if (server.Password is null)
 				{
 					App.ShowInfo("Refreshing server info...");
-					Server? newServer = await serverBrowserService.QueryServer(server.Endpoint);
+					Server? newServer = await serverBrowserService.QueryServer(server.Address);
 					if (newServer != null)
 					{
 						server = newServer;
@@ -278,7 +278,7 @@ public partial class JoinServer : UserControl
 
 		try
 		{
-			if (clientControlService.ConnectToServer(server.Endpoint, pw))
+			if (clientControlService.ConnectToServer(server.Address, pw))
 			{
 				App.ShowSuccess("Joining server...");
 			}
@@ -328,7 +328,7 @@ public partial class JoinServer : UserControl
 		{
 			if (ServerGrid.SelectedItem is Server server)
 			{
-				Server? newServer = await serverBrowserService.QueryServer(server.Endpoint, true, true);
+				Server? newServer = await serverBrowserService.QueryServer(server.Address, true, true);
 				if (newServer != null)
 				{
 					var detailsDialog = new ServerDetailsDialog
@@ -367,7 +367,7 @@ public partial class JoinServer : UserControl
 		{
 			if (ServerGrid.SelectedItem is Server server)
 			{
-				var link = SteamUtils.GetConnectLink(server.Endpoint, profilesService.ActiveProfile.GameAppId);
+				var link = SteamUtils.GetConnectLink(server.Address, profilesService.ActiveProfile.GameAppId);
 				await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(link);
 				App.ShowSuccess("Server join link copied to clipboard.");
 			}
@@ -384,7 +384,7 @@ public partial class JoinServer : UserControl
 		{
 			if (ServerGrid.SelectedItem is Server server)
 			{
-				await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(server.Endpoint);
+				await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(server.Address);
 				App.ShowSuccess("Server IP copied to clipboard.");
 			}
 		}
