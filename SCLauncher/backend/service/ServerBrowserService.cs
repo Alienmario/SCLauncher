@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SCLauncher.backend.util;
 using SCLauncher.model.config;
+using SCLauncher.model.exception;
 using SCLauncher.model.serverbrowser;
 using SteamKit2;
 using SteamQuery;
@@ -30,10 +31,18 @@ public class ServerBrowserService(ProfilesService profilesService, GlobalConfigu
 
 		using (dynamic gameServersService = WebAPI.GetAsyncInterface("IGameServersService", globalConfig.SteamWebApiKey))
 		{
-			KeyValue serverList = await gameServersService.GetServerList(
-					filter: "appid\\" + profilesService.ActiveProfile.GameAppId,
-					limit: 9999)
-				.ConfigureAwait(false);
+			KeyValue? serverList;
+			try
+			{
+				serverList = await gameServersService.GetServerList(
+						filter: "appid\\" + profilesService.ActiveProfile.GameAppId,
+						limit: 9999)
+					.ConfigureAwait(false);
+			}
+			catch (WebAPIRequestException e) when (e.StatusCode == HttpStatusCode.Forbidden)
+			{
+				throw new InvalidSteamApiKeyException();
+			}
 			ct.ThrowIfCancellationRequested();
 			
 			foreach (KeyValue serverKv in serverList["servers"].Children)
@@ -99,6 +108,10 @@ public class ServerBrowserService(ProfilesService profilesService, GlobalConfigu
 
 				return TranslateServer(gameServer);
 			}, ct).ConfigureAwait(false);
+		}
+		catch (WebAPIRequestException e) when (e.StatusCode == HttpStatusCode.Forbidden)
+		{
+			throw new InvalidSteamApiKeyException();
 		}
 		catch (Exception e) when (e is not OperationCanceledException)
 		{

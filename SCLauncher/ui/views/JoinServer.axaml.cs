@@ -14,6 +14,7 @@ using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.backend.util;
 using SCLauncher.model.config;
+using SCLauncher.model.exception;
 using SCLauncher.model.serverbrowser;
 using SCLauncher.ui.design;
 using SCLauncher.ui.views.serverbrowser;
@@ -95,7 +96,7 @@ public partial class JoinServer : UserControl
 		refreshCts = new CancellationTokenSource();
 		CancellationToken ct = refreshCts.Token;
 		IsRefreshing = true;
-		
+
 		try
 		{
 			await Task.Delay(msDelay, ct);
@@ -110,6 +111,10 @@ public partial class JoinServer : UserControl
 			}
 		}
 		catch (OperationCanceledException) {}
+		catch (InvalidSteamApiKeyException e)
+		{
+			App.ShowFailure(e.Message);
+		}
 		catch (Exception e)
 		{
 			e.Log();
