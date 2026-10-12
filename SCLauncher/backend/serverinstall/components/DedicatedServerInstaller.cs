@@ -153,7 +153,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 					// ToDo: GMOD - System.FormatException: The input string '2025.03.26' was not in a correct format.
 					// ToDo: NMRIH - System.FormatException: The input string '1.1.5.0' was not in a correct format.
 					var uintVersion = Convert.ToUInt32(version);
-					upgradeVersion = await SteamUpToDateCheckAsync(ctx.Params.Profile.ServerAppId, uintVersion, ct);
+					upgradeVersion = await SteamUpToDateCheckAsync(ctx.Params.Profile.GameAppId, uintVersion, ct);
 				}
 				catch (Exception e)
 				{
