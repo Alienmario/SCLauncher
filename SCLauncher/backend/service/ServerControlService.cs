@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using SCLauncher.backend.serverinstall.components;
@@ -101,10 +102,10 @@ public class ServerControlService
 			args.Add("-console");
 			args.Add("-nocrashdialog");
 			args.Add("-game");
-			args.Add(appInfo.ModFolder);
+			args.Add(QuoteArgument(appInfo.ModFolder));
 			foreach (string arg in _profilesService.ActiveProfile.ServerConfig.ToLaunchParams())
 			{
-				args.Add(arg);
+				args.Add(QuoteArgument(arg));
 			}
 			
 			_serverProcess.OutputDataReceived += (s, e) => OutputReceived?.Invoke(s, e);
@@ -166,6 +167,21 @@ public class ServerControlService
 		{
 			_serverProcess!.StandardInput.WriteLine(cmd);
 		}
+	}
+
+	/// <summary>
+	/// On Linux, srcds rebuilds its command line by joining argv with spaces without preserving quotes,
+	/// so a value like "My Server" would be split and only "My" would reach the console command.
+	/// Wrap such values in literal quotes so the engine's tokenizer keeps them together.
+	/// On Windows the raw command line (with .NET's quoting) is used, so no extra quoting is needed.
+	/// </summary>
+	private static string QuoteArgument(string value)
+	{
+		if (OperatingSystem.IsWindows() || string.IsNullOrEmpty(value) || !value.Any(char.IsWhiteSpace))
+			return value;
+
+		// the engine tokenizer has no escape sequence for quotes, so drop any embedded ones
+		return "\"" + value.Replace("\"", "") + "\"";
 	}
 
 }
