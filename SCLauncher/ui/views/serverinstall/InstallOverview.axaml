@@ -53,7 +53,7 @@
 			           IsVisible="{Binding Method, Converter={x:Static ObjectConverters.Equal},
 						ConverterParameter={x:Static serverinstallmodel:ServerInstallMethod.Standalone}}"/>
 			
-			<Label Grid.Row="2" Grid.Column="0" Content="Addons preset" Classes="Key"/>
+			<Label Grid.Row="2" Grid.Column="0" Content="Install preset" Classes="Key"/>
 			<ComboBox Grid.Row="2" Grid.Column="1" Name="PresetComboBox" Classes="Value" HorizontalAlignment="Stretch"
 			          PlaceholderText="All"
 			          DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance},

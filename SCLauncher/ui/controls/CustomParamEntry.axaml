@@ -89,7 +89,7 @@
 			<TextBlock FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource TextControlForegroundFocused}">
 				<Run>Start with - (dash) for launch parameters</Run>
 				<LineBreak/>
-				<Run>Start with + (plus) for console commands</Run>
+				<Run>Start with + (plus) for console variables</Run>
 			</TextBlock>
 		</ContentControl>
 		
