@@ -1,35 +1,41 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
+using Avalonia.Controls.Primitives;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Markdig;
+using MarkView.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
-using Octokit;
 using SCLauncher.backend;
-using SCLauncher.backend.install;
 using SCLauncher.backend.service;
-using SCLauncher.backend.util;
 using SCLauncher.model.config;
-using SCLauncher.ui.controls;
 using SCLauncher.ui.views;
-using SCLauncher.ui.views.profiles;
-using Application = Avalonia.Application;
-using Notification = Avalonia.Controls.Notifications.Notification;
+using SCLauncher.ui.views.profiles.init;
 
 namespace SCLauncher.ui;
 
-public partial class App : Application
+public class App : Application
 {
 	public new static App Current => (App)Application.Current!;
+
+	public static MainWindow MainWindow => GetService<MainWindow>();
 	
-	private ServiceProvider? services;
-	private readonly Dictionary<Window, WindowNotificationManager> notificationManagers = new();
+	public static readonly string Version = Assembly.GetExecutingAssembly()
+		.GetName().Version?.ToString(2) ?? string.Empty;
+
+	public static readonly string? RepositoryUrl = Assembly.GetExecutingAssembly()
+		.GetCustomAttributes<AssemblyMetadataAttribute>()
+		.FirstOrDefault(a => a.Key.Equals("RepositoryUrl", StringComparison.OrdinalIgnoreCase))?.Value;
+
+	private ServiceProvider? _services;
+	private readonly ConditionalWeakTable<TopLevel, WindowNotificationManager> _notificationManagers = new();
 
 	public override void Initialize()
 	{
@@ -38,11 +44,15 @@ public partial class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
+		MarkdownViewerDefaults.Pipeline = new MarkdownPipelineBuilder()
+			.UseSupportedExtensions()
+			.Build();
+			
 		// Register all the services needed for the application to run
 		var serviceCollection = new ServiceCollection();
 		serviceCollection.AddBackendServices();
 		serviceCollection.AddUIServices();
-		services = serviceCollection.BuildServiceProvider();
+		_services = serviceCollection.BuildServiceProvider();
 		GetService<BackendService>().Initialize();
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -71,17 +81,28 @@ public partial class App : Application
 
 			// Cache the MainWindow's notification manager
 			GetNotificationManager(mainWindow);
-
-			bool checkForUpdates = GetService<GlobalConfiguration>().CheckForUpdates;
+			
+			var config = GetService<GlobalConfiguration>();
 #if !DEBUG
-			if (checkForUpdates) CheckForUpdates();
+			if (config.CheckForUpdates)
+			{
+				CheckForUpdates();
+			}
+			
+			config.PropertyChanged += (sender, args) =>
+			{
+				if (args.PropertyName == nameof(GlobalConfiguration.CheckForUpdates) && config.CheckForUpdates)
+				{
+					Dispatcher.UIThread.Post(CheckForUpdates);
+				}
+			};
 #endif
 		}
 	}
 
 	public static T GetService<T>() where T : class
 	{
-		return Current.services!.GetRequiredService<T>();
+		return Current._services!.GetRequiredService<T>();
 	}
 	
 	public static object? GetResource(string name)
@@ -90,91 +111,93 @@ public partial class App : Application
 		return res;
 	}
 
-	private WindowNotificationManager GetNotificationManager(Window? window)
+	public WindowNotificationManager GetNotificationManager(TopLevel? topLevel)
 	{
-		// If no window is provided, try to get the MainWindow
-		if (window == null)
+		// If no topLevel is provided, try to get the current main window
+		if (topLevel == null)
 		{
 			if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 			{
-				window = desktop.MainWindow;
+				topLevel = desktop.MainWindow;
 			}
 
-			if (window == null)
+			if (topLevel == null)
 			{
-				throw new InvalidOperationException("No window available for notifications");
+				throw new InvalidOperationException("No topLevel available for notifications");
 			}
 		}
-
-		// Check if we already have a notification manager for this window
-		if (notificationManagers.TryGetValue(window, out var existingManager))
+		
+		WindowNotificationManager? manager;
+		
+		// Search in overlays
+		var overlayLayer = OverlayLayer.GetOverlayLayer(topLevel);
+		if (overlayLayer != null)
 		{
-			return existingManager;
+			manager = overlayLayer.FindLogicalDescendantOfType<WindowNotificationManager>();
+			if (manager != null)
+				return manager;
 		}
 
-		// Create a new notification manager for this window
-		var newManager = new WindowNotificationManager(window)
+		// Search in popups
+		foreach (Popup popup in topLevel.OpenedPopups.Reverse())
+		{
+			manager = popup.FindLogicalDescendantOfType<WindowNotificationManager>();
+			if (manager != null)
+				return manager;
+		}
+		
+		// Search in logical tree
+		manager = topLevel.FindLogicalDescendantOfType<WindowNotificationManager>();
+		if (manager != null)
+		{
+			return manager;
+		}
+
+		// Check if we already have or add a notification manager for this topLevel
+		return _notificationManagers.GetOrAdd(topLevel, tl => new WindowNotificationManager(tl)
 		{
 			Position = NotificationPosition.BottomCenter
-		};
-
-		notificationManagers[window] = newManager;
-
-		// Subscribe to the window's Closed event to clean up the dictionary
-		window.Closed += (sender, e) =>
-		{
-			if (sender is Window closedWindow)
-			{
-				notificationManagers.Remove(closedWindow);
-			}
-		};
-
-		return newManager;
+		});
 	}
 
-	public static void ShowSuccess(string msg, Window? window = null)
+	public static void ShowSuccess(string msg, TopLevel? topLevel = null, TimeSpan? expiration = null)
 	{
-		var manager = Current.GetNotificationManager(window);
-		manager.Show(new Notification("Success", msg, NotificationType.Information, TimeSpan.FromSeconds(2)));
+		var manager = Current.GetNotificationManager(topLevel);
+		manager.Show(new Notification("Success", msg, NotificationType.Information, expiration ?? TimeSpan.FromSeconds(5)));
 	}
 
-	public static void ShowFailure(string msg, Window? window = null)
+	public static void ShowFailure(string msg, TopLevel? topLevel = null, TimeSpan? expiration = null)
 	{
-		var manager = Current.GetNotificationManager(window);
-		manager.Show(new Notification("Failed", msg, NotificationType.Error, TimeSpan.FromSeconds(4)));
+		var manager = Current.GetNotificationManager(topLevel);
+		manager.Show(new Notification("Failed", msg, NotificationType.Error, expiration ?? TimeSpan.FromSeconds(8)));
 	}
 	
-	public static void ShowInfo(string msg, Window? window = null)
+	public static void ShowWarning(string msg, TopLevel? topLevel = null, TimeSpan? expiration = null)
 	{
-		var manager = Current.GetNotificationManager(window);
-		manager.Show(new Notification("Info", msg, NotificationType.Information, TimeSpan.FromSeconds(4)));
+		var manager = Current.GetNotificationManager(topLevel);
+		manager.Show(new Notification("Warning", msg, NotificationType.Warning, expiration ?? TimeSpan.FromSeconds(8)));
 	}
 	
-	public static string Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString(2) ?? string.Empty;
-
-	public static void CheckForUpdates()
+	public static void ShowInfo(string msg, TopLevel? topLevel = null, TimeSpan? expiration = null)
 	{
-		Task.Run(async () =>
+		var manager = Current.GetNotificationManager(topLevel);
+		manager.Show(new Notification("Info", msg, NotificationType.Information, expiration ?? TimeSpan.FromSeconds(8)));
+	}
+	
+	public static async void CheckForUpdates()
+	{
+		try
 		{
-			GitHubClient github = GetService<InstallHelper>().GithubClient;
-			var latestRelease = await github.Repository.Release.GetLatest("Alienmario", "SCLauncher");
-			string latestVersion = latestRelease.TagName;
-			string localVersion = Version;
-			
-			Trace.WriteLine($"Checking SCLauncher version [Current: {localVersion}, Latest: {latestVersion}]");
-			if (VersionUtils.SmartCompare(localVersion, latestVersion) < 0)
+			var releases = await GetService<Updater>().CheckForUpdates();
+			if (releases.Count > 0)
 			{
-				Dispatcher.UIThread.Post(() =>
-				{
-					var notification = GetService<MainWindow>().FindLogicalDescendantOfType<UpdateNotification>();
-					if (notification != null)
-					{
-						notification.Url = latestRelease.HtmlUrl;
-						notification.Show();
-					}
-				});
+				MainWindow.UpdateNotification.Show(releases);
 			}
-		}).LogExceptions();
+		}
+		catch (Exception e)
+		{
+			e.Log();
+		}
 	}
 	
 }

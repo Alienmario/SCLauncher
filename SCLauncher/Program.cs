@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -12,9 +12,16 @@ namespace SCLauncher;
 static class Program
 {
 	// Avalonia configuration, don't remove; also used by visual designer.
+	#pragma warning disable AVALONIA_X11_CSD
 	public static AppBuilder BuildAvaloniaApp()
 		=> AppBuilder.Configure<App>()
 			.UsePlatformDetect()
+			.With(new X11PlatformOptions
+			{
+				// Let Avalonia draw the decorations, so windows opting in via
+				// ExtendClientAreaToDecorationsHint get a custom titlebar instead of the WM one.
+				EnableDrawnDecorations = true
+			})
 			.WithInterFont()
 			.LogToTrace();
 
@@ -31,12 +38,20 @@ static class Program
 		}
 		
 		Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+		
 		TaskScheduler.UnobservedTaskException += (sender, eventArgs) =>
 		{
 			eventArgs.Exception.Log();
 			eventArgs.SetObserved();
 		};
 
+		// Started headless by the updater?
+		if (Updater.IsFinishUpdateCommand(args))
+		{
+			return Updater.FinishUpdate(args);
+		}
+		
+		Updater.Cleanup();
 		return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
 	}
 
@@ -54,31 +69,51 @@ static class Program
 		TaskContinuationOptions.OnlyOnFaulted);
 	}
 
-	/// Extension method that logs an exception.
-	public static void Log(this Exception exception)
+	extension(Exception exception)
 	{
-		Trace.WriteLine(exception);
-	}
-	public static void Log(this Exception exception, string message)
-	{
-		Trace.WriteLine(message);
-		Trace.WriteLine(exception);
+		/// Extension method that logs an exception.
+		public void Log()
+		{
+			Trace.WriteLine(exception);
+		}
+
+		public void Log(string message)
+		{
+			Trace.WriteLine(message);
+			Trace.WriteLine(exception);
+		}
+
+		/// Extension method for extracting all nested messages from exceptions.
+		public string GetAllMessages(string delimiter = " - ")
+		{
+			var messages = new List<string>();
+			for (;;)
+			{
+				if (!string.IsNullOrWhiteSpace(exception.Message))
+					messages.Add(exception.Message);
+				if (exception.InnerException == null)
+					break;
+				exception = exception.InnerException;
+			}
+			return string.Join(delimiter, messages);
+		}
+
+		/// Scanner extension that finds first nested exception (or self) of specific type.
+		public T? Find<T>(bool includeSelf = true) where T : Exception
+		{
+			if (includeSelf && exception is T typedException)
+			{
+				return typedException;
+			}
+			return exception.InnerException?.Find<T>();
+		}
+
+		public bool Contains<T>(bool includeSelf = true) where T : Exception
+		{
+			return exception.Find<T>(includeSelf) != null;
+		}
 	}
 
-	/// Extension method for extracting all nested messages from exceptions.
-	public static string GetAllMessages(this Exception? e, string delimiter = " - ")
-	{
-		var messages = new List<string>();
-		do
-		{
-			if (!string.IsNullOrWhiteSpace(e!.Message))
-				messages.Add(e.Message);
-			e = e.InnerException;
-		}
-		while (e != null);
-		return string.Join(delimiter, messages);
-	}
-	
 	/// Extension method for extracting an enum value's description (DescriptionAttribute).
 	/// Fallbacks to definition string.
 	public static string GetDescription(this Enum enumValue)

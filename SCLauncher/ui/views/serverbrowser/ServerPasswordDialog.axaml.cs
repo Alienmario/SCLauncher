@@ -11,10 +11,9 @@ public partial class ServerPasswordDialog : BaseDialogWindow
 	public ServerPasswordDialog(bool required)
 	{
 		InitializeComponent();
-		Title = required ? "Password required" : "Password";
+		Title = required ? "Password is required" : "Enter password or leave empty";
 		Activated += delegate
 		{
-			InvalidateArrange(); // SizeToContent bugfix
 			PasswordTextBox.Focus();
 		};
 		KeyUp += (sender, args) =>

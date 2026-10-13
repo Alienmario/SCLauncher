@@ -3,15 +3,38 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:SCLauncher.ui.controls"
-             xmlns:serverinstall="clr-namespace:SCLauncher.model.serverinstall"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SCLauncher.ui.views.serverinstall.InstallConsole"
-             x:DataType="serverinstall:ServerInstallParams">
+             x:Class="SCLauncher.ui.views.serverinstall.InstallConsole">
 	
-	<Border Background="Black" BorderBrush="{StaticResource SystemAccentColor}"
-	        BorderThickness="1" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+	<Panel>
+		<ProgressBar Name="ProgressBar" Width="400" Foreground="{StaticResource HighlightColor}"
+		             VerticalAlignment="Center" HorizontalAlignment="Center"/>
+		<TextBlock FontSize="26" Name="Header" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 -40 0 0">
+			Preparing..
+		</TextBlock>
 		
-		<controls:StatusMessageViewer Name="ConsoleViewer"/>
-		
-	</Border>
+		<Border Classes.Expanded="{Binding #ConsoleViewer.IsExpanded}"
+		        BorderThickness="1" CornerRadius="5"
+		        HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+			
+			<controls:StatusMessageViewer Name="ConsoleViewer" CanMinimize="True"/>
+			
+			<Border.Transitions>
+				<Transitions>
+					<BrushTransition Property="Background" Duration="0:0:0.6" Easing="ExponentialEaseIn"/>
+					<BrushTransition Property="BorderBrush" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+				</Transitions>
+			</Border.Transitions>
+			<Border.Styles>
+				<Style Selector="Border">
+					<Setter Property="Background" Value="#2F000000"/>
+					<Setter Property="BorderBrush" Value="#00000000"/>
+				</Style>
+				<Style Selector="Border.Expanded">
+					<Setter Property="Background" Value="Black"/>
+					<Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}"/>
+				</Style>
+			</Border.Styles>
+		</Border>
+	</Panel>
 </UserControl>

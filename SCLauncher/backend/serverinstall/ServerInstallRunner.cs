@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using SCLauncher.backend.install;
 using SCLauncher.model;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
@@ -13,68 +14,84 @@ namespace SCLauncher.backend.serverinstall;
 
 public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<ComponentInfo>> installers)
 {
-	internal async IAsyncEnumerable<StatusMessage> Installer(ServerInstallParams installParams,
+	internal async IAsyncEnumerable<object> Installer(ServerInstallParams installParams,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
-		yield return new StatusMessage("Installation started");
-		
 		ServerInstallContext ctx = new ServerInstallContext(installParams);
+
+		yield return new ProgressUpdate { Text = "Installation started", NumSteps = ctx.Params.Components.Count + 1 };
+		yield return new StatusMessage($"Installer started{Environment.NewLine}");
+		int step = 1;
 		
-		// ensure server info is always available in the context
-		if (!ctx.Params.Components.Contains(ServerInstallComponent.Server))
+		try
 		{
-			var serverInstaller = installers.First(installer => installer.Component == ServerInstallComponent.Server);
-			ctx.ComponentInfos[ServerInstallComponent.Server] = await serverInstaller.GatherInfoAsync(ctx, false, ct);
+			foreach (var component in ctx.Params.Components.OrderBy(component => component.InstallOrder))
+			{
+				async Task GatherInfoRecursive(ServerInstallComponent c)
+				{
+					foreach (var dependency in c.Dependencies)
+					{
+						await GatherInfoRecursive(dependency);
+					}
+					if (!ctx.ComponentInfos.ContainsKey(c))
+					{
+						ct.ThrowIfCancellationRequested();
+						ctx.ComponentInfos[c] = await installers.Single(i => i.Component == c)
+							.GatherInfoAsync(ctx, false, ct);
+					}
+				}
+
+				await GatherInfoRecursive(component);
+				ct.ThrowIfCancellationRequested();
+
+				yield return new ProgressUpdate { Text = $"Installing {component}", Step = step++ };
+				yield return new StatusMessage($"Installing {component}");
+				
+				if (!ctx.ComponentInfos[component].Installable)
+				{
+					yield return new StatusMessage($"Component \"{component}\" is not installable, skipping");
+					continue;
+				}
+				
+				var installer = installers.Single(i => i.Component == component);
+				await foreach (var message in installer.Install(ctx, ct))
+				{
+					yield return message;
+				}
+
+				ct.ThrowIfCancellationRequested();
+
+				ctx.ComponentInfos[component] = await installer.GatherInfoAsync(ctx, false, ct);
+				if (!ctx.ComponentInfos[component].Installed)
+				{
+					throw new InstallException($"Failed to validate component installation: {component}");
+				}
+
+				yield return new StatusMessage($"{component} installed{Environment.NewLine}");
+			}
+		}
+		finally
+		{
+			// Save install path in the profile - even when install fails
+			try
+			{
+				ctx.Params.Profile.ServerPath = ctx.InstallPath;
+			}
+			catch (UnsetInstallPathException) {}
 		}
 
-		foreach (var component in ctx.Params.Components.OrderBy(component => component.InstallOrder))
-		{
-			var installer = installers.FirstOrDefault(i => i.Component == component);
-			if (installer == null)
-			{
-				yield return new StatusMessage($"Component <{component}> has no corresponding installer!", MessageStatus.Error);
-				continue;
-			}
-
-			ct.ThrowIfCancellationRequested();
-
-			ctx.ComponentInfos[component] = await installer.GatherInfoAsync(ctx, false, ct);
-			if (!ctx.ComponentInfos[component].Installable)
-			{
-				yield return new StatusMessage($"Component <{component}> is not installable, skipping");
-				continue;
-			}
-			
-			ct.ThrowIfCancellationRequested();
-			
-			yield return new StatusMessage($"Installing component <{component}>");
-			await foreach (var message in installer.Install(ctx, ct))
-			{
-				yield return message;
-			}
-
-			ct.ThrowIfCancellationRequested();
-			
-			ctx.ComponentInfos[component] = await installer.GatherInfoAsync(ctx, false, ct);
-			if (!ctx.ComponentInfos[component].Installed)
-			{
-				yield return new StatusMessage($"Failed to validate component installation <{component}>",
-					MessageStatus.Error);
-				throw new InstallException();
-			}
-			
-			yield return new StatusMessage($"Component <{component}> installed");
-		}
-
-		yield return new StatusMessage("Installation finished successfully", MessageStatus.Success);
+		yield return new StatusMessage("Installer finished successfully", MessageStatus.Success);
+		yield return new ProgressUpdate { Text = "All done!", Step = step };
 	}
 
-	internal async IAsyncEnumerable<StatusMessage> Uninstaller(ServerUninstallParams uninstallParams,
+	internal async IAsyncEnumerable<object> Uninstaller(ServerUninstallParams uninstallParams,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
 		ServerUninstallContext ctx = new ServerUninstallContext(uninstallParams);
 		
-		yield return new StatusMessage("Uninstall started");
+		yield return new ProgressUpdate { Text = "Uninstallation started", NumSteps = installers.Count() + 2 };
+		yield return new StatusMessage($"Uninstaller started{Environment.NewLine}");
+		int step = 1;
 
 		foreach (var installer in installers.OrderByDescending(installer => installer.Component.InstallOrder))
 		{
@@ -88,32 +105,39 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 			}
 			catch (NotImplementedException)
 			{
+				step++;
 				continue;
 			}
 			
-			yield return new StatusMessage($"Uninstalling component <{component}>");
+			yield return new ProgressUpdate { Text = $"Uninstalling {component}", Step = step++ };
+			yield return new StatusMessage($"Uninstalling {component}");
+			
 			await foreach (var message in componentUninstaller.WithCancellation(ct))
 			{
 				yield return message;
 			}
-			yield return new StatusMessage($"Component <{component}> uninstalled");
+			yield return new StatusMessage($"{component} uninstalled{Environment.NewLine}");
 		}
 
 		if (!Directory.Exists(ctx.Params.Path))
 		{
-			throw new InstallException("Server directory is not valid");
+			throw new InstallException("Server directory does not exist");
 		}
 		
 		yield return new StatusMessage("Deleting server directory");
+		yield return new ProgressUpdate { Text = "Deleting server directory", Step = step++ };
+		
 		try
 		{
 			Directory.Delete(ctx.Params.Path, true);
 		}
 		catch (Exception e)
 		{
-			throw new InstallException("Unable to delete server directory", e);
+			e.Log();
+			throw new InstallException("Unable to delete the server directory", e);
 		}
 
-		yield return new StatusMessage("Uninstall finished successfully", MessageStatus.Success);
+		yield return new StatusMessage("Uninstaller finished successfully", MessageStatus.Success);
+		yield return new ProgressUpdate { Text = "All done!", Step = step };
 	}
 }

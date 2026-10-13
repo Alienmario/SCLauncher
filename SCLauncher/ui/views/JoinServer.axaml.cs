@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using SCLauncher.backend.service;
 using SCLauncher.backend.util;
 using SCLauncher.model.config;
+using SCLauncher.model.exception;
 using SCLauncher.model.serverbrowser;
 using SCLauncher.ui.design;
 using SCLauncher.ui.views.serverbrowser;
@@ -94,7 +96,7 @@ public partial class JoinServer : UserControl
 		refreshCts = new CancellationTokenSource();
 		CancellationToken ct = refreshCts.Token;
 		IsRefreshing = true;
-		
+
 		try
 		{
 			await Task.Delay(msDelay, ct);
@@ -109,6 +111,10 @@ public partial class JoinServer : UserControl
 			}
 		}
 		catch (OperationCanceledException) {}
+		catch (InvalidSteamApiKeyException e)
+		{
+			App.ShowFailure(e.Message);
+		}
 		catch (Exception e)
 		{
 			e.Log();
@@ -154,13 +160,13 @@ public partial class JoinServer : UserControl
 		if (server.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
 			return true;
 		
-		if (server.Keywords.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+		if (server.Keywords != null && server.Keywords.Contains(filterText, StringComparison.OrdinalIgnoreCase))
 			return true;
 		
-		if (server.Map.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+		if (server.Map != null && server.Map.Contains(filterText, StringComparison.OrdinalIgnoreCase))
 			return true;
 		
-		if (server.Endpoint.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+		if (server.Address.Contains(filterText, StringComparison.OrdinalIgnoreCase))
 			return true;
 
 		return false;
@@ -227,7 +233,7 @@ public partial class JoinServer : UserControl
 	protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs args)
 	{
 		base.OnDetachedFromVisualTree(args);
-		HotKeyManager.SetHotKey(RefreshButton, null!);
+		HotKeyManager.SetHotKey(RefreshButton, null);
 	}
 
 	private async void OnRefreshClicked(object? sender, RoutedEventArgs args)
@@ -257,7 +263,7 @@ public partial class JoinServer : UserControl
 				if (server.Password is null)
 				{
 					App.ShowInfo("Refreshing server info...");
-					Server? newServer = await serverBrowserService.QueryServer(server.Endpoint);
+					Server? newServer = await serverBrowserService.QueryServer(server.Address);
 					if (newServer != null)
 					{
 						server = newServer;
@@ -267,7 +273,7 @@ public partial class JoinServer : UserControl
 				if (server.Password != false)
 				{
 					var passwordDialog = new ServerPasswordDialog(server.Password == true);
-					if (null == (pw = await passwordDialog.ShowDialog<string?>(App.GetService<MainWindow>())))
+					if (null == (pw = await passwordDialog.ShowDialog<string?>(App.MainWindow)))
 					{
 						return; // window closed
 					}
@@ -277,7 +283,7 @@ public partial class JoinServer : UserControl
 
 		try
 		{
-			if (clientControlService.ConnectToServer(server.Endpoint, pw))
+			if (clientControlService.ConnectToServer(server.Address, pw))
 			{
 				App.ShowSuccess("Joining server...");
 			}
@@ -327,14 +333,14 @@ public partial class JoinServer : UserControl
 		{
 			if (ServerGrid.SelectedItem is Server server)
 			{
-				Server? newServer = await serverBrowserService.QueryServer(server.Endpoint, true, true);
+				Server? newServer = await serverBrowserService.QueryServer(server.Address, true, true);
 				if (newServer != null)
 				{
 					var detailsDialog = new ServerDetailsDialog
 					{
 						DataContext = newServer
 					};
-					detailsDialog.Show(App.GetService<MainWindow>());
+					detailsDialog.Show(App.MainWindow);
 				}
 				else App.ShowFailure($"Unable to retrieve details for {server.Name}");
 			}
@@ -366,7 +372,7 @@ public partial class JoinServer : UserControl
 		{
 			if (ServerGrid.SelectedItem is Server server)
 			{
-				var link = SteamUtils.GetConnectLink(server.Endpoint, profilesService.ActiveProfile.GameAppId);
+				var link = SteamUtils.GetConnectLink(server.Address, profilesService.ActiveProfile.GameAppId);
 				await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(link);
 				App.ShowSuccess("Server join link copied to clipboard.");
 			}
@@ -383,7 +389,7 @@ public partial class JoinServer : UserControl
 		{
 			if (ServerGrid.SelectedItem is Server server)
 			{
-				await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(server.Endpoint);
+				await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(server.Address);
 				App.ShowSuccess("Server IP copied to clipboard.");
 			}
 		}
@@ -395,7 +401,7 @@ public partial class JoinServer : UserControl
 
 	private void OnGenerateKeyClicked(object? sender, RoutedEventArgs e)
 	{
-		var mainWindow = App.GetService<MainWindow>();
+		var mainWindow = App.MainWindow;
 		mainWindow.GoToSettings();
 		Settings settings = (mainWindow.SettingsTab.Content as Settings)!;
 		mainWindow.Launcher.LaunchUriAsync(settings.SteamApiKeyLink.NavigateUri!);

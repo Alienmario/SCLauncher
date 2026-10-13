@@ -29,12 +29,12 @@ public class BackendService(
 	{
 		serverControlService.StateChanged += (sender, isRunning) => ComputeCanSwitchProfiles();
 
-		persistence.Bind("global", globalConfig, JsonSourceGenerationContext.Default);
+		persistence.Bind("global", globalConfig, JsonSourceGenerationContext.Resolver);
 		
-		string? steamDir = SteamUtils.FindSteamInstallDir();
-		if (steamDir != null)
+		string? steamPath = SteamUtils.FindSteamInstallPath();
+		if (steamPath != null)
 		{
-			globalConfig.SteamPath = steamDir;
+			globalConfig.SteamPath = steamPath;
 		}
 		
 		profilesService.Initialize();
