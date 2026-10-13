@@ -72,7 +72,7 @@ public static class AppDefinitions
 			},
 			ServerConfigFactory: preset => preset switch
 			{
-				AppPreset.Cooperative => new ServerConfigurationHl2dm
+				AppPreset.Cooperative => new ServerConfigurationHL2DM
 				{
 					Teamplay = true,
 					StartMap = "dm_lockdown",
@@ -81,7 +81,7 @@ public static class AppDefinitions
 						new CustomParam("+modelchooser_teambased", "0")
 					]
 				},
-				_ => new ServerConfigurationHl2dm
+				_ => new ServerConfigurationHL2DM
 				{
 					Teamplay = false,
 					StartMap = "dm_lockdown"
@@ -100,7 +100,7 @@ public static class AppDefinitions
 				ModFolder = "tf",
 				GameExecutable = Exe("tf_win64.exe", "tf.sh")
 			},
-			ServerConfigFactory: _ => new ServerConfiguration
+			ServerConfigFactory: _ => new ServerConfigurationSDK2013
 			{
 				StartMap = "cp_dustbowl"
 			}
@@ -117,7 +117,7 @@ public static class AppDefinitions
 				ModFolder = "cstrike",
 				GameExecutable = Exe("cstrike_win64.exe", "cstrike.sh")
 			},
-			ServerConfigFactory: _ => new ServerConfiguration
+			ServerConfigFactory: _ => new ServerConfigurationSDK2013
 			{
 				StartMap = "de_dust2"
 			}
@@ -134,7 +134,7 @@ public static class AppDefinitions
 				ModFolder = "dod",
 				GameExecutable = Exe("dod_win64.exe", "dod.sh")
 			},
-			ServerConfigFactory: _ => new ServerConfiguration
+			ServerConfigFactory: _ => new ServerConfigurationSDK2013
 			{
 				StartMap = "dod_donner"
 			}
@@ -253,7 +253,7 @@ public static class AppDefinitions
 				ModFolder = "hl2mp",
 				GameExecutable = Exe("hl2.exe", "hl2.sh")
 			},
-			ServerConfigFactory: _ => new ServerConfiguration()
+			ServerConfigFactory: _ => new ServerConfigurationSDK2013()
 		),
 	};
 

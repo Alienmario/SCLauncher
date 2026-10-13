@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace SCLauncher.backend.service;
 
@@ -11,7 +11,7 @@ public class PersistenceService
 {
 	private readonly string _dir;
 
-	private readonly Dictionary<string, (object Instance, JsonSerializerContext? Context)> _persistedObjects = new();
+	private readonly Dictionary<string, (object Instance, IJsonTypeInfoResolver? Context)> _persistedObjects = new();
 
 	private readonly JsonSerializerOptions _serializerOptions = new();
 
@@ -62,7 +62,7 @@ public class PersistenceService
 		SaveAll();
 	}
 
-	public void Bind(string name, object instance, JsonSerializerContext? context = null, bool loadNow = true)
+	public void Bind(string name, object instance, IJsonTypeInfoResolver? context = null, bool loadNow = true)
 	{
 	    _persistedObjects[name] = (instance, context);
 		if (loadNow)
@@ -92,7 +92,7 @@ public class PersistenceService
 		}
 	}
 
-	public bool Save(string name, object o, JsonSerializerContext? context = null)
+	public bool Save(string name, object o, IJsonTypeInfoResolver? context = null)
 	{
 		if (!Available)
 			return false;
@@ -115,7 +115,7 @@ public class PersistenceService
 		}
 	}
 
-	public void LoadAndMerge(string name, object instance, JsonSerializerContext? context = null)
+	public void LoadAndMerge(string name, object instance, IJsonTypeInfoResolver? context = null)
 	{
 		object? loaded = Load(name, instance.GetType(), context);
 		if (loaded != null)
@@ -139,7 +139,7 @@ public class PersistenceService
 		}
 	}
 	
-	public object? Load(string name, Type type, JsonSerializerContext? context = null)
+	public object? Load(string name, Type type, IJsonTypeInfoResolver? context = null)
 	{
 		if (!Available)
 			return null;

@@ -27,7 +27,7 @@ public class ProfilesService(GlobalConfiguration globalConfig, PersistenceServic
 
 	internal void Initialize()
 	{
-		persistence.Bind("profiles", profiles, JsonSourceGenerationContext.Default);
+		persistence.Bind("profiles", profiles, JsonSourceGenerationContext.Resolver);
 
 		// Try to set active profile
 		if (globalConfig.ActiveProfile == null || !SetActiveProfile(globalConfig.ActiveProfile))
