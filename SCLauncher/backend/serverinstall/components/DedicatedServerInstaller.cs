@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -18,7 +17,7 @@ using SteamKit2.Authentication;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallHelper installHelper)
+internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallHelper installHelper)
 	: IServerComponentInstaller<ComponentInfo>
 {
 	public class ServerComponentInfo : ComponentInfo
@@ -126,45 +125,40 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 		}
 		else // ServerInstallMethod.Standalone
 		{
-			if (!Directory.Exists(ctx.InstallPath))
+			if (!File.Exists(Path.Join(ctx.GameModPath, "gameinfo.txt")))
 				return ComponentInfo.ReadyToInstall;
-
-			string? version = null;
+			
+			string? localVersion = null;
 			try
 			{
-				version = await GetLocalPatchVersionAsync(ctx.InstallPath, ct);
+				localVersion = await GetLocalPatchVersionAsync(ctx, ct);
 			}
 			catch (Exception e)
 			{
-				e.Log();
-			}
-
-			if (version == null)
-			{
-				Trace.WriteLine("Failed to find server patch version, considering installation as incomplete");
-				return ComponentInfo.ReadyToInstall;
+				e.Log("Failed reading local server patch version");
 			}
 
 			string? upgradeVersion = null;
-			if (checkForUpgrades)
+			if (checkForUpgrades && localVersion != null)
 			{
 				try
 				{
-					// ToDo: GMOD - System.FormatException: The input string '2025.03.26' was not in a correct format.
-					// ToDo: NMRIH - System.FormatException: The input string '1.1.5.0' was not in a correct format.
-					var uintVersion = Convert.ToUInt32(version);
+					// TODO: Transition to steam build id comparison
+					// GMOD - System.FormatException: The input string '2025.03.26' was not in a correct format.
+					// NMRIH - System.FormatException: The input string '1.1.5.0' was not in a correct format.
+					var uintVersion = Convert.ToUInt32(localVersion);
 					upgradeVersion = await SteamUpToDateCheckAsync(ctx.Params.Profile.GameAppId, uintVersion, ct);
 				}
 				catch (Exception e)
 				{
-					e.Log();
+					e.Log("Failed server up-to-date check");
 				}
 			}
 
 			return new ComponentInfo
 			{
 				Path = ctx.InstallPath,
-				Version = version,
+				Version = localVersion,
 				UpgradeVersion = upgradeVersion,
 				Upgradable = upgradeVersion != null
 			};
@@ -215,19 +209,16 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 		while (true);
 	}
 	
-	private static async Task<string?> GetLocalPatchVersionAsync(string installDir, CancellationToken ct = default)
+	private static async Task<string?> GetLocalPatchVersionAsync(ServerInstallContext ctx, CancellationToken ct = default)
 	{
-		foreach (string dir in Directory.EnumerateDirectories(installDir))
+		string steaminfPath = Path.Join(ctx.GameModPath, "steam.inf");
+		if (File.Exists(steaminfPath))
 		{
-			string steaminfPath = Path.Combine(dir, "steam.inf");
-			if (File.Exists(steaminfPath))
+			foreach (string line in await File.ReadAllLinesAsync(steaminfPath, ct))
 			{
-				foreach (string line in await File.ReadAllLinesAsync(steaminfPath, ct))
+				if (line.StartsWith("PatchVersion="))
 				{
-					if (line.StartsWith("PatchVersion="))
-					{
-						return line["PatchVersion=".Length..];
-					}
+					return line["PatchVersion=".Length..];
 				}
 			}
 		}

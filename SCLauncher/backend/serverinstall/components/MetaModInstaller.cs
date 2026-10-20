@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Octokit;
 using SCLauncher.backend.install;
 using SCLauncher.model;
 using SCLauncher.model.install;
@@ -14,57 +16,101 @@ using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public partial class MetaModInstaller(InstallHelper helper) : IServerComponentInstaller<ComponentInfo>
+internal partial class MetaModInstaller : GithubInstaller<ServerInstallContext>, IServerComponentInstaller<ComponentInfo>
 {
-	private const string MetaModVersion = "1.12";
-
-	public ServerInstallComponent Component => ServerInstallComponent.MetaMod;
+	[GeneratedRegex(@"^mmsource.*-windows.*\.(?:tar\.gz|tgz|zip)$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+	private static partial Regex AssetRegexWindows { get; }
 	
+	[GeneratedRegex(@"^mmsource.*-linux.*\.(?:tar\.gz|tgz|zip)$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+	private static partial Regex AssetRegexLinux { get; }
+	
+	[GeneratedRegex(@"^(\d+)\.(\d+)\..*[\.\+](\d+)$")]
+	private static partial Regex VersionRegex { get; }
+	
+	public ServerInstallComponent Component => ServerInstallComponent.MetaMod;
+
+	private readonly InstallHelper _helper;
+
+	[SetsRequiredMembers]
+	public MetaModInstaller(InstallHelper helper) : base(helper)
+	{
+		_helper = helper;
+		
+		GithubOwner = "alliedmodders";
+		GithubRepo = "metamod-source";
+		
+		if (OperatingSystem.IsWindows())
+			GithubAssetRegex = AssetRegexWindows;
+		else if (OperatingSystem.IsLinux())
+			GithubAssetRegex = AssetRegexLinux;
+		else throw new PlatformNotSupportedException();
+	}
+
 	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken ct)
 	{
-		(string url, string filename) dl = await GetDownloadAsync(MetaModVersion, ct);
-		string archivePath = Path.Join(ctx.InstallPath, dl.filename);
-		
-		yield return new StatusMessage($"Downloading...\n URL: {dl.url}\n Target: \"{archivePath}\"");
-		
+		(Release release, ReleaseAsset asset)? entry;
 		try
 		{
-			await helper.DownloadAsync(dl.url, archivePath, ct);
+			entry = await GetGithubDownloadableAsync(false, ctx, ct).ConfigureAwait(false);
 		}
 		catch (Exception e)
 		{
-			helper.SafeDelete(archivePath);
-			throw new InstallException("Failed to download MetaMod", e);
+			throw new InstallException($"Unable to read {Component} releases from GitHub", e);
 		}
 
-		yield return new StatusMessage($"Extracting...");
+		if (entry == null)
+		{
+			throw new InstallException("No downloadable archive found in GitHub releases");
+		}
 
+		string dlFilename = entry.Value.asset.Name;
+		string dlUrl = entry.Value.asset.BrowserDownloadUrl;
+		string targetArchive = Path.Join(ctx.InstallPath, dlFilename);
+		
+		yield return new StatusMessage($"Downloading...\n URL: {dlUrl}\n Target: \"{targetArchive}\"");
+		
 		try
 		{
-			await helper.ExtractAsync(archivePath, ctx.GameModPath, true, ct);
+			await _helper.DownloadAsync(dlUrl, targetArchive, ct);
 		}
 		catch (Exception e)
 		{
-			throw new InstallException("Failed to extract MetaMod", e);
+			_helper.SafeDelete(targetArchive);
+			throw new InstallException($"Failed to download {Component}", e);
+		}
+		
+		ct.ThrowIfCancellationRequested();
+
+		try
+		{
+			yield return new StatusMessage("Extracting...");
+			try
+			{
+				await _helper.ExtractAsync(targetArchive, ctx.GameModPath, true, ct);
+			}
+			catch (Exception e)
+			{
+				throw new InstallException($"Failed to extract {dlFilename}", e);
+			}
 		}
 		finally
 		{
-			helper.SafeDelete(archivePath);
+			_helper.SafeDelete(targetArchive);
 		}
 	}
-
+	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
 		CancellationToken ct = default)
 	{
-		string? metamod = null;
+		string? path = null;
 		try
 		{
-			metamod = Path.Join(ctx.AddonsPath, "metamod");
+			path = Path.Join(ctx.AddonsPath, "metamod");
 		}
 		catch (UnsetInstallPathException) {}
 		
-		if (!Directory.Exists(metamod))
+		if (!Directory.Exists(path))
 		{
 			return ComponentInfo.ReadyToInstall;
 		}
@@ -75,16 +121,22 @@ public partial class MetaModInstaller(InstallHelper helper) : IServerComponentIn
 		{
 			try
 			{
-				localVersion = GetLocalVersion(metamod);
+				localVersion = GetLocalVersion(path);
 				if (localVersion != null)
 				{
-					Version? latestVersion = await GetLatestVersionAsync(MetaModVersion, ct);
-					if (latestVersion != null)
+					(Release release, ReleaseAsset asset)? entry = await GetGithubDownloadableAsync(false, ctx, ct)
+						.ConfigureAwait(false);
+					
+					if (entry != null)
 					{
-						Trace.WriteLine($"Checking MetaMod version [Local: {localVersion}, Latest: {latestVersion}]");
-						if (localVersion.CompareTo(latestVersion) < 0)
+						Version? latestVersion = ExtractVersion(VersionRegex.Match(entry.Value.release.TagName));
+						if (latestVersion != null)
 						{
-							upgradeVersion = latestVersion;
+							Trace.WriteLine($"Checking {Component} version [Local: {localVersion}, Latest: {latestVersion}]");
+							if (localVersion.CompareTo(latestVersion) < 0)
+							{
+								upgradeVersion = latestVersion;
+							}
 						}
 					}
 				}
@@ -97,39 +149,22 @@ public partial class MetaModInstaller(InstallHelper helper) : IServerComponentIn
 		
 		return new ComponentInfo
 		{
-			Path = metamod,
+			Path = path,
 			Upgradable = upgradeVersion != null,
 			UpgradeVersion = upgradeVersion?.ToString(),
 			Version = localVersion?.ToString()
 		};
 	}
-
-	private async Task<(string url, string filename)> GetDownloadAsync(string baseVersion,
-		CancellationToken cancellationToken = default)
-	{
-		string platform = Environment.OSVersion.Platform switch
-		{
-			PlatformID.Win32NT => "windows",
-			PlatformID.Unix => "linux",
-			_ => throw new PlatformNotSupportedException()
-		};
-		string baseUrl = $"https://mms.alliedmods.net/mmsdrop/{baseVersion}/";
-		string filename = await helper.HttpClient.GetStringAsync($"{baseUrl}mmsource-latest-{platform}", cancellationToken);
-		return (baseUrl + filename, filename);
-	}
-
-	[GeneratedRegex(@"^(\d+)\.(\d+)\..*\+(\d+)$")]
-	private static partial Regex ProductVersionRegex();
 	
-	private Version? GetLocalVersion(string metamod)
+	private Version? GetLocalVersion(string path)
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
-			string metamodDll = Path.Join(metamod, "bin", "server.dll");
-			string? productVersion = helper.GetFileProductVersion(metamodDll);
+			string dll = Path.Join(path, "bin", "server.dll");
+			string? productVersion = _helper.GetFileProductVersion(dll);
 			if (productVersion != null)
 			{
-				Match match = ProductVersionRegex().Match(productVersion);
+				Match match = VersionRegex.Match(productVersion);
 				return ExtractVersion(match);
 			}
 		}
@@ -140,17 +175,7 @@ public partial class MetaModInstaller(InstallHelper helper) : IServerComponentIn
 
 		return null;
 	}
-
-	[GeneratedRegex(@"^mmsource-(\d+)\.(\d+)\..*-git(\d+)")]
-	private static partial Regex DlFilenameVersionRegex();
 	
-	private async Task<Version?> GetLatestVersionAsync(string baseVersion, CancellationToken cancellationToken = default)
-	{
-		var dl = await GetDownloadAsync(baseVersion, cancellationToken);
-		Match match = DlFilenameVersionRegex().Match(dl.filename);
-		return ExtractVersion(match);
-	}
-
 	private static Version? ExtractVersion(Match match)
 	{
 		if (match.Success)
