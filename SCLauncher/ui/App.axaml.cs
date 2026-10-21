@@ -10,8 +10,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Markdig;
-using MarkView.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using SCLauncher.backend;
 using SCLauncher.backend.service;
@@ -44,10 +42,6 @@ public class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
-		MarkdownViewerDefaults.Pipeline = new MarkdownPipelineBuilder()
-			.UseSupportedExtensions()
-			.Build();
-			
 		// Register all the services needed for the application to run
 		var serviceCollection = new ServiceCollection();
 		serviceCollection.AddBackendServices();
