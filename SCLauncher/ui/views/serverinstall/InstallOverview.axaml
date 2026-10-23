@@ -64,14 +64,19 @@
 		<ScrollViewer AllowAutoHide="False" DockPanel.Dock="Bottom" Name="ComponentsScrollViewer" Classes="RightMargin">
 			<ItemsControl Name="ComponentsGrid" ItemsSource="{Binding}" Margin="1 0">
 				<ItemsControl.ItemTemplate>
-					<DataTemplate DataType="serverinstallviews:ComponentViewModel">
-						<DockPanel Margin="0 2">
+					<DataTemplate DataType="serverinstallviews:InstallOverview+ComponentViewModel">
+						<DockPanel Margin="0 2" HorizontalSpacing="2">
 							
+							<!-- Right side -->
 							<DockPanel DockPanel.Dock="Right">
-								<SelectableTextBlock DockPanel.Dock="Right" VerticalAlignment="Center" TextWrapping="Wrap"
-								                     Text="{Binding Text}"/>
+								<Button DockPanel.Dock="Right" VerticalAlignment="Center"
+								        Content="{Binding Text}"
+								        Classes="Link"
+								        IsEnabled="{Binding ComponentInfo.VersionSelectable}"
+								        Click="OnSelectVersionClicked"/>
 							</DockPanel>
 							
+							<!-- Left side -->
 							<CheckBox DockPanel.Dock="Left" VerticalAlignment="Top"
 							          IsChecked="{Binding Enabled}"
 							          IsEnabled="{Binding Editable}">
@@ -80,11 +85,14 @@
 									<TextBlock.Effect>
 										<DropShadowEffect BlurRadius="15" Color="#80151515"/>
 									</TextBlock.Effect>
-									<Run FontSize="14" Foreground="{DynamicResource TextControlForeground}" Text="{Binding Component.Title}"/>
-									<Run FontSize="12" Foreground="#BEBEBE" FontWeight="DemiBold" Text="{Binding Component.Description}"/>
+									<Run FontSize="14" Foreground="{DynamicResource TextControlForeground}"
+									     Text="{Binding Component.Title}"/>
+									<Run FontSize="12" Foreground="#BEBEBE" FontWeight="DemiBold"
+									     Text="{Binding Component.Description}"/>
 								</TextBlock>
 							</CheckBox>
 							
+							<!-- Middle dots fill in -->
 							<Border Classes="DashedUnderline" Padding="0 10" VerticalAlignment="Bottom"/>
 
 						</DockPanel>

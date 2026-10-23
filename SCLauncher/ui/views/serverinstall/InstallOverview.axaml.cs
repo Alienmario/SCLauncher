@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SCLauncher.backend.service;
@@ -19,10 +21,15 @@ namespace SCLauncher.ui.views.serverinstall;
 
 public partial class InstallOverview : UserControl, IWizardPage
 {
+	private readonly ServerInstallService _installService;
 	
 	private WizardNavigator? Wizard { get; set; }
+	
 	private CancellationTokenSource? GatherCancelSrc { get; set; }
+	
 	private ObservableCollection<ComponentViewModel> ComponentEntries { get; } = [];
+	
+	private ConcurrentDictionary<ServerInstallComponent, IReadOnlyList<ComponentVersion>> VersionCache { get; } = new();
 
 	public bool IsLoading
 	{
@@ -38,6 +45,8 @@ public partial class InstallOverview : UserControl, IWizardPage
 	{
 		InitializeComponent();
 
+		_installService = App.GetService<ServerInstallService>();
+		
 		ComponentsGrid.DataContext = ComponentEntries;
 		
 		if (Design.IsDesignMode)
@@ -51,13 +60,13 @@ public partial class InstallOverview : UserControl, IWizardPage
 			ComponentEntries.Add(new ComponentViewModel
 			{
 				Component = ServerInstallComponent.MetaMod,
-				ComponentInfo = new ComponentInfo(),
+				ComponentInfo = new ComponentInfo { VersionSelectable = true },
 				Action = ComponentViewModel.CheckAction.Reinstall
 			});
 			ComponentEntries.Add(new ComponentViewModel
 			{
 				Component = ServerInstallComponent.SourceMod,
-				ComponentInfo = new ComponentInfo { Version = "1.0", Upgradable = true, UpgradeVersion = "2.0" },
+				ComponentInfo = new ComponentInfo { Version = "1.0", Upgradable = true, UpgradeVersion = "2.0", VersionSelectable = true },
 				Action = ComponentViewModel.CheckAction.Update
 			});
 			foreach (ComponentViewModel entry in ComponentEntries)
@@ -128,21 +137,22 @@ public partial class InstallOverview : UserControl, IWizardPage
 		{
 			installParams.Components = ComponentEntries
 				.Where(i => i.Enabled)
-				.Select(i => i.Component)
-				.ToHashSet();
+				.ToDictionary(i => i.Component, i => new ServerInstallComponentParams
+				{
+					Version = i.SelectedVersion?.Version
+				});
 		}
 		wizard.SetPageContent(new InstallConsole());
 	}
 
 	private void GatherComponentData(ServerInstallParams installParams)
 	{
-		var installService = App.GetService<ServerInstallService>();
-		
 		GatherCancelSrc?.Cancel();
 		GatherCancelSrc?.Dispose();
 		GatherCancelSrc = new CancellationTokenSource();
 		CancellationToken ct = GatherCancelSrc.Token;
 		
+		VersionCache.Clear();
 		IsLoading = true;
 
 		Task.Run(async () =>
@@ -150,7 +160,7 @@ public partial class InstallOverview : UserControl, IWizardPage
 			if (ct.IsCancellationRequested)
 				return;
 			
-			var componentInfos = (await installService.GatherComponentInfosAsync(installParams, true, ct))
+			var componentInfos = (await _installService.GatherComponentInfosAsync(installParams, true, ct))
 					.OrderBy(pair => pair.Key.InstallOrder)
 					.ToList();
 			
@@ -208,6 +218,28 @@ public partial class InstallOverview : UserControl, IWizardPage
 		}, ct).LogExceptions();
 	}
 
+	private void OnSelectVersionClicked(object? sender, RoutedEventArgs args)
+	{
+		if (sender is not Control { DataContext: ComponentViewModel { ComponentInfo.VersionSelectable: true } vm })
+			return;
+
+		if (DataContext is not ServerInstallParams installParams)
+			return;
+
+		new VersionSelectOverlay(vm.Component, vm.SelectedVersion,
+			async ct =>
+			{
+				if (VersionCache.TryGetValue(vm.Component, out var cached))
+					return cached;
+
+				var fetched = await _installService.GatherComponentVersionsAsync(installParams, vm.Component, ct);
+				VersionCache[vm.Component] = fetched;
+				return fetched;
+			},
+			selectedVersion => vm.SelectedVersion = selectedVersion)
+			.Open(this);
+	}
+
 	private void OnPresetSelectionChanged(object? sender, SelectionChangedEventArgs e)
 	{
 		ResetInstallStates();
@@ -216,7 +248,7 @@ public partial class InstallOverview : UserControl, IWizardPage
 	/// Prevents re-entrance loops from property-changed events
 	private bool _isUpdatingComponentStates;
 	
-	/// Sets components' default checkbox states by the preset
+	/// Sets components' default states by the preset
 	private void ResetInstallStates()
 	{
 		if (_isUpdatingComponentStates) return;
@@ -226,6 +258,7 @@ public partial class InstallOverview : UserControl, IWizardPage
 		{
 			foreach (var entry in ComponentEntries)
 			{
+				entry.SelectedVersion = null;
 				entry.Enabled = entry.Action != ComponentViewModel.CheckAction.Reinstall;
 				if (entry.Action == ComponentViewModel.CheckAction.Install)
 				{
@@ -295,52 +328,78 @@ public partial class InstallOverview : UserControl, IWizardPage
 			UpdateDependencyLocks();
 		}
 	}
-}
-
-public partial class ComponentViewModel : ObservableObject
-{
-	public enum CheckAction
-	{
-		Install, Reinstall, Update
-	}
 	
-	public required ServerInstallComponent Component { get; init; }
-	public required ComponentInfo ComponentInfo { get; init; }
-	public required CheckAction Action
+	public partial class ComponentViewModel : ObservableObject
 	{
-		get;
-		init
+		/// Computed meaning of checking the install checkbox
+		public enum CheckAction
 		{
-			field = value;
+			Install, Reinstall, Update
+		}
+	
+		/// The installation component being targeted
+		public required ServerInstallComponent Component { get; init; }
+		/// Gathered component status
+		public required ComponentInfo ComponentInfo { get; init; }
+		/// See <see cref="CheckAction"/>
+		public required CheckAction Action
+		{
+			get;
+			init
+			{
+				field = value;
+				UpdateText();
+			}
+		}
+	
+		[ObservableProperty]
+		public partial string? Text { get; private set; }
+	
+		[ObservableProperty]
+		public partial bool Enabled { get; set; }
+
+		[ObservableProperty]
+		public partial bool Editable { get; set; }
+
+		[ObservableProperty]
+		public partial ComponentVersion? SelectedVersion { get; set; }
+
+		partial void OnEnabledChanged(bool value)
+		{
 			UpdateText();
 		}
+
+		partial void OnSelectedVersionChanged(ComponentVersion? value)
+		{
+			if (value != null)
+			{
+				Enabled = true;
+			}
+			UpdateText();
+		}
+
+		private void UpdateText()
+		{
+			Text = this switch
+			{
+				{ SelectedVersion: not null, Enabled: true, ComponentInfo.Installed: true, ComponentInfo.Version: not null }
+					=> SelectedVersion.Version.Equals(ComponentInfo.Version)
+						? $"Force reinstall ({ComponentInfo.Version})"
+						: $"Change version ({ComponentInfo.Version} -> {SelectedVersion.Version})",
+				{ SelectedVersion: not null, Enabled: true, ComponentInfo.Installed: true }
+					=> $"Change version ({SelectedVersion.Version})",
+				{ SelectedVersion: not null, Enabled: true, ComponentInfo.Installed: false }
+					=> $"Install ({SelectedVersion.Version})",
+				{ Action: CheckAction.Install }
+					=> Enabled ? "Install" : "Available",
+				{ Action: CheckAction.Reinstall }
+					=> Enabled ? "Force reinstall" : "Installed",
+				{ Action: CheckAction.Update, Enabled: true, ComponentInfo: { Version: not null, UpgradeVersion: not null } }
+					=> $"Update ({ComponentInfo.Version} -> {ComponentInfo.UpgradeVersion})",
+				{ Action: CheckAction.Update }
+					=> Enabled ? "Update" : "Update available",
+				_ => "???"
+			};
+		}
 	}
-	
-	[ObservableProperty]
-	public partial string? Text { get; private set; }
-	
-    [ObservableProperty]
-    public partial bool Enabled { get; set; }
-
-    [ObservableProperty]
-    public partial bool Editable { get; set; }
-
-    partial void OnEnabledChanged(bool value)
-    {
-	    UpdateText();
-    }
-
-    private void UpdateText()
-    {
-	    Text = Action switch
-	    {
-		    CheckAction.Install => Enabled ? "Install" : "Available",
-		    CheckAction.Reinstall => Enabled ? "Force reinstall" : "Installed",
-		    CheckAction.Update when Enabled => ComponentInfo is { Version: not null, UpgradeVersion: not null }
-			    ? $"Update ({ComponentInfo.Version} -> {ComponentInfo.UpgradeVersion})"
-			    : "Update",
-		    CheckAction.Update => "Update available",
-		    _ => "???"
-	    };
-    }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
@@ -13,14 +14,13 @@ using SCLauncher.model;
 using SCLauncher.model.config;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
-using SteamKit2.Authentication;
 
 namespace SCLauncher.backend.serverinstall.components;
 
 internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallHelper installHelper)
 	: IServerComponentInstaller<ComponentInfo>
 {
-	public class ServerComponentInfo : ComponentInfo
+	public class DedicatedServerComponentInfo : ComponentInfo
 	{
 		public bool Validate { get; init; }
 	}
@@ -55,7 +55,7 @@ internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, Instal
 			await Task.Delay(1000, ct);
 			ComponentInfo info = await GatherInfoAsync(ctx, false, ct);
 			
-			if (info is ServerComponentInfo { Validate: true })
+			if (info is DedicatedServerComponentInfo { Validate: true })
 			{
 				yield return new StatusMessage("Requesting Steam validation");
 				SteamUtils.ValidateApp(ctx.Params.Profile.ServerAppId);
@@ -76,19 +76,30 @@ internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, Instal
 			VerifyAll = true,
 			AppId = ctx.Params.Profile.ServerAppId
 		};
-
-		int? exitCode = null;
-		await foreach ((string message, bool error) in SubProcess.AppDownload(cfg,
-			               i => exitCode = i,
-			               new UserConsoleAuthenticator(),
-			               ct))
+		if (ctx.GetTargetVersion(Component) is { } branch)
 		{
-			yield return new StatusMessage(message);
+			cfg.Branch = branch;
 		}
 
-		if (exitCode != SubProcess.Success)
+		await using var enumerator = DepotDownloaderApi.AppDownload(cfg, null, ct)
+			.ConfigureAwait(false).GetAsyncEnumerator();
+
+		while (true)
 		{
-			throw new InstallException("Dedicated server download failed");
+			try
+			{
+				if (!await enumerator.MoveNextAsync())
+					break;
+			}
+			catch (DepotDownloaderApiException e)
+			{
+				string messages = e.GetAllMessages();
+				if (messages != "")
+					throw new InstallException($"Dedicated server download failed ({messages})");
+				throw new InstallException("Dedicated server download failed");
+			}
+
+			yield return new StatusMessage(enumerator.Current.msg);
 		}
 	}
 	
@@ -115,7 +126,7 @@ internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, Instal
 			
 			bool dirExists = Directory.Exists(absInstallPath);
 			
-			return new ServerComponentInfo
+			return new DedicatedServerComponentInfo
 			{
 				Installable = true,
 				Installed = fullyInstalled && dirExists,
@@ -126,7 +137,7 @@ internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, Instal
 		else // ServerInstallMethod.Standalone
 		{
 			if (!File.Exists(Path.Join(ctx.GameModPath, "gameinfo.txt")))
-				return ComponentInfo.ReadyToInstall;
+				return ComponentInfo.ReadyToInstallWithVersionSelect;
 			
 			string? localVersion = null;
 			try
@@ -160,9 +171,34 @@ internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, Instal
 				Path = ctx.InstallPath,
 				Version = localVersion,
 				UpgradeVersion = upgradeVersion,
-				Upgradable = upgradeVersion != null
+				Upgradable = upgradeVersion != null,
+				VersionSelectable = true
 			};
 		}
+	}
+
+	public async Task<IReadOnlyList<ComponentVersion>> GatherVersionsAsync(
+		ServerInstallContext ctx, CancellationToken ct = default)
+	{
+		if (ctx.Params.Method != ServerInstallMethod.Standalone)
+			return [];
+
+		var branches = await DepotDownloaderApi.GetAppBranches(ctx.Params.Profile.ServerAppId, ct)
+			.ConfigureAwait(false);
+
+		return branches
+			.Where(b => !b.PasswordRequired)
+			.OrderByDescending(b => string.Equals(b.Name, "public", StringComparison.OrdinalIgnoreCase))
+			.Select(b => new ComponentVersion
+			{
+				Version = b.Name,
+				Title = b.Name,
+				Date = b.TimeUpdated,
+				Description = string.IsNullOrWhiteSpace(b.Description)
+					? $"Build ID: {b.BuildId}"
+					: $"{b.Description}\n\nBuild ID: {b.BuildId}"
+			})
+			.ToList();
 	}
 
 	public async IAsyncEnumerable<StatusMessage> Uninstall(ServerUninstallContext ctx,

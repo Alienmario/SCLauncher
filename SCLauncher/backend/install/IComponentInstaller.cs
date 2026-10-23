@@ -20,5 +20,11 @@ public interface IComponentInstaller<TComponentInfo, TInstallContext, TUninstall
 
 	/// Returns information about current installation of the component and whether it can be installed/upgraded.
 	public Task<TComponentInfo> GatherInfoAsync(TInstallContext ctx, bool checkForUpgrades, CancellationToken ct = default);
+
+	/// Returns selectable versions for the component in the given install context.
+	public Task<IReadOnlyList<ComponentVersion>> GatherVersionsAsync(TInstallContext ctx, CancellationToken ct = default)
+	{
+		return Task.FromResult<IReadOnlyList<ComponentVersion>>([]);
+	}
 	
 }

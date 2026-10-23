@@ -12,7 +12,8 @@
 		<!-- Header -->
 		<DockPanel DockPanel.Dock="Top" Margin="10 8 6 0">
 			<Button DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="8" Background="Transparent"
-			        Command="{Binding $parent[controls:UpdateOverlay].Close}">
+			        Command="{Binding $parent[controls:UpdateOverlay].Close}"
+			        HotKey="Escape">
 				<PathIcon Data="{StaticResource dismiss_regular}" Height="12" Width="12"/>
 			</Button>
 			<TextBlock Text="Release notes" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>

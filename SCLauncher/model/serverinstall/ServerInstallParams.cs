@@ -19,5 +19,12 @@ public partial class ServerInstallParams : INotifyPropertyChanged
 	public bool CreateSubfolder { get; set; } = true;
 
 	/// Components to install
-	public ISet<ServerInstallComponent> Components { get; set; } = new HashSet<ServerInstallComponent>();
+	public IDictionary<ServerInstallComponent, ServerInstallComponentParams> Components { get; set; } =
+		new Dictionary<ServerInstallComponent, ServerInstallComponentParams>();
+}
+
+public class ServerInstallComponentParams
+{
+	/// Optional specific version (tag or branch) to install. If null, latest stable is installed.
+	public string? Version { get; set; }
 }

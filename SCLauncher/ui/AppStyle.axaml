@@ -113,6 +113,33 @@
 		</Style>
 	</Style>
 	
+	<Style Selector="Button.Link">
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="^:pressed /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="^:disabled /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Foreground" Value="{DynamicResource ButtonForeground}"/>
+		</Style>
+		<Style Selector="^:not(:disabled)">
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="ContentTemplate">
+				<DataTemplate DataType="{x:Type x:String}">
+					<TextBlock Text="{Binding}" TextDecorations="Underline"/>
+				</DataTemplate>
+			</Setter>
+			<Style Selector="^:pointerover > TextBlock">
+				<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
+			</Style>
+		</Style>
+	</Style>
+	
 	<Style Selector="Button.danger">
 		<Setter Property="Background" Value="#660000"/>
 		<Style Selector="^:pointerover /template/ ContentPresenter">

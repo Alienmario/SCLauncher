@@ -69,10 +69,19 @@ public class ServerInstallService(
 			         .Where(installer => installer.Component.AppTypes.Contains(p.Profile.AppType))
 			         .OrderBy(installer => installer.Component.InstallOrder))
 		{
-			ctx.ComponentInfos[installer.Component] = await installer.GatherInfoAsync(ctx, checkForUpgrades, ct);
+			ctx.ComponentInfos[installer.Component] = await installer.GatherInfoAsync(ctx, checkForUpgrades, ct)
+				.ConfigureAwait(false);
 		}
 		
 		return ctx.ComponentInfos;
+	}
+
+	public async Task<IReadOnlyList<ComponentVersion>> GatherComponentVersionsAsync(
+		ServerInstallParams p, ServerInstallComponent component, CancellationToken ct = default)
+	{
+		var ctx = new ServerInstallContext(p);
+		var installer = componentInstallers.Single(i => i.Component == component);
+		return await installer.GatherVersionsAsync(ctx, ct).ConfigureAwait(false);
 	}
 	
 	public async Task<ServerAvailability> GetAvailabilityAsync(CancellationToken ct = default)
@@ -87,7 +96,7 @@ public class ServerInstallService(
 			Method = ServerInstallMethod.Standalone,
 			Path = profile.ServerPath,
 			CreateSubfolder = false
-		}, false, ct);
+		}, false, ct).ConfigureAwait(false);
 
 		var required = infos.Where(e => e.Key.Required && e.Value.Installable).ToList();
 		if (required.All(e => e.Value.Installed))

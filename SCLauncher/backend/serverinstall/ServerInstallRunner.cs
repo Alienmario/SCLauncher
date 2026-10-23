@@ -25,7 +25,7 @@ public class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Component
 		
 		try
 		{
-			foreach (var component in ctx.Params.Components.OrderBy(component => component.InstallOrder))
+			foreach (var component in ctx.Params.Components.Keys.OrderBy(component => component.InstallOrder))
 			{
 				async Task GatherInfoRecursive(ServerInstallComponent c)
 				{

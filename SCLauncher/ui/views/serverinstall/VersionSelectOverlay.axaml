@@ -1,0 +1,117 @@
+<controls:BaseOverlay xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+        xmlns:serverinstallviews="clr-namespace:SCLauncher.ui.views.serverinstall"
+        xmlns:li="using:LoadingIndicators.Avalonia"
+        xmlns:mv="using:MarkView.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="SCLauncher.ui.views.serverinstall.VersionSelectOverlay">
+
+	<DockPanel>
+		
+		<!-- Header -->
+		<Grid DockPanel.Dock="Top" Margin="10 6 6 6" ColumnSpacing="10">
+			<Grid.ColumnDefinitions>
+				<!-- Title --><ColumnDefinition Width="1.5*"/>
+				<!-- Filter --><ColumnDefinition Width="*" MaxWidth="180"/>
+				<!-- Buttons --><ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			
+			<!-- Title -->
+			<FlexPanel Grid.Column="0" VerticalAlignment="Center" ColumnSpacing="6" Wrap="Wrap"
+			           TextBlock.TextTrimming="CharacterEllipsis">
+				<TextBlock Name="HeaderTextBlock" Text="Component"
+				           FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"/>
+				<TextBlock Text="version select"
+				           FontSize="14" Foreground="#BEBEBE" VerticalAlignment="Center"/>
+			</FlexPanel>
+			
+			<!-- Filter -->
+			<TextBox Grid.Column="1" Name="FilterTextBox" PlaceholderText="Filter..." BorderThickness="0"
+			         VerticalAlignment="Center" TextChanged="OnFilterChanged"/>
+			
+			<!-- Buttons -->
+			<StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="10">
+				<ToggleSwitch Name="PreReleaseToggle" OffContent="Pre-release" OnContent="Pre-release"
+				              VerticalAlignment="Stretch" IsCheckedChanged="OnFilterChanged"/>
+				<Button Name="DefaultButton" Classes="accent" Padding="8 4"
+				        VerticalAlignment="Stretch" Content="Default"
+				        Click="OnDefaultClicked"/>
+				<Button Padding="8" Background="Transparent"
+				        Command="{Binding $parent[controls:BaseOverlay].Close}"
+				        HotKey="Escape">
+					<PathIcon Data="{StaticResource dismiss_regular}" Height="12" Width="12"/>
+				</Button>
+			</StackPanel>
+		</Grid>
+		
+		<!-- Separator -->
+		<Border DockPanel.Dock="Top" Height="1" Background="{StaticResource FlyoutBorderThemeBrush}" Margin="10 0 10 0"/>
+		
+		<!-- Content -->
+		<Panel Name="MainContent">
+			<ListBox Name="VersionsListBox" Background="Transparent" Margin="10 6 6 6"
+			         ScrollViewer.AllowAutoHide="False"
+			         SelectionMode="Toggle"
+			         SelectionChanged="OnSelectionChanged">
+			    <!-- Use non-virtualizing panel to avoid scrollbar resizing -->
+				<ListBox.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel/>
+					</ItemsPanelTemplate>
+				</ListBox.ItemsPanel>
+			    <!-- Set selection colors -->
+				<ListBox.Resources>
+					<SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Color="#18FFFFFF"/>
+					<SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="#22FFFFFF"/>
+					<SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="#2CFFFFFF"/>
+				</ListBox.Resources>
+				<ListBox.Styles>
+					<Style Selector="ListBoxItem">
+						<Setter Property="Padding" Value="10 8"/>
+						<Setter Property="Margin" Value="0 0 8 4"/>
+						<Setter Property="CornerRadius" Value="6"/>
+						<Setter Property="Cursor" Value="Hand"/>
+					</Style>
+				</ListBox.Styles>
+				<ListBox.ItemTemplate>
+					<DataTemplate DataType="serverinstallviews:VersionSelectOverlay+VersionItemViewModel">
+						<StackPanel>
+							<StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+								<Button Classes="Transparent"
+								        Padding="0" BorderThickness="0"
+								        VerticalAlignment="Center"
+								        Click="OnVersionTitleClicked">
+									<TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold"
+									           Foreground="{StaticResource Highlight}"/>
+								</Button>
+								
+								<TextBlock Text="{Binding DateText}"
+								           IsVisible="{Binding DateText, Converter={x:Static ObjectConverters.IsNotNull}}"
+								           Margin="6 0 0 0"
+								           FontSize="12" Foreground="#BEBEBE" VerticalAlignment="Center"/>
+							</StackPanel>
+							
+							<LayoutTransformControl LayoutTransform="scale(0.80)" Margin="8 6" IsHitTestVisible="False">
+								<mv:MarkdownViewer Markdown="{Binding Body}"/>
+							</LayoutTransformControl>
+						</StackPanel>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+			
+			<TextBlock Name="EmptyText"
+			           Text="No applicable versions found."
+			           Foreground="#BEBEBE" FontSize="14"
+			           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			
+			<li:LoadingIndicator Name="LoadingIndicator" Mode="DoubleBounce" SpeedRatio="1.5"
+			                     Foreground="{StaticResource Highlight}"
+			                     MaxHeight="120"
+			                     VerticalAlignment="Center" HorizontalAlignment="Center"/>
+		</Panel>
+		
+	</DockPanel>
+</controls:BaseOverlay>

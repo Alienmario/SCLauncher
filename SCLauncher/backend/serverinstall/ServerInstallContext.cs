@@ -43,4 +43,7 @@ public class ServerInstallContext
 	/// Full addons path
 	/// <exception cref="UnsetInstallPathException">Throws if base path has not been set</exception>
 	public string AddonsPath => Path.Join(InstallPath, Params.Profile.ModFolder, "addons");
+
+	public string? GetTargetVersion(ServerInstallComponent component) =>
+		Params.Components.TryGetValue(component, out var componentParams) ? componentParams.Version : null;
 }

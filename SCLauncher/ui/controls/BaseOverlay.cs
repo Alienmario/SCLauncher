@@ -48,7 +48,7 @@ public partial class BaseOverlay : ContentControl
 	    }
     }
 
-    public virtual void Close()
+	public virtual void Close()
     {
 	    if (IsOpen)
 	    {
@@ -93,4 +93,5 @@ public partial class BaseOverlay : ContentControl
 	    if (sender == args.Source)
 	        Close();
     }
+
 }
