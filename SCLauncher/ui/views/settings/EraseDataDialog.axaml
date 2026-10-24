@@ -13,7 +13,7 @@
 		           TextWrapping="Wrap" FontSize="16" LineSpacing="10">
 			<Run Text="Are you sure you want to erase all local data?"/>
 			<LineBreak/>
-			<Run Text="This will delete all settings, profiles and cached data." FontSize="13"
+			<Run Text="This will delete all settings and profiles." FontSize="13"
 			     Foreground="{DynamicResource TextControlForegroundDisabled}"/>
 		</TextBlock>
 	</controls:BaseDialogWindow.MainContent>
