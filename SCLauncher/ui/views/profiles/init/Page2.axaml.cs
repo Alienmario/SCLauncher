@@ -16,7 +16,8 @@ public partial class Page2 : UserControl, IWizardPage
 	{
 		public required AppType AppType { get; init; }
 		public required IEnumerable<AppPreset> Presets { get; init; }
-		[ObservableProperty] public required partial AppPreset SelectedPreset { get; set; }
+		[ObservableProperty]
+		public required partial AppPreset SelectedPreset { get; set; }
 	}
 
 	public IEnumerable<AppType> AppTypes
@@ -43,18 +44,29 @@ public partial class Page2 : UserControl, IWizardPage
 	public void OnAttachedToWizard(WizardNavigator wizard, bool unstacked)
 	{
 		wizard.ForwardButtonRunsAction = true;
+
+		if (DataContext is IEnumerable<Item> items && !items.Any(item => item.Presets.Count() > 1))
+		{
+			CreateProfiles(items);
+			wizard.RequestExit();
+		}
 	}
 
 	public void OnNextPageRequest(WizardNavigator wizard)
 	{
 		if (DataContext is IEnumerable<Item> items)
 		{
-			var profilesService = App.GetService<ProfilesService>();
-			foreach (var item in items.OrderBy(item => item.AppType))
-			{
-				profilesService.CreateProfile(item.AppType, item.SelectedPreset, item.AppType.GetDescription());
-			}
+			CreateProfiles(items);
 			wizard.RequestExit();
+		}
+	}
+
+	private static void CreateProfiles(IEnumerable<Item> items)
+	{
+		var profilesService = App.GetService<ProfilesService>();
+		foreach (var item in items.OrderBy(item => item.AppType))
+		{
+			profilesService.CreateProfile(item.AppType, item.SelectedPreset, item.AppType.GetDescription());
 		}
 	}
 }
