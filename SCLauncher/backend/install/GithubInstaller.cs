@@ -176,7 +176,7 @@ internal class GithubInstaller<TContext>(InstallHelper helper)
 		var downloadables = await GetGithubDownloadablesAsync(ctx, preRelease: null, ct).ConfigureAwait(false);
 		return downloadables.Select(d => new ComponentVersion
 		{
-			Version = d.release.TagName,
+			Version = GetVersionString(d.release) ?? d.release.TagName,
 			Title = string.IsNullOrWhiteSpace(d.release.Name) ? d.release.TagName : d.release.Name,
 			Description = string.IsNullOrWhiteSpace(d.release.Body) ? null : d.release.Body.Trim(),
 			Url = d.release.HtmlUrl,
@@ -184,5 +184,7 @@ internal class GithubInstaller<TContext>(InstallHelper helper)
 			Prerelease = d.release.Prerelease
 		}).ToList();
 	}
+
+	public virtual string? GetVersionString(Release release) => release.TagName;
 	
 }

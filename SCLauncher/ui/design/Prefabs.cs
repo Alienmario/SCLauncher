@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using SCLauncher.model.config;
 using SCLauncher.model.definition;
+using SCLauncher.model.install;
 using SCLauncher.model.serverbrowser;
 using SCLauncher.model.serverinstall;
 
@@ -34,6 +36,20 @@ public class DServerConfiguration : ServerConfigurationHL2DM
 		StartMap = "bm_c0a0a";
 		CustomParams.Add(new CustomParam { Key = "key1", Value = "value1" });
 		CustomParams.Add(new CustomParam { Key = "key2", Value = "value2" });
+	}
+}
+
+public class DComponentVersion : ComponentVersion
+{
+	[SetsRequiredMembers]
+	public DComponentVersion(int major = 1)
+	{
+		Version = $"{major}.0.0.0";
+		Title = $"Version {major}";
+		Description = "Version description";
+		Url = "https://example.com";
+		Date = DateTimeOffset.UnixEpoch;
+		Prerelease = major % 2 == 0;
 	}
 }
 

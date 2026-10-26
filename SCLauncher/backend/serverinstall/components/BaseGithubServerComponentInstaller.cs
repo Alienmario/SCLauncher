@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Octokit;
 using SCLauncher.backend.install;
-using SCLauncher.backend.util;
 using SCLauncher.model;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
@@ -18,7 +17,7 @@ namespace SCLauncher.backend.serverinstall.components;
 internal abstract partial class BaseGithubServerComponentInstaller(InstallHelper helper)
 	: GithubInstaller<ServerInstallContext>(helper), IServerComponentInstaller<ComponentInfo>
 {
-	[GeneratedRegex(@"^(\d+)\.(\d+)\..*[\.\+](\d+)$")]
+	[GeneratedRegex(@"^(\d+)\.(\d+)\.(\d+).*?[\.\+](\d+)$")]
 	protected static partial Regex AlliedModdersVersionRegex { get; }
 
 	public required ServerInstallComponent Component { get; init; }
@@ -117,11 +116,12 @@ internal abstract partial class BaseGithubServerComponentInstaller(InstallHelper
 					
 					if (downloadable != null)
 					{
-						string? latestVersion = GetReleaseVersion(downloadable.Value.release);
+						string? latestVersion = GetVersionString(downloadable.Value.release);
 						if (latestVersion != null)
 						{
 							Trace.WriteLine($"Checking {Component} version [Local: {localVersion}, Latest: {latestVersion}]");
-							if (CompareVersions(localVersion, latestVersion) < 0)
+							if (((IServerComponentInstaller<ComponentInfo>)this)
+							    .TryCompareVersions(localVersion, latestVersion, out int? cmp) && cmp < 0)
 							{
 								upgradeVersion = latestVersion;
 							}
@@ -151,12 +151,6 @@ internal abstract partial class BaseGithubServerComponentInstaller(InstallHelper
 
 	protected abstract string? GetLocalVersion(string path);
 
-	protected virtual string? GetReleaseVersion(Release release) =>
-		release.TagName.StartsWith('v') ? release.TagName[1..] : release.TagName;
-
-	protected virtual int CompareVersions(string localVersion, string latestVersion) =>
-		VersionUtils.SmartCompare(localVersion, latestVersion);
-
 	protected static string? ExtractAlliedModdersVersion(string input)
 	{
 		Match match = AlliedModdersVersionRegex.Match(input);
@@ -165,7 +159,8 @@ internal abstract partial class BaseGithubServerComponentInstaller(InstallHelper
 			return new Version(
 				int.TryParse(match.Groups[1].Value, out int major) ? major : 0,
 				int.TryParse(match.Groups[2].Value, out int minor) ? minor : 0,
-				int.TryParse(match.Groups[3].Value, out int build) ? build : 0
+				int.TryParse(match.Groups[3].Value, out int build) ? build : 0,
+				int.TryParse(match.Groups[4].Value, out int revision) ? revision : 0
 			).ToString();
 		}
 

@@ -24,6 +24,7 @@
 	<Styles.Resources>
 		<Color x:Key="HighlightColor">#FFAA00</Color> <!-- Themed highlight color -->
 		<Color x:Key="HighlightColor2">#AB7200</Color> <!-- Themed highlight color (secondary) -->
+		<Color x:Key="SecondaryColor">#BEBEBE</Color> <!-- Secondary foreground color -->
 		<Color x:Key="BackgroundColor">#292929</Color> <!-- Gray without transparency-->
 		<Color x:Key="BackdropColor">#CC000000</Color> <!-- Black with transparency -->
 		<Color x:Key="BackgroundPane">#34595959</Color> <!-- Translucent panels -->
@@ -31,6 +32,8 @@
 		<Color x:Key="BackgroundPane3">#F5232323</Color> <!-- Translucent panels -->
 
 		<SolidColorBrush x:Key="Highlight" Color="{StaticResource HighlightColor}"/>
+		<SolidColorBrush x:Key="Secondary" Color="{StaticResource SecondaryColor}"/>
+		
 		<!--Flyout-->
 		<SolidColorBrush x:Key="FlyoutPresenterBackground" Color="{StaticResource BackgroundPane3}"/>
 		<SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="{StaticResource BackgroundPane3}"/>
@@ -42,12 +45,11 @@
 		<SolidColorBrush x:Key="ComboBoxItemBackground" Color="{StaticResource BackgroundPane3}"/>
 		<!--Notification-->
 		<SolidColorBrush x:Key="NotificationCardBackgroundBrush" Color="{StaticResource BackgroundPane3}"/>
-		
 		<!-- Fix title bar buttons PointerOver bg -->
 		<SolidColorBrush x:Key="CaptionButtonBackground" Color="{DynamicResource SystemBaseLowColor}" />
 		<!-- Fix title bar buttons Pressed bg -->
 		<SolidColorBrush x:Key="CaptionButtonBorderBrush" Color="{DynamicResource SystemBaseMediumLowColor}" />
-		
+		<!-- Window title bar backdrop -->
 		<SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="#2C4B4B4B" />
 		
 		<LinearGradientBrush x:Key="WindowBackground" StartPoint="0%,0%" EndPoint="0%,100%">

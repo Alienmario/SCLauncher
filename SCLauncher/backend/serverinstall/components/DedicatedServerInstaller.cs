@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DepotDownloader;
-using SCLauncher.backend.install;
 using SCLauncher.backend.steam;
 using SCLauncher.backend.util;
 using SCLauncher.model;
@@ -17,9 +16,11 @@ using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallHelper installHelper)
+internal class DedicatedServerInstaller(GlobalConfiguration globalConfig)
 	: IServerComponentInstaller<ComponentInfo>
 {
+	private const char VersionDelimiter = '/';
+
 	public class DedicatedServerComponentInfo : ComponentInfo
 	{
 		public bool Validate { get; init; }
@@ -76,9 +77,9 @@ internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, Instal
 			VerifyAll = true,
 			AppId = ctx.Params.Profile.ServerAppId
 		};
-		if (ctx.GetTargetVersion(Component) is { } branch)
+		if (ctx.GetTargetVersion(Component) is { } targetVersion)
 		{
-			cfg.Branch = branch;
+			cfg.Branch = targetVersion.Split(VersionDelimiter)[0];
 		}
 
 		await using var enumerator = DepotDownloaderApi.AppDownload(cfg, null, ct)
@@ -138,27 +139,35 @@ internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, Instal
 		{
 			if (!File.Exists(Path.Join(ctx.GameModPath, "gameinfo.txt")))
 				return ComponentInfo.ReadyToInstallWithVersionSelect;
-			
-			string? localVersion = null;
+
+			LocalInstallInfo? installInfo = null;
 			try
 			{
-				localVersion = await GetLocalPatchVersionAsync(ctx, ct);
+				installInfo = DepotDownloaderApi.GetLocalInstallInfo(ctx.InstallPath);
 			}
 			catch (Exception e)
 			{
-				e.Log("Failed reading local server patch version");
+				e.Log("Failed reading current installation metadata");
 			}
 
+			if (installInfo is { State: LocalInstallState.Incomplete })
+				return ComponentInfo.ReadyToInstallWithVersionSelect;
+
+			string? localVersion = installInfo is { Branch: { } branch, BuildId: { } buildId }
+				? FormatVersion(branch, buildId)
+				: null;
+
 			string? upgradeVersion = null;
-			if (checkForUpgrades && localVersion != null)
+			if (checkForUpgrades && installInfo is { Branch: { } localBranch, BuildId: { } localBuildId })
 			{
 				try
 				{
-					// TODO: Transition to steam build id comparison
-					// GMOD - System.FormatException: The input string '2025.03.26' was not in a correct format.
-					// NMRIH - System.FormatException: The input string '1.1.5.0' was not in a correct format.
-					var uintVersion = Convert.ToUInt32(localVersion);
-					upgradeVersion = await SteamUpToDateCheckAsync(ctx.Params.Profile.GameAppId, uintVersion, ct);
+					uint latestBuildId = await DepotDownloaderApi.GetAppBuildId(
+						ctx.Params.Profile.ServerAppId, localBranch, ct).ConfigureAwait(false);
+					if (latestBuildId > 0 && latestBuildId != localBuildId)
+					{
+						upgradeVersion = FormatVersion(localBranch, latestBuildId);
+					}
 				}
 				catch (Exception e)
 				{
@@ -191,7 +200,7 @@ internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, Instal
 			.OrderByDescending(b => string.Equals(b.Name, "public", StringComparison.OrdinalIgnoreCase))
 			.Select(b => new ComponentVersion
 			{
-				Version = b.Name,
+				Version = FormatVersion(b.Name, b.BuildId),
 				Title = b.Name,
 				Date = b.TimeUpdated,
 				Description = string.IsNullOrWhiteSpace(b.Description)
@@ -199,6 +208,23 @@ internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, Instal
 					: $"{b.Description}\n\nBuild ID: {b.BuildId}"
 			})
 			.ToList();
+	}
+
+	public bool TryCompareVersions(string v1, string v2, [NotNullWhen(true)] out int? result)
+	{
+		string[] parts1 = v1.Split(VersionDelimiter);
+		string[] parts2 = v2.Split(VersionDelimiter);
+		if (parts1.Length == 2 && parts2.Length == 2
+		    && string.Equals(parts1[0], parts2[0], StringComparison.OrdinalIgnoreCase)
+		    && uint.TryParse(parts1[1], out uint b1)
+		    && uint.TryParse(parts2[1], out uint b2))
+		{
+			result = b1.CompareTo(b2);
+			return true;
+		}
+
+		result = null;
+		return false;
 	}
 
 	public async IAsyncEnumerable<StatusMessage> Uninstall(ServerUninstallContext ctx,
@@ -245,36 +271,7 @@ internal class DedicatedServerInstaller(GlobalConfiguration globalConfig, Instal
 		while (true);
 	}
 	
-	private static async Task<string?> GetLocalPatchVersionAsync(ServerInstallContext ctx, CancellationToken ct = default)
-	{
-		string steaminfPath = Path.Join(ctx.GameModPath, "steam.inf");
-		if (File.Exists(steaminfPath))
-		{
-			foreach (string line in await File.ReadAllLinesAsync(steaminfPath, ct))
-			{
-				if (line.StartsWith("PatchVersion="))
-				{
-					return line["PatchVersion=".Length..];
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public async Task<string?> SteamUpToDateCheckAsync(uint appId, uint version, CancellationToken cancellationToken = default)
-	{
-		var url = $"https://api.steampowered.com/ISteamApps/UpToDateCheck/v1/?appid={appId}&version={version}";
-		var json = await installHelper.HttpClient.GetStringAsync(url, cancellationToken);
-
-		// Parse JSON for required_version
-		var doc = JsonDocument.Parse(json);
-		if (doc.RootElement.TryGetProperty("response", out var respElem) &&
-		    respElem.TryGetProperty("required_version", out var reqVerElem))
-		{
-			return reqVerElem.ToString();
-		}
-		return null;
-	}
+	private static string FormatVersion(string branch, uint buildId) =>
+		$"{branch}{VersionDelimiter}{buildId}";
 	
 }

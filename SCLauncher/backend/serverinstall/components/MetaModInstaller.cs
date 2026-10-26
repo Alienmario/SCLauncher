@@ -53,5 +53,5 @@ internal partial class MetaModInstaller : BaseGithubServerComponentInstaller
 		return null;
 	}
 
-	protected override string? GetReleaseVersion(Release release) => ExtractAlliedModdersVersion(release.TagName);
+	public override string? GetVersionString(Release release) => ExtractAlliedModdersVersion(release.TagName);
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -82,6 +83,13 @@ public class ServerInstallService(
 		var ctx = new ServerInstallContext(p);
 		var installer = componentInstallers.Single(i => i.Component == component);
 		return await installer.GatherVersionsAsync(ctx, ct).ConfigureAwait(false);
+	}
+
+	public bool TryCompareComponentVersions(
+		ServerInstallComponent component, string v1, string v2, [NotNullWhen(true)] out int? result)
+	{
+		var installer = componentInstallers.Single(i => i.Component == component);
+		return installer.TryCompareVersions(v1, v2, out result);
 	}
 	
 	public async Task<ServerAvailability> GetAvailabilityAsync(CancellationToken ct = default)

@@ -10,11 +10,14 @@
 
 	<controls:BaseDialogWindow.MainContent>
 		<TextBlock Margin="10 10 10 0" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"
-		           TextWrapping="Wrap" FontSize="16" LineSpacing="10">
-			<Run Text="Are you sure you want to erase all local data?"/>
+		           TextWrapping="Wrap" FontSize="16" LineSpacing="6">
+			<Run Text="Are you sure you want to erase local data?"/>
 			<LineBreak/>
-			<Run Text="This will delete all settings and profiles." FontSize="13"
-			     Foreground="{DynamicResource TextControlForegroundDisabled}"/>
+			<Run Text="This will delete all settings and profiles." FontSize="14"
+			     Foreground="{StaticResource Secondary}"/>
+			<LineBreak/>
+			<Run Text="Installed servers will be preserved." FontSize="12"
+			     Foreground="{StaticResource Secondary}"/>
 		</TextBlock>
 	</controls:BaseDialogWindow.MainContent>
 

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using SCLauncher.backend.util;
 using SCLauncher.model;
 using SCLauncher.model.install;
 
@@ -25,6 +27,13 @@ public interface IComponentInstaller<TComponentInfo, TInstallContext, TUninstall
 	public Task<IReadOnlyList<ComponentVersion>> GatherVersionsAsync(TInstallContext ctx, CancellationToken ct = default)
 	{
 		return Task.FromResult<IReadOnlyList<ComponentVersion>>([]);
+	}
+
+	/// Attempts to compare two version strings of this component.
+	public bool TryCompareVersions(string v1, string v2, [NotNullWhen(true)] out int? result)
+	{
+		result = VersionUtils.SmartCompare(v1, v2);
+		return true;
 	}
 	
 }

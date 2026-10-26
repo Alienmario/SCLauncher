@@ -64,7 +64,7 @@
 		<ScrollViewer AllowAutoHide="False" DockPanel.Dock="Bottom" Name="ComponentsScrollViewer" Classes="RightMargin">
 			<ItemsControl Name="ComponentsGrid" ItemsSource="{Binding}" Margin="1 0">
 				<ItemsControl.ItemTemplate>
-					<DataTemplate DataType="serverinstallviews:InstallOverview+ComponentViewModel">
+					<DataTemplate DataType="serverinstallviews:InstallOverview+ComponentItem">
 						<DockPanel Margin="0 2" HorizontalSpacing="2">
 							
 							<!-- Right side -->

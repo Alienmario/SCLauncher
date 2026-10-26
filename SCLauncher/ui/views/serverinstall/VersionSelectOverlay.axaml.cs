@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
+using MarkView.Avalonia;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
 using SCLauncher.ui.controls;
+using SCLauncher.ui.design;
 using SCLauncher.ui.util;
 
 namespace SCLauncher.ui.views.serverinstall;
@@ -16,29 +19,34 @@ namespace SCLauncher.ui.views.serverinstall;
 public partial class VersionSelectOverlay : BaseOverlay
 {
 	private readonly Action<ComponentVersion?>? _onVersionSelected;
-	private readonly string? _selectedVersionStr;
+	private readonly string? _selectedVersion;
 	private IReadOnlyList<ComponentVersion>? _allVersions;
 	private CancellationTokenSource? _cts;
-	private bool _isUpdatingSelection;
+	private bool _innerClickHandled;
 
-	public VersionSelectOverlay()
+	/// Designer constructor
+	public VersionSelectOverlay() : this(
+		ServerInstallComponent.Server,
+		ct => Task.FromResult<IReadOnlyList<ComponentVersion>>(
+			[new DComponentVersion(1), new DComponentVersion(2), new DComponentVersion(3)]),
+		null, null)
 	{
-		InitializeComponent();
+		Debug.Assert(Design.IsDesignMode);
 	}
 
 	public VersionSelectOverlay(
 		ServerInstallComponent component,
-		ComponentVersion? currentSelection,
 		Func<CancellationToken, Task<IReadOnlyList<ComponentVersion>>> versionsLoader,
-		Action<ComponentVersion?> onVersionSelected)
+		string? currentSelection,
+		Action<ComponentVersion?>? onVersionSelected)
 	{
 		InitializeComponent();
+		SetupItemClickHandling();
 
 		_onVersionSelected = onVersionSelected;
-		_selectedVersionStr = currentSelection?.Version;
+		_selectedVersion = currentSelection;
 
 		HeaderTextBlock.Text = component.Title;
-		PreReleaseToggle.IsChecked = currentSelection?.Prerelease == true;
 
 		Closed += OnClosed;
 		LoadVersions(versionsLoader);
@@ -51,53 +59,43 @@ public partial class VersionSelectOverlay : BaseOverlay
 		_cts = null;
 	}
 
-	private void LoadVersions(Func<CancellationToken, Task<IReadOnlyList<ComponentVersion>>> versionsLoader)
+	private async void LoadVersions(Func<CancellationToken, Task<IReadOnlyList<ComponentVersion>>> loader)
 	{
 		_cts = new CancellationTokenSource();
 		CancellationToken ct = _cts.Token;
-
-		MainContent.VisibleChild = LoadingIndicator;
-
-		Task.Run(async () =>
+		
+		try
 		{
-			try
+			MainContent.VisibleChild = LoadingIndicator;
+
+			_allVersions = await loader(ct);
+			if (ct.IsCancellationRequested)
+				return;
+
+			var preReleases = _allVersions.Where(v => v.Prerelease).ToArray();
+			PreReleaseToggle.IsVisible = preReleases.Any();
+			if (preReleases.Any(v => v.Version.Equals(_selectedVersion, StringComparison.OrdinalIgnoreCase)))
 			{
-				var versions = await versionsLoader(ct);
-				if (ct.IsCancellationRequested)
-					return;
-
-				Dispatcher.UIThread.Post(() =>
-				{
-					if (ct.IsCancellationRequested)
-						return;
-
-					MainContent.VisibleChild = VersionsListBox;
-					bool hasPreReleases = versions.Any(v => v.Prerelease);
-					PreReleaseToggle.IsVisible = hasPreReleases;
-					if (!hasPreReleases)
-					{
-						PreReleaseToggle.IsChecked = false;
-					}
-					_allVersions = versions;
-					ApplyFilter();
-				});
+				PreReleaseToggle.IsChecked = true;
 			}
-			catch (Exception e)
+			ApplyFilter();
+			
+			MainContent.VisibleChild = MainContentScrollViewer;
+			PreReleaseToggle.IsCheckedChanged += OnFilterChanged;
+			FilterTextBox.TextChanged += OnFilterChanged;
+		}
+		catch (Exception e)
+		{
+			if (e is OperationCanceledException)
+				return;
+
+			e.Log();
+			if (!ct.IsCancellationRequested)
 			{
-				if (e is OperationCanceledException)
-					return;
-
-				e.Log();
-				Dispatcher.UIThread.Post(() =>
-				{
-					if (ct.IsCancellationRequested)
-						return;
-
-					Close();
-					App.ShowFailure(e.GetAllMessages());
-				});
+				Close();
+				App.ShowFailure(e.GetAllMessages());
 			}
-		}, ct);
+		}
 	}
 
 	private void ApplyFilter()
@@ -108,44 +106,25 @@ public partial class VersionSelectOverlay : BaseOverlay
 		bool preReleaseOnly = PreReleaseToggle.IsChecked == true;
 		string? filter = FilterTextBox.Text?.Trim();
 
-		var items = _allVersions
+		VersionsItemsControl.ItemsSource = _allVersions
 			.Where(v => v.Prerelease == preReleaseOnly)
 			.Where(v => string.IsNullOrEmpty(filter) ||
 			            v.Version.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
 			            v.Title.Contains(filter, StringComparison.OrdinalIgnoreCase))
-			.Select(v =>
+			.Select(v => new VersionItem
 			{
-				bool isSelected = _selectedVersionStr != null &&
-				                  string.Equals(v.Version, _selectedVersionStr, StringComparison.Ordinal);
-				return new VersionItemViewModel
-				{
-					ComponentVersion = v,
-					Title = string.IsNullOrWhiteSpace(v.Title) ? v.Version : v.Title,
-					Body = string.IsNullOrWhiteSpace(v.Description) ? "(No description)" : v.Description,
-					Url = v.Url,
-					DateText = v.Date?.LocalDateTime.ToShortDateString(),
-					IsSelected = isSelected
-				};
+				ComponentVersion = v,
+				Title = string.IsNullOrWhiteSpace(v.Title) ? v.Version : v.Title,
+				Body = string.IsNullOrWhiteSpace(v.Description) ? "(No description)" : v.Description,
+				Url = v.Url,
+				DateText = v.Date?.LocalDateTime.ToShortDateString(),
+				IsSelected = v.Version.Equals(_selectedVersion, StringComparison.OrdinalIgnoreCase)
 			})
 			.ToList();
 
-		if (items.Count == 0)
-		{
-			MainContent.VisibleChild = EmptyText;
-			return;
-		}
-
-		_isUpdatingSelection = true;
-		try
-		{
-			VersionsListBox.ItemsSource = items;
-			VersionsListBox.SelectedItem = items.FirstOrDefault(i => i.IsSelected);
-			MainContent.VisibleChild = VersionsListBox;
-		}
-		finally
-		{
-			_isUpdatingSelection = false;
-		}
+		MainContent.VisibleChild = VersionsItemsControl.ItemCount != 0
+			? MainContentScrollViewer
+			: EmptyFallbackTextBlock;
 	}
 
 	private void OnFilterChanged(object? sender, RoutedEventArgs args)
@@ -155,33 +134,46 @@ public partial class VersionSelectOverlay : BaseOverlay
 
 	private void OnVersionTitleClicked(object? sender, RoutedEventArgs args)
 	{
-		if (sender is Control { DataContext: VersionItemViewModel { Url: { } url } })
+		if (sender is Control { DataContext: VersionItem { Url: { } url } })
 		{
 			TopLevel.GetTopLevel(this)?.Launcher.LaunchUriAsync(new Uri(url));
 		}
 	}
-
-	private void OnSelectionChanged(object? sender, SelectionChangedEventArgs args)
-	{
-		if (_isUpdatingSelection)
-			return;
-
-		var item = args.AddedItems.OfType<VersionItemViewModel>().FirstOrDefault()
-			?? args.RemovedItems.OfType<VersionItemViewModel>().FirstOrDefault();
-		if (item != null)
-		{
-			_onVersionSelected?.Invoke(item.ComponentVersion);
-			Close();
-		}
-	}
-
+	
 	private void OnDefaultClicked(object? sender, RoutedEventArgs args)
 	{
 		_onVersionSelected?.Invoke(null);
 		Close();
 	}
 
-	public class VersionItemViewModel
+	private void SetupItemClickHandling()
+	{
+		// Tapped is raised even if an inner control (title button, markdown link) already handled the click,
+		// so track inner clicks and skip version selection for them
+		VersionsItemsControl.AddHandler(PointerPressedEvent, (_, _) => _innerClickHandled = false,
+			RoutingStrategies.Tunnel, handledEventsToo: true);
+		VersionsItemsControl.AddHandler(Button.ClickEvent, (_, _) => _innerClickHandled = true,
+			RoutingStrategies.Bubble, handledEventsToo: true);
+		VersionsItemsControl.AddHandler(MarkdownViewer.LinkClickedEvent, (_, _) => _innerClickHandled = true,
+			RoutingStrategies.Bubble, handledEventsToo: true);
+	}
+
+	private void OnVersionItemTapped(object? sender, TappedEventArgs args)
+	{
+		if (_innerClickHandled)
+		{
+			_innerClickHandled = false;
+			return;
+		}
+
+		if (sender is Control { DataContext: VersionItem item })
+		{
+			_onVersionSelected?.Invoke(item.ComponentVersion);
+			Close();
+		}
+	}
+	
+	public class VersionItem
 	{
 		public required ComponentVersion ComponentVersion { get; init; }
 		public string Title { get; init; } = "";
@@ -190,4 +182,5 @@ public partial class VersionSelectOverlay : BaseOverlay
 		public string? DateText { get; init; }
 		public bool IsSelected { get; init; }
 	}
+
 }
