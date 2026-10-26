@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using SCLauncher.model.config;
+using SCLauncher.model.definition;
+using SCLauncher.model.install;
 using SCLauncher.model.serverbrowser;
 using SCLauncher.model.serverinstall;
 
@@ -11,7 +14,7 @@ public class DServerInstallParams : ServerInstallParams
 	public DServerInstallParams()
 	{
 		Profile = DAppProfile.Instance;
-		Method = ServerInstallMethod.External;
+		Method = ServerInstallMethod.Standalone;
 		Path = @"C:\Program Files\Program Files\Program Files\Program Files\Program Files\Program Files\Server";
 	}
 }
@@ -25,7 +28,7 @@ public class DServerUninstallParams : ServerUninstallParams
 	}
 }
 
-public class DServerConfiguration : ServerConfigurationHl2dm
+public class DServerConfiguration : ServerConfigurationHL2DM
 {
 	public DServerConfiguration()
 	{
@@ -33,6 +36,20 @@ public class DServerConfiguration : ServerConfigurationHl2dm
 		StartMap = "bm_c0a0a";
 		CustomParams.Add(new CustomParam { Key = "key1", Value = "value1" });
 		CustomParams.Add(new CustomParam { Key = "key2", Value = "value2" });
+	}
+}
+
+public class DComponentVersion : ComponentVersion
+{
+	[SetsRequiredMembers]
+	public DComponentVersion(int major = 1)
+	{
+		Version = $"{major}.0.0.0";
+		Title = $"Version {major}";
+		Description = "Version description";
+		Url = "https://example.com";
+		Date = DateTimeOffset.UnixEpoch;
+		Prerelease = major % 2 == 0;
 	}
 }
 

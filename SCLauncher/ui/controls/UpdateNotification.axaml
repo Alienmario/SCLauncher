@@ -4,46 +4,48 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800"
              x:Class="SCLauncher.ui.controls.UpdateNotification">
+	
+	<LayoutTransformControl RenderTransformOrigin="50%,100%" Name="TransformControl">
+		<LayoutTransformControl.Styles>
+			<Style Selector="LayoutTransformControl">
+				<Setter Property="LayoutTransform" Value="scaleY(0)"/>
+			</Style>
+			<Style Selector="LayoutTransformControl.show">
+				<Setter Property="LayoutTransform" Value="scaleY(1)"/>
+			</Style>
+		</LayoutTransformControl.Styles>
+		<LayoutTransformControl.Transitions>
+			<Transitions>
+				<TransformOperationsTransition Property="LayoutTransform" Duration="0:0:1" Easing="CircularEaseInOut"/>
+			</Transitions>
+		</LayoutTransformControl.Transitions>
+		
+		<Panel>
+			<Border BorderThickness="0 2 0 0" Background="{StaticResource BackgroundPane2}" BorderBrush="#BB2145"
+			       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
-	<TransitioningContentControl Name="ContentControl" IsTransitionReversed="True"
-	                             TransitionCompleted="OnTransitionCompleted">
+			<Button Cursor="Hand"
+			        Padding="0"
+			        BorderThickness="0"
+			        Classes="Transparent"
+			        HorizontalAlignment="Stretch" VerticalContentAlignment="Center" VerticalAlignment="Center"
+			        Click="OnClick">
 
-		<TransitioningContentControl.PageTransition>
-			<PageSlide Orientation="Vertical" Duration="1.0" SlideOutEasing="QuinticEaseOut"/>
-		</TransitioningContentControl.PageTransition>
-
-		<TransitioningContentControl.Content>
-			<Panel>
-
-				<Border BorderThickness="0 2 0 0" Background="{StaticResource BackgroundPane2}" BorderBrush="#BB2145"
-				       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-
-				<Button Cursor="Hand"
-				        Padding="0"
-				        BorderThickness="0"
-				        Classes="Transparent"
-				        HorizontalAlignment="Stretch" VerticalContentAlignment="Center" VerticalAlignment="Center"
-				        Click="OnClick">
-
-						<TextBlock Padding="0 8" Text="Launcher update available!"
-						           TextAlignment="Center" VerticalAlignment="Center"
-						           FontSize="14" FontWeight="SemiBold">
-							<TextBlock.Effect>
-								<DropShadowEffect OffsetX="0" OffsetY="2" BlurRadius="4" Color="#000000"/>
-							</TextBlock.Effect>
-						</TextBlock>
-				</Button>
-				
-				<!-- Dismiss button -->
-				<Button HorizontalAlignment="Right" Padding="20 10" CornerRadius="0"
-				        Background="Transparent"
-				        Click="OnDismissClicked">
-					<PathIcon Data="{StaticResource dismiss_regular}" Height="10" Width="10"/>
-				</Button>
-				
-			</Panel>
-		</TransitioningContentControl.Content>
-
-	</TransitioningContentControl>
-
+					<TextBlock Padding="0 8" Text="Launcher update available!"
+					           TextAlignment="Center" VerticalAlignment="Center"
+					           FontSize="14" FontWeight="SemiBold">
+						<TextBlock.Effect>
+							<DropShadowEffect OffsetX="0" OffsetY="2" BlurRadius="4" Color="#000000"/>
+						</TextBlock.Effect>
+					</TextBlock>
+			</Button>
+			
+			<!-- Dismiss button -->
+			<Button HorizontalAlignment="Right" Padding="20 10" CornerRadius="0"
+			        Background="Transparent"
+			        Click="OnDismissButtonClicked">
+				<PathIcon Data="{StaticResource dismiss_regular}" Height="10" Width="10"/>
+			</Button>
+		</Panel>
+	</LayoutTransformControl>
 </UserControl>

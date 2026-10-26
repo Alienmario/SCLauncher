@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Octokit;
 using SCLauncher.backend.install;
 using SCLauncher.model;
 using SCLauncher.model.install;
@@ -15,33 +15,34 @@ using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public partial class SourceModInstaller(InstallHelper helper) : IServerComponentInstaller<ComponentInfo>
+internal partial class SourceModInstaller : BaseGithubServerComponentInstaller
 {
+	[GeneratedRegex(@"^sourcemod.*-windows.*\.(?:tar\.gz|tgz|zip)$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+	private static partial Regex AssetRegexWindows { get; }
 	
-	private const string SourceModVersion = "1.12";
+	[GeneratedRegex(@"^sourcemod.*-linux.*\.(?:tar\.gz|tgz|zip)$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+	private static partial Regex AssetRegexLinux { get; }
 
-	public ServerInstallComponent Component => ServerInstallComponent.SourceMod;
-	
-	public async IAsyncEnumerable<StatusMessage> Install(ServerInstallContext ctx,
-		[EnumeratorCancellation] CancellationToken ct)
+	[SetsRequiredMembers]
+	public SourceModInstaller(InstallHelper helper) : base(helper)
 	{
-		(string url, string filename) dl = await GetDownloadAsync(SourceModVersion, ct);
-		string smArchive = Path.Join(ctx.InstallPath, dl.filename);
+		Component = ServerInstallComponent.SourceMod;
+		GithubOwner = "alliedmodders";
+		GithubRepo = "sourcemod";
 		
-		yield return new StatusMessage($"Downloading...\n URL: {dl.url}\n Target: \"{smArchive}\"");
-		
-		try
-		{
-			await helper.DownloadAsync(dl.url, smArchive, ct);
-		}
-		catch (Exception e)
-		{
-			helper.SafeDelete(smArchive);
-			throw new InstallException("Failed to download SourceMod", e);
-		}
+		if (OperatingSystem.IsWindows())
+			GithubAssetRegex = AssetRegexWindows;
+		else if (OperatingSystem.IsLinux())
+			GithubAssetRegex = AssetRegexLinux;
+		else throw new PlatformNotSupportedException();
+	}
 
-		yield return new StatusMessage($"Backing up config files...");
-		string? backupArchive = await BackupUserData(ctx, ct);
+	protected override async IAsyncEnumerable<StatusMessage> ExtractArchiveAsync(
+		ServerInstallContext ctx, string archivePath,
+		[EnumeratorCancellation] CancellationToken ct = default)
+	{
+		yield return new StatusMessage("Backing up config files...");
+		string? backupArchive = await BackupUserData(ctx, ct).ConfigureAwait(false);
 		if (backupArchive == null)
 		{
 			yield return new StatusMessage("No files to backup");
@@ -49,22 +50,17 @@ public partial class SourceModInstaller(InstallHelper helper) : IServerComponent
 
 		try
 		{
-			yield return new StatusMessage($"Extracting...");
-			try
+			await foreach (var msg in base.ExtractArchiveAsync(ctx, archivePath, ct).ConfigureAwait(false))
 			{
-				await helper.ExtractAsync(smArchive, ctx.GameModPath, true, ct);
-			}
-			catch (Exception e)
-			{
-				throw new InstallException("Failed to extract SourceMod", e);
+				yield return msg;
 			}
 
 			if (backupArchive != null)
 			{
-				yield return new StatusMessage($"Restoring config files...");
+				yield return new StatusMessage("Restoring config files...");
 				try
 				{
-					await RestoreUserData(ctx, backupArchive);
+					await RestoreUserData(ctx, backupArchive).ConfigureAwait(false);
 				}
 				catch (Exception e)
 				{
@@ -75,16 +71,15 @@ public partial class SourceModInstaller(InstallHelper helper) : IServerComponent
 		}
 		finally
 		{
-			helper.SafeDelete(smArchive);
-			helper.SafeDelete(backupArchive);
+			Helper.SafeDelete(backupArchive);
 		}
 	}
 
-	public async Task<string?> BackupUserData(ServerInstallContext ctx, CancellationToken ct)
+	private async Task<string?> BackupUserData(ServerInstallContext ctx, CancellationToken ct)
 	{
 		string smConfigsPath = Path.Join(ctx.AddonsPath, "sourcemod", "configs");
 		string backupFile = Path.Join(ctx.AddonsPath, "sourcemod", "sclauncher_backup.zip");
-		helper.SafeDelete(backupFile);
+		Helper.SafeDelete(backupFile);
 
 		try
 		{
@@ -98,124 +93,38 @@ public partial class SourceModInstaller(InstallHelper helper) : IServerComponent
 		}
 		catch (Exception)
 		{
-			helper.SafeDelete(backupFile);
+			Helper.SafeDelete(backupFile);
 			throw;
 		}
 	}
 
-	public async Task RestoreUserData(ServerInstallContext ctx, string backupFile)
+	private async Task RestoreUserData(ServerInstallContext ctx, string backupFile)
 	{
-		await helper.ExtractAsync(backupFile, Path.Join(ctx.AddonsPath, "sourcemod"), true);
-	}
-	
-	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
-		CancellationToken ct = default)
-	{
-		string? sourcemod = null;
-		try
-		{
-			sourcemod = Path.Join(ctx.AddonsPath, "sourcemod");
-		}
-		catch (UnsetInstallPathException) {}
-		
-		if (!Directory.Exists(sourcemod))
-		{
-			return ComponentInfo.ReadyToInstall;
-		}
-		
-		Version? localVersion = null;
-		Version? upgradeVersion = null;
-		if (checkForUpgrades)
-		{
-			try
-			{
-				localVersion = GetLocalVersion(sourcemod);
-				if (localVersion != null)
-				{
-					Version? latestVersion = await GetLatestVersionAsync(SourceModVersion, ct);
-					if (latestVersion != null)
-					{
-						Trace.WriteLine($"Checking SourceMod version [Local: {localVersion}, Latest: {latestVersion}]");
-						if (localVersion.CompareTo(latestVersion) < 0)
-						{
-							upgradeVersion = latestVersion;
-						}
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				e.Log();
-			}
-		}
-		
-		return new ComponentInfo
-		{
-			Path = sourcemod,
-			Upgradable = upgradeVersion != null,
-			UpgradeVersion = upgradeVersion?.ToString(),
-			Version = localVersion?.ToString()
-		};
-	}
-	
-	private async Task<(string url, string filename)> GetDownloadAsync(string baseVersion,
-		CancellationToken ct = default)
-	{
-		string platform = Environment.OSVersion.Platform switch
-		{
-			PlatformID.Win32NT => "windows",
-			PlatformID.Unix => "linux",
-			_ => throw new PlatformNotSupportedException()
-		};
-		string baseUrl = $"https://sm.alliedmods.net/smdrop/{baseVersion}/";
-		string filename = await helper.HttpClient.GetStringAsync($"{baseUrl}sourcemod-latest-{platform}", ct);
-		return (baseUrl + filename, filename);
+		await Helper.ExtractAsync(backupFile, Path.Join(ctx.AddonsPath, "sourcemod"), true);
 	}
 
-	[GeneratedRegex(@"^(\d+)\.(\d+)\..*\.(\d+)$")]
-	private static partial Regex ProductVersionRegex();
-	
-	private Version? GetLocalVersion(string sourcemod)
+	protected override string GetComponentPath(ServerInstallContext ctx) =>
+		Path.Join(ctx.AddonsPath, "sourcemod");
+
+	protected override string? GetLocalVersion(string path)
 	{
-		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+		if (OperatingSystem.IsWindows())
 		{
-			string sourcemodDll = Path.Join(sourcemod, "bin", "sourcemod.logic.dll");
-			string? productVersion = helper.GetFileProductVersion(sourcemodDll);
+			string dll = Path.Join(path, "bin", "sourcemod.logic.dll");
+			string? productVersion = Helper.GetFileProductVersion(dll);
 			if (productVersion != null)
 			{
-				Match match = ProductVersionRegex().Match(productVersion);
-				return ExtractVersion(match);
+				return ExtractAlliedModdersVersion(productVersion);
 			}
 		}
-		else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+		else if (OperatingSystem.IsLinux())
 		{
 			// wat do
 		}
+		else throw new PlatformNotSupportedException();
 
 		return null;
 	}
 
-	[GeneratedRegex(@"^sourcemod-(\d+)\.(\d+)\..*-git(\d+)")]
-	private static partial Regex DlFilenameVersionRegex();
-	
-	private async Task<Version?> GetLatestVersionAsync(string baseVersion, CancellationToken ct = default)
-	{
-		var dl = await GetDownloadAsync(baseVersion, ct);
-		Match match = DlFilenameVersionRegex().Match(dl.filename);
-		return ExtractVersion(match);
-	}
-
-	private static Version? ExtractVersion(Match match)
-	{
-		if (match.Success)
-		{
-			return new Version(
-				int.TryParse(match.Groups[1].Value, out int major) ? major : 0,
-				int.TryParse(match.Groups[2].Value, out int minor) ? minor : 0,
-				int.TryParse(match.Groups[3].Value, out int build) ? build : 0
-			);
-		}
-
-		return null;
-	}
+	public override string? GetVersionString(Release release) => ExtractAlliedModdersVersion(release.TagName);
 }

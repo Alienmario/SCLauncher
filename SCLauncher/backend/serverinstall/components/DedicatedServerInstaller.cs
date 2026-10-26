@@ -1,27 +1,27 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DepotDownloader;
-using SCLauncher.backend.install;
 using SCLauncher.backend.steam;
 using SCLauncher.backend.util;
 using SCLauncher.model;
 using SCLauncher.model.config;
 using SCLauncher.model.install;
 using SCLauncher.model.serverinstall;
-using SteamKit2.Authentication;
 
 namespace SCLauncher.backend.serverinstall.components;
 
-public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallHelper installHelper)
+internal class DedicatedServerInstaller(GlobalConfiguration globalConfig)
 	: IServerComponentInstaller<ComponentInfo>
 {
-	public class ServerComponentInfo : ComponentInfo
+	private const char VersionDelimiter = '/';
+
+	public class DedicatedServerComponentInfo : ComponentInfo
 	{
 		public bool Validate { get; init; }
 	}
@@ -43,7 +43,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 	public async IAsyncEnumerable<StatusMessage> InstallViaSteamClient(ServerInstallContext ctx,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
-		if (!SteamUtils.IsValidSteamInstallDir(globalConfig.SteamPath))
+		if (!SteamUtils.IsValidSteamInstallPath(globalConfig.SteamPath))
 		{
 			throw new InstallException("Steam not found! Install it or specify Steam path in settings, then retry.");
 		}
@@ -56,14 +56,13 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 			await Task.Delay(1000, ct);
 			ComponentInfo info = await GatherInfoAsync(ctx, false, ct);
 			
-			if (info is ServerComponentInfo { Validate: true })
+			if (info is DedicatedServerComponentInfo { Validate: true })
 			{
 				yield return new StatusMessage("Requesting Steam validation");
 				SteamUtils.ValidateApp(ctx.Params.Profile.ServerAppId);
 			}
 			else if (info.Installed)
 			{
-				ctx.Params.Profile.ServerPath = info.Path;
 				break;
 			}
 		}
@@ -78,22 +77,31 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 			VerifyAll = true,
 			AppId = ctx.Params.Profile.ServerAppId
 		};
-
-		int? exitCode = null;
-		await foreach ((string message, bool error) in SubProcess.AppDownload(cfg,
-			               i => exitCode = i,
-			               new UserConsoleAuthenticator(),
-			               ct))
+		if (ctx.GetTargetVersion(Component) is { } targetVersion)
 		{
-			yield return new StatusMessage(message);
+			cfg.Branch = targetVersion.Split(VersionDelimiter)[0];
 		}
 
-		if (exitCode != SubProcess.Success)
-		{
-			throw new InstallException("Dedicated server download failed");
-		}
+		await using var enumerator = DepotDownloaderApi.AppDownload(cfg, null, ct)
+			.ConfigureAwait(false).GetAsyncEnumerator();
 
-		ctx.Params.Profile.ServerPath = ctx.InstallPath;
+		while (true)
+		{
+			try
+			{
+				if (!await enumerator.MoveNextAsync())
+					break;
+			}
+			catch (DepotDownloaderApiException e)
+			{
+				string messages = e.GetAllMessages();
+				if (messages != "")
+					throw new InstallException($"Dedicated server download failed ({messages})");
+				throw new InstallException("Dedicated server download failed");
+			}
+
+			yield return new StatusMessage(enumerator.Current.msg);
+		}
 	}
 	
 	public async Task<ComponentInfo> GatherInfoAsync(ServerInstallContext ctx, bool checkForUpgrades,
@@ -101,11 +109,11 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 	{
 		if (ctx.Params.Method == ServerInstallMethod.Steam)
 		{
-			string? steamDir = globalConfig.SteamPath;
-			if (steamDir == null) // this is explicitly handled during install
+			string? steamPath = globalConfig.SteamPath;
+			if (steamPath == null) // this is explicitly handled during install
 				return ComponentInfo.ReadyToInstall;
 
-			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamDir, ctx.Params.Profile.ServerAppId, ct);
+			SteamAppManifest? manifest = await SteamUtils.FindAppManifestAsync(steamPath, ctx.Params.Profile.ServerAppId, ct);
 			if (manifest == null)
 				return ComponentInfo.ReadyToInstall;
 
@@ -119,7 +127,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 			
 			bool dirExists = Directory.Exists(absInstallPath);
 			
-			return new ServerComponentInfo
+			return new DedicatedServerComponentInfo
 			{
 				Installable = true,
 				Installed = fullyInstalled && dirExists,
@@ -127,49 +135,96 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 				Validate = !dirExists
 			};
 		}
-		else // ServerInstallMethod.External
+		else // ServerInstallMethod.Standalone
 		{
-			if (!Directory.Exists(ctx.InstallPath))
-				return ComponentInfo.ReadyToInstall;
+			if (!File.Exists(Path.Join(ctx.GameModPath, "gameinfo.txt")))
+				return ComponentInfo.ReadyToInstallWithVersionSelect;
 
-			string? version = null;
+			LocalInstallInfo? installInfo = null;
 			try
 			{
-				version = await GetLocalPatchVersionAsync(ctx.InstallPath, ct);
+				installInfo = DepotDownloaderApi.GetLocalInstallInfo(ctx.InstallPath);
 			}
 			catch (Exception e)
 			{
-				e.Log();
+				e.Log("Failed reading current installation metadata");
 			}
 
-			if (version == null)
-			{
-				Trace.WriteLine("Failed to find server patch version, considering installation as incomplete");
-				return ComponentInfo.ReadyToInstall;
-			}
+			if (installInfo is { State: LocalInstallState.Incomplete })
+				return ComponentInfo.ReadyToInstallWithVersionSelect;
+
+			string? localVersion = installInfo is { Branch: { } branch, BuildId: { } buildId }
+				? FormatVersion(branch, buildId)
+				: null;
 
 			string? upgradeVersion = null;
-			if (checkForUpgrades)
+			if (checkForUpgrades && installInfo is { Branch: { } localBranch, BuildId: { } localBuildId })
 			{
 				try
 				{
-					var uintVersion = Convert.ToUInt32(version);
-					upgradeVersion = await SteamUpToDateCheckAsync(ctx.Params.Profile.ServerAppId, uintVersion, ct);
+					uint latestBuildId = await DepotDownloaderApi.GetAppBuildId(
+						ctx.Params.Profile.ServerAppId, localBranch, ct).ConfigureAwait(false);
+					if (latestBuildId > 0 && latestBuildId != localBuildId)
+					{
+						upgradeVersion = FormatVersion(localBranch, latestBuildId);
+					}
 				}
 				catch (Exception e)
 				{
-					e.Log();
+					e.Log("Failed server up-to-date check");
 				}
 			}
 
 			return new ComponentInfo
 			{
 				Path = ctx.InstallPath,
-				Version = version,
+				Version = localVersion,
 				UpgradeVersion = upgradeVersion,
-				Upgradable = upgradeVersion != null
+				Upgradable = upgradeVersion != null,
+				VersionSelectable = true
 			};
 		}
+	}
+
+	public async Task<IReadOnlyList<ComponentVersion>> GatherVersionsAsync(
+		ServerInstallContext ctx, CancellationToken ct = default)
+	{
+		if (ctx.Params.Method != ServerInstallMethod.Standalone)
+			return [];
+
+		var branches = await DepotDownloaderApi.GetAppBranches(ctx.Params.Profile.ServerAppId, ct)
+			.ConfigureAwait(false);
+
+		return branches
+			.Where(b => !b.PasswordRequired)
+			.OrderByDescending(b => string.Equals(b.Name, "public", StringComparison.OrdinalIgnoreCase))
+			.Select(b => new ComponentVersion
+			{
+				Version = FormatVersion(b.Name, b.BuildId),
+				Title = b.Name,
+				Date = b.TimeUpdated,
+				Description = string.IsNullOrWhiteSpace(b.Description)
+					? $"Build ID: {b.BuildId}"
+					: $"{b.Description}\n\nBuild ID: {b.BuildId}"
+			})
+			.ToList();
+	}
+
+	public bool TryCompareVersions(string v1, string v2, [NotNullWhen(true)] out int? result)
+	{
+		string[] parts1 = v1.Split(VersionDelimiter);
+		string[] parts2 = v2.Split(VersionDelimiter);
+		if (parts1.Length == 2 && parts2.Length == 2
+		    && string.Equals(parts1[0], parts2[0], StringComparison.OrdinalIgnoreCase)
+		    && uint.TryParse(parts1[1], out uint b1)
+		    && uint.TryParse(parts2[1], out uint b2))
+		{
+			result = b1.CompareTo(b2);
+			return true;
+		}
+
+		result = null;
+		return false;
 	}
 
 	public async IAsyncEnumerable<StatusMessage> Uninstall(ServerUninstallContext ctx,
@@ -216,39 +271,7 @@ public class DedicatedServerInstaller(GlobalConfiguration globalConfig, InstallH
 		while (true);
 	}
 	
-	private static async Task<string?> GetLocalPatchVersionAsync(string installDir, CancellationToken ct = default)
-	{
-		foreach (string dir in Directory.EnumerateDirectories(installDir))
-		{
-			string steaminfPath = Path.Combine(dir, "steam.inf");
-			if (File.Exists(steaminfPath))
-			{
-				foreach (string line in await File.ReadAllLinesAsync(steaminfPath, ct))
-				{
-					if (line.StartsWith("PatchVersion="))
-					{
-						return line["PatchVersion=".Length..];
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public async Task<string?> SteamUpToDateCheckAsync(uint appId, uint version, CancellationToken cancellationToken = default)
-	{
-		var url = $"https://api.steampowered.com/ISteamApps/UpToDateCheck/v1/?appid={appId}&version={version}";
-		var json = await installHelper.HttpClient.GetStringAsync(url, cancellationToken);
-
-		// Parse JSON for required_version
-		var doc = JsonDocument.Parse(json);
-		if (doc.RootElement.TryGetProperty("response", out var respElem) &&
-		    respElem.TryGetProperty("required_version", out var reqVerElem))
-		{
-			return reqVerElem.ToString();
-		}
-		return null;
-	}
+	private static string FormatVersion(string branch, uint buildId) =>
+		$"{branch}{VersionDelimiter}{buildId}";
 	
 }

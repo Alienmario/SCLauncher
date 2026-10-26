@@ -1,0 +1,86 @@
+<controls:BaseDialogWindow xmlns="https://github.com/avaloniaui"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:converters="clr-namespace:SCLauncher.ui.converters"
+                           xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+                           xmlns:crud="clr-namespace:SCLauncher.ui.views.profiles.crud"
+                           mc:Ignorable="d"
+                           x:Class="SCLauncher.ui.views.profiles.crud.ProfileManagerDialog"
+                           Title="Profile Manager"
+                           Width="600" Height="450"
+                           CanResize="False"
+                           VerticalScrollBarVisibility="Disabled">
+	
+	<controls:BaseDialogWindow.MainContent>
+		<DockPanel Margin="20" VerticalSpacing="20">
+			<TextBlock DockPanel.Dock="Top" Text="Profile Manager" FontSize="20" FontWeight="Bold"/>
+
+			<Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" BorderThickness="1"
+			        CornerRadius="4">
+				<ListBox Name="ProfilesListBox" DoubleTapped="OnDoubleTapped">
+					<ListBox.ItemTemplate>
+						<DataTemplate DataType="crud:ProfileManagerEntry">
+							<Grid ColumnDefinitions="*,Auto" Margin="8 8 20 8">
+								
+								<!-- Overview -->
+								<StackPanel Grid.Column="0" Spacing="5" VerticalAlignment="Center">
+									<TextBlock Text="{Binding Profile.Name}" FontWeight="SemiBold"
+									           FontSize="14"/>
+									<TextBlock FontSize="12" Opacity="0.7">
+										<Run Text="{Binding Profile.AppType, Mode=OneWay,
+											Converter={x:Static converters:EnumDescriptionConverter.Instance}}"/>
+										<Run Text="{Binding Profile.AppPreset, Mode=OneWay, StringFormat='- {0}',
+											Converter={x:Static converters:EnumDescriptionConverter.Instance}}"/>
+									</TextBlock>
+									<TextBlock Text="{Binding Profile.CreatedAt, StringFormat='{}Created {0}'}"
+									           FontSize="10" Opacity="0.5" VerticalAlignment="Center"/>
+								</StackPanel>
+								
+								<!-- Activation button -->
+								<Button Grid.Column="1" FontSize="12" IsEnabled="{Binding !IsActive}"
+								        Classes="accent" ClipToBounds="False" BorderThickness="10" Width="100"
+								        HorizontalContentAlignment="Center"
+								        Content="{Binding IsActive, Converter={x:Static converters:BoolToStringConverter.Instance},
+											ConverterParameter='Current|Activate'}"
+								        Click="OnActivateClick">
+									<Button.Effect>
+										<DropShadowEffect BlurRadius="10" OffsetY="0" OffsetX="0" Opacity="1"
+										                  Color="{DynamicResource SystemAccentColorDark2}"/>
+									</Button.Effect>
+								</Button>
+								
+							</Grid>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+			</Border>
+		</DockPanel>
+	</controls:BaseDialogWindow.MainContent>
+
+	<controls:BaseDialogWindow.FooterContent>
+		<DockPanel Margin="20" HorizontalSpacing="10">
+			<Button Name="AddButton" Classes="action" HotKey="N">
+				<StackPanel Spacing="6">
+					<PathIcon Data="{StaticResource add_regular}" Width="16"/>
+					<TextBlock Text="New" FontSize="10"/>
+				</StackPanel>
+			</Button>
+			<Button Name="EditButton" IsEnabled="False" Classes="action" HotKey="E">
+				<StackPanel Spacing="6">
+					<PathIcon Data="{StaticResource settings_regular}" Width="16"/>
+					<TextBlock Text="Edit" FontSize="10"/>
+				</StackPanel>
+			</Button>
+			<Button Name="DeleteButton" IsEnabled="False" Classes="action" HotKey="Delete">
+				<StackPanel Spacing="6">
+					<PathIcon Data="{StaticResource delete_regular}" Width="16"/>
+					<TextBlock Text="Delete" FontSize="10"/>
+				</StackPanel>
+			</Button>
+			<Button Name="CloseButton" Content="Close" Classes="action" HotKey="Escape"
+			        HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+		</DockPanel>
+	</controls:BaseDialogWindow.FooterContent>
+
+</controls:BaseDialogWindow>

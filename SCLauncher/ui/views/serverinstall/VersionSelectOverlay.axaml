@@ -1,0 +1,122 @@
+<controls:BaseOverlay xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:SCLauncher.ui.controls"
+        xmlns:serverinstallviews="clr-namespace:SCLauncher.ui.views.serverinstall"
+        xmlns:li="using:LoadingIndicators.Avalonia"
+        xmlns:mv="using:MarkView.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="SCLauncher.ui.views.serverinstall.VersionSelectOverlay">
+
+	<DockPanel>
+		
+		<!-- Header -->
+		<Grid DockPanel.Dock="Top" Margin="10 6 6 6" ColumnSpacing="10">
+			<Grid.ColumnDefinitions>
+				<!-- Title --><ColumnDefinition Width="1.5*"/>
+				<!-- Filter --><ColumnDefinition Width="*" MaxWidth="180"/>
+				<!-- Buttons --><ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			
+			<!-- Title -->
+			<FlexPanel Grid.Column="0" VerticalAlignment="Center" ColumnSpacing="6" Wrap="Wrap"
+			           TextBlock.TextTrimming="CharacterEllipsis">
+				<TextBlock Name="HeaderTextBlock" Text="Component"
+				           FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"/>
+				<TextBlock Text="version select"
+				           FontSize="14" Foreground="{StaticResource Secondary}" VerticalAlignment="Center"/>
+			</FlexPanel>
+			
+			<!-- Filter -->
+			<TextBox Grid.Column="1" Name="FilterTextBox" PlaceholderText="Filter..." BorderThickness="0"
+			         VerticalAlignment="Center"/>
+			
+			<!-- Buttons -->
+			<StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="10">
+				<ToggleSwitch Name="PreReleaseToggle" OffContent="Pre-release" OnContent="Pre-release"
+				              VerticalAlignment="Stretch" IsVisible="False"/>
+				<Button Name="DefaultButton" Classes="accent" Padding="8 4"
+				        VerticalAlignment="Stretch" Content="Default"
+				        Click="OnDefaultClicked"/>
+				<Button Padding="8" Background="Transparent"
+				        Command="{Binding $parent[controls:BaseOverlay].Close}"
+				        HotKey="Escape">
+					<PathIcon Data="{StaticResource dismiss_regular}" Height="12" Width="12"/>
+				</Button>
+			</StackPanel>
+		</Grid>
+		
+		<!-- Separator -->
+		<Border DockPanel.Dock="Top" Height="1" Background="{StaticResource FlyoutBorderThemeBrush}" Margin="10 0 10 0"/>
+		
+		<!-- Main content -->
+		<Panel Name="MainContent">
+			<ScrollViewer Name="MainContentScrollViewer" Margin="10 6 6 6"
+			              AllowAutoHide="False" BringIntoViewOnFocusChange="False">
+				<ItemsControl Name="VersionsItemsControl">
+				    <!-- Item and selection colors -->
+					<ItemsControl.Styles>
+						<Style Selector="Border.VersionItem">
+							<Setter Property="Background" Value="Transparent"/>
+							<Setter Property="BorderBrush" Value="Transparent"/>
+							<Setter Property="BorderThickness" Value="1"/>
+							<Setter Property="Padding" Value="10 8"/>
+							<Setter Property="Margin" Value="0 0 8 4"/>
+							<Setter Property="CornerRadius" Value="6"/>
+							<Setter Property="Cursor" Value="Hand"/>
+						</Style>
+						<Style Selector="Border.VersionItem:pointerover">
+							<Setter Property="Background" Value="#18FFFFFF"/>
+						</Style>
+						<Style Selector="Border.VersionItem.Selected">
+							<Setter Property="BorderBrush" Value="{StaticResource Highlight}"/>
+						</Style>
+					</ItemsControl.Styles>
+				    <!-- Item content -->
+					<ItemsControl.ItemTemplate>
+						<DataTemplate DataType="serverinstallviews:VersionSelectOverlay+VersionItem">
+							<Border Classes="VersionItem" Classes.Selected="{Binding IsSelected}"
+							        Tapped="OnVersionItemTapped">
+								<StackPanel>
+									<!-- Version title and date -->
+									<StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+										<Button Classes="Transparent" Padding="0" BorderThickness="0"
+										        VerticalAlignment="Center"
+										        Click="OnVersionTitleClicked">
+											<TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold"
+											           Foreground="{StaticResource Highlight}"/>
+										</Button>
+										
+										<TextBlock Text="{Binding DateText}"
+										           IsVisible="{Binding DateText, Converter={x:Static ObjectConverters.IsNotNull}}"
+										           Margin="6 0 0 0" Foreground="{StaticResource Secondary}"
+										           FontSize="12" VerticalAlignment="Center"/>
+									</StackPanel>
+									
+									<!-- Markdown release notes -->
+									<LayoutTransformControl LayoutTransform="scale(0.80)" Margin="8 6">
+										<mv:MarkdownViewer Markdown="{Binding Body}"/>
+									</LayoutTransformControl>
+								</StackPanel>
+							</Border>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</ScrollViewer>
+			
+			<!-- Controls switched from code-behind on demand -->
+			
+			<TextBlock Name="EmptyFallbackTextBlock"
+			           Text="No applicable versions found."
+			           Foreground="{StaticResource Secondary}" FontSize="14"
+			           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			
+			<li:LoadingIndicator Name="LoadingIndicator" Mode="DoubleBounce" SpeedRatio="1.5"
+			                     Foreground="{StaticResource Highlight}"
+			                     MaxHeight="120"
+			                     VerticalAlignment="Center" HorizontalAlignment="Center"/>
+		</Panel>
+		
+	</DockPanel>
+</controls:BaseOverlay>

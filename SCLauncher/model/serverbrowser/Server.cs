@@ -15,20 +15,20 @@ public partial class Server : INotifyPropertyChanged
 	public required string Name { get; init; }
 	public required ulong? GameAppId { get; init; }
 	public required string GameModDir { get; init; }
-	public required string GameDescription { get; init; }
+	public string? GameDescription { get; init; }
 	public required int NumPlayers { get; init; }
 	public required int MaxPlayers { get; init; }
 	public required int NumBots { get; init; }
-	public required string Map { get; init; }
-	public required string Type { get; init; }
+	public string? Map { get; init; }
+	public string? Type { get; init; }
 	public required bool Secure { get; init; }
-	public required string Version { get; init; }
-	public required string Keywords { get; init; }
+	public string? Version { get; init; }
+	public string? Keywords { get; init; }
 	public required ulong? SteamId { get; init; }
-	public required string Environment { get; init; }
+	public string? Environment { get; init; }
 	public bool? Password { get; set; }
 	public TimeSpan? Ping { get; set; }
 
-	public string Endpoint => IP + ':' + Port;
+	public string Address => IP + ':' + Port;
 	public int NumRealPlayers => NumPlayers - NumBots;
 }

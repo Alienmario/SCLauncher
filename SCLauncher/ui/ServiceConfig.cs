@@ -10,5 +10,6 @@ public static class ServiceConfig
 	public static void AddUIServices(this IServiceCollection collection)
 	{
 		collection.AddSingleton<MainWindow>();
+		collection.AddSingleton<Updater>();
 	}
 }

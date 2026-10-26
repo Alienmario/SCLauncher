@@ -6,14 +6,16 @@ public partial class ServerMessageAnalyzerService
 {
 	public bool AutoReset { get; set; } = true;
 	
-	public string? PublicIp { get; private set; }
-	
 	public string? LocalIp { get; private set; }
 	
-	public int? ServerPort { get; private set; }
+	public int? LocalServerPort { get; private set; }
 	
-	public int? Clientport { get; private set; }
-
+	public string? PublicIp { get; private set; }
+	
+	public int? PublicServerPort { get; private set; }
+	
+	public bool IsFakeIp { get; private set; }
+	
 	public ServerMessageAnalyzerService(ServerControlService controlService)
 	{
 		controlService.StateChanged += OnServerStateChanged;
@@ -21,27 +23,46 @@ public partial class ServerMessageAnalyzerService
 
 	public void Reset()
 	{
-		PublicIp = null;
 		LocalIp = null;
-		ServerPort = null;
-		Clientport = null;
+		LocalServerPort = null;
+		PublicIp = null;
+		PublicServerPort = null;
+		IsFakeIp = false;
 	}
 
 	[GeneratedRegex(@"\[srccoop.*\.smx\] Could not obtain gamedata")]
 	private static partial Regex SourceCoopBadGamedataRegex();
 	
-	[GeneratedRegex(@"^(?:\[STEAM\])?\s+Public IP is (.+)\.$")]
+	[GeneratedRegex(@"^(?:\[STEAM\])?\s+Public IP (?:to Steam )?is (.+)\.$")]
 	private static partial Regex PublicIpRegex();
 	
 	[GeneratedRegex(@"^Network: IP (.+), mode (?:.+), dedicated (?:Yes|No), ports (\d+) SV / (\d+) CL$")]
 	private static partial Regex NetworkRegex();
 
+	[GeneratedRegex(@"^FakeIP allocation succeeded: ([^:]+):(\d+)")]
+	private static partial Regex FakeIpRegex();
+
+	/// Analyzes server console messages, stores contextual data for later retrieval
+	/// and returns helpful details when applicable.
 	public string? AnalyzeMessage(string msg)
 	{
 		var publicIpMatch = PublicIpRegex().Match(msg);
 		if (publicIpMatch.Success)
 		{
 			PublicIp = publicIpMatch.Groups[1].Value;
+			IsFakeIp = false;
+			return null;
+		}
+
+		var fakeIpMatch = FakeIpRegex().Match(msg);
+		if (fakeIpMatch.Success)
+		{
+			if (int.TryParse(fakeIpMatch.Groups[2].Value, out var svPort))
+			{
+				PublicIp = fakeIpMatch.Groups[1].Value;
+				PublicServerPort = svPort;
+				IsFakeIp = true;
+			}
 			return null;
 		}
 
@@ -50,11 +71,16 @@ public partial class ServerMessageAnalyzerService
 		{
 			string localIp = networkMatch.Groups[1].Value;
 			if (!localIp.Equals("0.0.0.0"))
+			{
 				LocalIp = localIp;
+			}
 			if (int.TryParse(networkMatch.Groups[2].Value, out var svPort))
-				ServerPort = svPort;
-			if (int.TryParse(networkMatch.Groups[3].Value, out var clPort))
-				Clientport = clPort;
+			{
+				LocalServerPort = PublicServerPort = svPort;
+			}
+			// CL port - unused
+			// if (int.TryParse(networkMatch.Groups[3].Value, out var clPort))
+			// 	Clientport = clPort;
 			return null;
 		}
 

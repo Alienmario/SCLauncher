@@ -8,12 +8,15 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Octokit;
+using SCLauncher.backend.util.stream;
 using FileMode = System.IO.FileMode;
 
 namespace SCLauncher.backend.install;
 
 public class InstallHelper(HttpClient httpClient)
 {
+	public static TimeSpan DefaultNetworkTimeout => TimeSpan.FromSeconds(10);
+	
 	public HttpClient HttpClient => httpClient;
 	
 	public GitHubClient GithubClient => new GitHubClient(new ProductHeaderValue("SCLauncher"));
@@ -41,8 +44,31 @@ public class InstallHelper(HttpClient httpClient)
 	public async Task DownloadAsync(string url, string destination, CancellationToken ct = default)
 	{
 		await using Stream stream = await httpClient.GetStreamAsync(url, ct);
-		await using var fileStream = new FileStream(destination, FileMode.OpenOrCreate);
-		await stream.CopyToAsync(fileStream, ct);
+		await using var fileStream = new FileStream(destination, FileMode.Create);
+		await stream.CopyToAsync(fileStream, ct).ConfigureAwait(false);
+	}
+
+	public Task DownloadAsync(string url, string destination, IProgress<int>? progress, CancellationToken ct = default)
+	{
+		return DownloadAsync(url, destination, DefaultNetworkTimeout, progress, ct);
+	}
+	
+	public async Task DownloadAsync(string url, string destination, 
+		TimeSpan? timeout, IProgress<int>? progress, CancellationToken ct = default)
+	{
+		using var request = new HttpRequestMessage(HttpMethod.Get, url);
+		using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct)
+			.ConfigureAwait(false);
+		response.EnsureSuccessStatusCode();
+
+		// Try to get total file size for percentage calculation
+		long? totalBytes = response.Content.Headers.ContentLength;
+
+		var contentStream = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
+		await using var responsiveStream = new ResponsiveStream(contentStream, timeout, totalBytes, progress);
+		await using var fileStream = new FileStream(destination, FileMode.Create);
+
+		await responsiveStream.CopyToAsync(fileStream, ct).ConfigureAwait(false);
 	}
 
 	public bool SafeDelete(string? path)

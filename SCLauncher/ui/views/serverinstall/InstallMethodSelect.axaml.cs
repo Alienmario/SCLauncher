@@ -1,11 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using SCLauncher.model.serverinstall;
-using SCLauncher.ui.controls;
+using SCLauncher.ui.controls.wizard;
 
 namespace SCLauncher.ui.views.serverinstall;
 
-public partial class InstallMethodSelect : UserControl, WizardNavigator.IWizardContent
+public partial class InstallMethodSelect : UserControl, IWizardPage
 {
 	public WizardNavigator? Wizard { get; set; }
 
@@ -20,14 +20,14 @@ public partial class InstallMethodSelect : UserControl, WizardNavigator.IWizardC
 		Wizard = wizard;
 	}
 
-	private void SteamClicked(object? sender, RoutedEventArgs e)
+	private void OnSteamClicked(object? sender, RoutedEventArgs e)
 	{
 		Advance(ServerInstallMethod.Steam);
 	}
 
-	private void ExternalClicked(object? sender, RoutedEventArgs e)
+	private void OnStandaloneClicked(object? sender, RoutedEventArgs e)
 	{
-		Advance(ServerInstallMethod.External);
+		Advance(ServerInstallMethod.Standalone);
 	}
 
 	private void Advance(ServerInstallMethod method)
@@ -39,11 +39,11 @@ public partial class InstallMethodSelect : UserControl, WizardNavigator.IWizardC
 
 		if (method == ServerInstallMethod.Steam)
 		{
-			Wizard?.SetContent(new InstallOverview());
+			Wizard?.SetPageContent(new InstallOverview());
 		}
 		else
 		{
-			Wizard?.SetContent(new InstallPathSelect());
+			Wizard?.SetPageContent(new InstallPathSelect());
 		}
 	}
 }

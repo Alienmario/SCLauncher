@@ -5,7 +5,7 @@
         xmlns:config="clr-namespace:SCLauncher.model.config"
         xmlns:controls="clr-namespace:SCLauncher.ui.controls"
         mc:Ignorable="d"
-        x:Class="SCLauncher.ui.views.profiles.DeleteProfileDialog"
+        x:Class="SCLauncher.ui.views.profiles.crud.DeleteProfileDialog"
         x:DataType="config:AppProfile"
         Title="Delete Profile"
         CanResize="False">

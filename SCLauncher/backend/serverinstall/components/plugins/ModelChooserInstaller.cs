@@ -3,7 +3,7 @@ using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.serverinstall.components.plugins;
 
-public class ModelChooserInstaller : BasePluginInstaller
+internal class ModelChooserInstaller : SourceModPluginInstaller
 {
 	public ModelChooserInstaller(InstallHelper helper) : base(helper)
 	{

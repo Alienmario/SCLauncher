@@ -13,20 +13,13 @@
 	</Design.DataContext>
 	
 	<DockPanel Margin="0 10 0 5" LastChildFill="False">
-	
-		<!--<Border DockPanel.Dock="Bottom"
-		        BorderBrush="#31EFEFEF"
-		        Opacity="0.5"
-		        BorderThickness="0 0 0 2"
-		        CornerRadius="1"
-		        Margin="0 10 0 0"/>-->
 		
 		<Grid ColumnDefinitions="* Auto"
 		      RowDefinitions="Auto, Auto"
 		      DockPanel.Dock="Top">
 			
 			<Label Grid.Row="0" Grid.Column="0"
-			       Content="Server install directory"
+			       Content="Server install path"
 			       VerticalAlignment="Center"
 			/>
 			

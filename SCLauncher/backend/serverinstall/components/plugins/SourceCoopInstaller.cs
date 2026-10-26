@@ -3,7 +3,7 @@ using SCLauncher.model.serverinstall;
 
 namespace SCLauncher.backend.serverinstall.components.plugins;
 
-public class SourceCoopInstaller : BasePluginInstaller
+internal class SourceCoopInstaller : SourceModPluginInstaller
 {
 	public SourceCoopInstaller(InstallHelper helper) : base(helper)
 	{

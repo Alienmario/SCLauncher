@@ -69,7 +69,7 @@
 				    <TextBlock Grid.Row="8" Grid.Column="0" Text="LAN Mode:"/>
 				    <CheckBox Grid.Row="8" Grid.Column="1" IsChecked="{Binding Lan}"/>
 				    
-				    <TextBlock Grid.Row="9" Grid.Column="0" Text="Team Play:"/>
+				    <TextBlock Grid.Row="9" Grid.Column="0" Text="Teamplay:"/>
 				    <CheckBox Grid.Row="9" Grid.Column="1" IsChecked="{Binding Teamplay}"/>
 				</Grid>
 				
@@ -87,7 +87,7 @@
 	<!-- Game specific templates -->
 	<UserControl.DataTemplates>
 		
-		<DataTemplate DataType="config:ServerConfigurationHl2dm">
+		<DataTemplate DataType="config:ServerConfigurationSDK2013">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*" RowSpacing="5" ColumnSpacing="8">
 				<TextBlock Grid.Row="0" Grid.Column="0" Text="Steam Networking:"/>
 				<CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding UseSteamNetworking}"/>
