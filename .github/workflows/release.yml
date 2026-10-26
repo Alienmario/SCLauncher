@@ -39,7 +39,7 @@ jobs:
     
     - name: Create archive (windows)
       if: contains(matrix.platform, 'win')
-      run: zip -qq -j -r ${{ env.artifact }} ./out
+      run: zip -qq -j ${{ env.artifact }} ./out/*.exe
   
     - name: Create archive (linux)
       if: contains(matrix.platform, 'linux')
