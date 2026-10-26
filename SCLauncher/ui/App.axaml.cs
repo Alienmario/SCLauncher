@@ -13,6 +13,7 @@ using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using SCLauncher.backend;
 using SCLauncher.backend.service;
+using SCLauncher.backend.util;
 using SCLauncher.model.config;
 using SCLauncher.ui.views;
 using SCLauncher.ui.views.profiles.init;
@@ -26,7 +27,8 @@ public class App : Application
 	public static MainWindow MainWindow => GetService<MainWindow>();
 	
 	public static readonly string Version = Assembly.GetExecutingAssembly()
-		.GetName().Version?.ToString(2) ?? string.Empty;
+		.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+		.InformationalVersion is { } infoVersion ? VersionUtils.FormatVersion(infoVersion) : string.Empty;
 
 	public static readonly string? RepositoryUrl = Assembly.GetExecutingAssembly()
 		.GetCustomAttributes<AssemblyMetadataAttribute>()

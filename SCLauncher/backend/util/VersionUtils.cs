@@ -1,12 +1,30 @@
 using System;
 using System.Linq;
+using NuGet.Versioning;
 
 namespace SCLauncher.backend.util;
 
 public static class VersionUtils
 {
+	public static string FormatVersion(string version)
+	{
+		if (NuGetVersion.TryParse(version.TrimStart('v', 'V'), out var nv))
+		{
+			int fields = nv.Revision > 0 ? 4 : nv.Patch > 0 ? 3 : 2;
+			return nv.IsPrerelease ? $"{nv.Version.ToString(fields)}-{nv.Release}" : nv.Version.ToString(fields);
+		}
+
+		return version.Split('+')[0];
+	}
+
 	public static int SmartCompare(string v1, string v2)
 	{
+		if (NuGetVersion.TryParse(v1.TrimStart('v', 'V'), out var nv1) &&
+		    NuGetVersion.TryParse(v2.TrimStart('v', 'V'), out var nv2))
+		{
+			return nv1.CompareTo(nv2);
+		}
+
 		return SmartCompareInner(v1, v2, ['-'], (vv1, vv2) =>
 		{
 			return SmartCompareInner(vv1, vv2, ['.'], (vvv1, vvv2) =>
