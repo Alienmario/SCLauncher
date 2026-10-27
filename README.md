@@ -31,11 +31,6 @@
 
 <img src=".github/img/scl-game.png" width="700">
 
-## Planned features
-- Built-in tunneling (playit.gg or alternatives)
-- Install new campaign mods on server and client
-- Select active campaign mod on server and client
-
 ## Known issues
 #### Windows application error appears when starting a server
 - Download and install vc_redist (x86) for 2013 and 2015-2022 from [Microsoft](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version).
