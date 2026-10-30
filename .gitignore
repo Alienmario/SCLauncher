@@ -6,3 +6,5 @@ riderModule.iml
 /_ReSharper.Caches/
 FodyWeavers.xsd
 /SCLauncher.sln.DotSettings.user
+.vscode/*
+*.code-workspace
