@@ -1,5 +1,6 @@
 bin/
 obj/
+out/
 /packages/
 .idea
 riderModule.iml
@@ -7,4 +8,5 @@ riderModule.iml
 FodyWeavers.xsd
 /SCLauncher.sln.DotSettings.user
 .vscode/*
+!.vscode/tasks.json
 *.code-workspace

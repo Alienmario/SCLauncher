@@ -1,0 +1,73 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "publish: win-x64 (Release)",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish", "${workspaceFolder}/SCLauncher.UI",
+                "-c", "Release",
+                "-r", "win-x64",
+                "-o", "out",
+                "--self-contained", "true",
+                "-p:PublishSingleFile=true",
+                "-p:PublishReadyToRun=true",
+                "-p:IncludeNativeLibrariesForSelfExtract=true"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish: win-x64 (Debug)",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish", "${workspaceFolder}/SCLauncher.UI",
+                "-c", "Debug",
+                "-r", "win-x64",
+                "-o", "out",
+                "--self-contained", "true",
+                "-p:PublishSingleFile=true",
+                "-p:PublishReadyToRun=true",
+                "-p:IncludeNativeLibrariesForSelfExtract=true"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish: linux-x64 (Release)",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish", "${workspaceFolder}/SCLauncher.UI",
+                "-c", "Release",
+                "-r", "linux-x64",
+                "-o", "out",
+                "--self-contained", "true",
+                "-p:PublishSingleFile=true",
+                "-p:PublishReadyToRun=true",
+                "-p:IncludeNativeLibrariesForSelfExtract=true"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish: linux-x64 (Debug)",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish", "${workspaceFolder}/SCLauncher.UI",
+                "-c", "Debug",
+                "-r", "linux-x64",
+                "-o", "out",
+                "--self-contained", "true",
+                "-p:PublishSingleFile=true",
+                "-p:PublishReadyToRun=true",
+                "-p:IncludeNativeLibrariesForSelfExtract=true"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
