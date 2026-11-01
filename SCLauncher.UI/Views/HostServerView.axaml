@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SCLauncher.UI.Views.HostServerView"
-             xmlns:serverhost="clr-namespace:SCLauncher.UI.Views.ServerHost"
+             xmlns:serverhost="using:SCLauncher.UI.Views.ServerHost"
              xmlns:li="using:LoadingIndicators.Avalonia"
-             xmlns:wizard="clr-namespace:SCLauncher.UI.Controls.Wizard"
-             xmlns:views="clr-namespace:SCLauncher.UI.Views"
-             xmlns:serverinstall="clr-namespace:SCLauncher.UI.Views.ServerInstall"
+             xmlns:wizard="using:SCLauncher.UI.Controls.Wizard"
+             xmlns:views="using:SCLauncher.UI.Views"
+             xmlns:serverinstall="using:SCLauncher.UI.Views.ServerInstall"
              Content="{Binding $self.DataContext}">
 	
 	<UserControl.DataTemplates>

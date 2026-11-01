@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
-             xmlns:config="clr-namespace:SCLauncher.Shared.Model.Config;assembly=SCLauncher.Shared"
-             xmlns:controls="clr-namespace:SCLauncher.UI.Controls"
+             xmlns:objectModel="using:System.Collections.ObjectModel"
+             xmlns:config="using:SCLauncher.Shared.Model.Config"
+             xmlns:controls="using:SCLauncher.UI.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SCLauncher.UI.Controls.CustomParamEntry"
              x:DataType="{x:Type objectModel:ObservableCollection, x:TypeArguments=config:CustomParam}">

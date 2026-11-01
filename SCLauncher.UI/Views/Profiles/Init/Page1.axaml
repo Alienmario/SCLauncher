@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:converters="clr-namespace:SCLauncher.UI.Converters"
-             xmlns:definition="clr-namespace:SCLauncher.Shared.Model.Definition;assembly=SCLauncher.Shared"
-             xmlns:wizard="clr-namespace:SCLauncher.UI.Controls.Wizard"
+             xmlns:converters="using:SCLauncher.UI.Converters"
+             xmlns:definition="using:SCLauncher.Shared.Model.Definition"
+             xmlns:wizard="using:SCLauncher.UI.Controls.Wizard"
              mc:Ignorable="d" d:DesignWidth="525" d:DesignHeight="450"
              x:Class="SCLauncher.UI.Views.Profiles.Init.Page1"
              wizard:TextNavBar.Text="Add some games, then click next ->">

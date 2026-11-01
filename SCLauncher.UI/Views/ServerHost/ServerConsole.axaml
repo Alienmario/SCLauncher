@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:SCLauncher.UI.Controls"
+             xmlns:controls="using:SCLauncher.UI.Controls"
              xmlns:li="using:LoadingIndicators.Avalonia"
-             xmlns:serverhost="clr-namespace:SCLauncher.UI.Views.ServerHost"
+             xmlns:serverhost="using:SCLauncher.UI.Views.ServerHost"
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="300"
              x:Class="SCLauncher.UI.Views.ServerHost.ServerConsole">
 	

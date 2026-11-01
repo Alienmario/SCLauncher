@@ -2,11 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:serverbrowser="clr-namespace:SCLauncher.Shared.Model.ServerBrowser;assembly=SCLauncher.Shared"
-             xmlns:converters="clr-namespace:SCLauncher.UI.Converters"
-             xmlns:controls="clr-namespace:SCLauncher.UI.Controls"
-             xmlns:views="clr-namespace:SCLauncher.UI.Views"
-             xmlns:config="clr-namespace:SCLauncher.Shared.Model.Config;assembly=SCLauncher.Shared"
+             xmlns:serverbrowser="using:SCLauncher.Shared.Model.ServerBrowser"
+             xmlns:converters="using:SCLauncher.UI.Converters"
+             xmlns:controls="using:SCLauncher.UI.Controls"
+             xmlns:views="using:SCLauncher.UI.Views"
+             xmlns:config="using:SCLauncher.Shared.Model.Config"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SCLauncher.UI.Views.JoinServerView">
 	

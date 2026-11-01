@@ -2,8 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:converters="clr-namespace:SCLauncher.UI.Converters"
-             xmlns:wizard="clr-namespace:SCLauncher.UI.Controls.Wizard"
+             xmlns:converters="using:SCLauncher.UI.Converters"
+             xmlns:wizard="using:SCLauncher.UI.Controls.Wizard"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="100"
              x:Class="SCLauncher.UI.Controls.Wizard.CancellableNavBar"
              x:Name="root">

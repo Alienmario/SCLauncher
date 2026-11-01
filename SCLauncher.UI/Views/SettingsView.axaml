@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:custom="clr-namespace:SCLauncher.UI.Controls"
-             xmlns:ui="clr-namespace:SCLauncher.UI"
-             xmlns:config="clr-namespace:SCLauncher.Shared.Model.Config;assembly=SCLauncher.Shared"
+             xmlns:custom="using:SCLauncher.UI.Controls"
+             xmlns:ui="using:SCLauncher.UI"
+             xmlns:config="using:SCLauncher.Shared.Model.Config"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="350"
              x:Class="SCLauncher.UI.Views.SettingsView"
              x:DataType="config:AppProfile">
