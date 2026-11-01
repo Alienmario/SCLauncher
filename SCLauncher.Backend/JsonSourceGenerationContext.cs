@@ -64,34 +64,34 @@ file static class Modifiers
 
 		int index = props.IndexOf(prop);
 
-		var surrogate = typeInfo.CreateJsonPropertyInfo(typeof(JsonElement), propertyName);
-
-		surrogate.Get = obj =>
+		var surrogateInfo = new JsonPropertyInfoValues<JsonElement>
 		{
-			if (obj is not TOwner owner)
-				return null;
+			IsProperty = true,
+			IsPublic = true,
+			DeclaringType = typeof(TOwner),
+			PropertyTypeInfo = typeInfo.Options.GetTypeInfo(typeof(JsonElement)),
+			PropertyName = propertyName,
+			Getter = obj =>
+			{
+				if (obj is not TOwner owner || getter(owner) is not { } value)
+					return default;
 
-			var value = getter(owner);
-			if (value == null)
-				return null;
+				var concreteTypeInfo = typeInfo.Options.GetTypeInfo(value.GetType());
+				return JsonSerializer.SerializeToElement(value, concreteTypeInfo);
+			},
+			Setter = (obj, element) =>
+			{
+				if (obj is not TOwner owner || element.ValueKind != JsonValueKind.Object)
+					return;
 
-			var concreteTypeInfo = typeInfo.Options.GetTypeInfo(value.GetType());
-			return JsonSerializer.SerializeToElement(value, concreteTypeInfo);
+				if (getter(owner) is not { } existingValue)
+					return;
+
+				var concreteTypeInfo = typeInfo.Options.GetTypeInfo(existingValue.GetType());
+				setter(owner, (TProperty)element.Deserialize(concreteTypeInfo)!);
+			}
 		};
 
-		surrogate.Set = (obj, value) =>
-		{
-			if (obj is not TOwner owner || value is not JsonElement { ValueKind: JsonValueKind.Object } element)
-				return;
-
-			var existingValue = getter(owner);
-			if (existingValue == null)
-				return;
-
-			var concreteTypeInfo = typeInfo.Options.GetTypeInfo(existingValue.GetType());
-			setter(owner, (TProperty)element.Deserialize(concreteTypeInfo)!);
-		};
-
-		props[index] = surrogate;
+		props[index] = JsonMetadataServices.CreatePropertyInfo(typeInfo.Options, surrogateInfo);
 	}
 }

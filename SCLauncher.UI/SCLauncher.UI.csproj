@@ -5,21 +5,26 @@
 		<AssemblyName>SCLauncher</AssemblyName>
 		<RootNamespace>SCLauncher.UI</RootNamespace>
 		<Nullable>enable</Nullable>
-		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ApplicationIcon>Assets\logo-sc.ico</ApplicationIcon>
 		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
 		<DebugType>embedded</DebugType>
-		<PublishReadyToRun>true</PublishReadyToRun>
-		<!-- DepotDownloader and its dependencies are not trim compatible -->
-		<PublishTrimmed>false</PublishTrimmed>
 		<!-- Publish repository for updater -->
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<PublishReadyToRun>true</PublishReadyToRun>
+		<PublishTrimmed>true</PublishTrimmed>
+		<!-- Octokit and DepotDownloaderSubProcess dependency tree are not trim compatible -->
+		<TrimMode>partial</TrimMode>
+		<!-- Enabling <PublishTrimmed> defaults the ILLink feature switch _DefaultValueAttributeSupport to false, 
+		breaking protobuf-net contracts with [DefaultValue] inside SteamKit2 library -->
+		<_DefaultValueAttributeSupport>true</_DefaultValueAttributeSupport>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\SCLauncher.Shared\SCLauncher.Shared.csproj" />
 		<ProjectReference Include="..\SCLauncher.Backend\SCLauncher.Backend.csproj" />
+		<!-- This lib is not trim ready -->
+		<TrimmerRootAssembly Include="Tmds.ExecFunction" />
 	</ItemGroup>
 
 	<ItemGroup>
