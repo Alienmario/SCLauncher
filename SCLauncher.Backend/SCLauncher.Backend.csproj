@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<RootNamespace>SCLauncher.Backend</RootNamespace>
+		<Nullable>enable</Nullable>
+		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SCLauncher.Shared\SCLauncher.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="DepotDownloaderSubProcess" Version="3.4.0-sp1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
+		<PackageReference Include="SteamQuery.NET" Version="2.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="ServerInstall\Components\srcds_sclauncher_x64.exe" />
+		<EmbeddedResource Include="ServerInstall\Components\srcds_sclauncher_x86.exe" />
+		<EmbeddedResource Include="ServerInstall\Components\srcds_sclauncher" />
+	</ItemGroup>
+</Project>

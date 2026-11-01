@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SCLauncher.UI.Views.HostServerView"
+             xmlns:serverhost="using:SCLauncher.UI.Views.ServerHost"
+             xmlns:li="using:LoadingIndicators.Avalonia"
+             xmlns:wizard="using:SCLauncher.UI.Controls.Wizard"
+             xmlns:views="using:SCLauncher.UI.Views"
+             xmlns:serverinstall="using:SCLauncher.UI.Views.ServerInstall"
+             Content="{Binding $self.DataContext}">
+	
+	<UserControl.DataTemplates>
+		
+		<DataTemplate DataType="views:HostServerView+LoadingViewModel">
+			<DockPanel>
+				<Label Content="Analyzing server files" DockPanel.Dock="Bottom" HorizontalContentAlignment="Center"/>
+				<Viewbox Stretch="Uniform" MaxHeight="500" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<li:LoadingIndicator IsActive="True" Mode="ArcsRing" Foreground="{StaticResource Highlight}"/>
+				</Viewbox>
+			</DockPanel>
+		</DataTemplate>
+		
+		<DataTemplate DataType="views:HostServerView+ServerNotFoundViewModel">
+			<StackPanel Orientation="Vertical" Spacing="10">
+				<TextBlock Text="{Binding Message}" Margin="5" FontSize="36" TextWrapping="Wrap"/>
+				<Button Click="OnInstallServerClicked" CornerRadius="10">- Install</Button>
+				<Button Click="OnLocateServerClicked" CornerRadius="10">- Locate server manually</Button>
+				<Button Click="OnRecheckAvailabilityClicked" CornerRadius="10">- Recheck</Button>
+			</StackPanel>
+		</DataTemplate>
+		
+		<DataTemplate DataType="views:HostServerView+InstallWizardViewModel">
+			<wizard:WizardNavigator DataContext="{Binding Params}" Exit="OnInstallWizardExit">
+				<wizard:WizardNavigator.NavBar>
+					<wizard:CancellableNavBar/>
+				</wizard:WizardNavigator.NavBar>
+				<wizard:WizardNavigator.PageContent>
+					<serverinstall:InstallMethodSelect/>
+				</wizard:WizardNavigator.PageContent>
+			</wizard:WizardNavigator>
+		</DataTemplate>
+		
+		<DataTemplate DataType="views:HostServerView+UninstallWizardViewModel">
+			<wizard:WizardNavigator DataContext="{Binding Params}" Exit="OnInstallWizardExit">
+				<wizard:WizardNavigator.NavBar>
+					<wizard:CancellableNavBar/>
+				</wizard:WizardNavigator.NavBar>
+				<wizard:WizardNavigator.PageContent>
+					<serverinstall:UninstallOverview/>
+				</wizard:WizardNavigator.PageContent>
+			</wizard:WizardNavigator>
+		</DataTemplate>
+		
+		<DataTemplate DataType="views:HostServerView+ServerConsoleViewModel">
+			<serverhost:ServerConsole/>
+		</DataTemplate>
+		
+	</UserControl.DataTemplates>
+
+</UserControl>

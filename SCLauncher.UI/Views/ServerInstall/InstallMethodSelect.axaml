@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:serverinstall="using:SCLauncher.Shared.Model.ServerInstall"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SCLauncher.UI.Views.ServerInstall.InstallMethodSelect"
+             x:DataType="serverinstall:ServerInstallParams">
+	
+	<Grid ColumnDefinitions="* *" RowDefinitions="*">
+		<Panel Grid.Row="0" Grid.Column="0">
+			<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="OnSteamClicked"
+			        CornerRadius="4 0 0 4">
+				<Panel>
+					<Svg Path="/Assets/logo-steam.svg" Width="150" Height="150"/>
+					<Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10">
+						Download to your Steam library
+					</Label>
+				</Panel>
+			</Button>
+		</Panel>
+		<Panel Grid.Row="0" Grid.Column="1">
+			<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="OnStandaloneClicked"
+			        CornerRadius="0 4 4 0">
+				<Panel>
+					<PathIcon Width="150" Height="150" Data="{StaticResource arrow_download_regular}"/>
+					<Label VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10">
+						Download as stand-alone to any folder
+					</Label>
+				</Panel>
+			</Button>
+		</Panel>
+	</Grid>
+</UserControl>

@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:design="using:SCLauncher.UI.DesignTime"
+             xmlns:config="using:SCLauncher.Shared.Model.Config"
+             xmlns:controls="using:SCLauncher.UI.Controls"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300"
+             x:Class="SCLauncher.UI.Views.ServerHost.ServerConfigurator"
+             x:DataType="config:ServerConfiguration"
+             Margin="0 2">
+
+	<Design.DataContext>
+		<design:DServerConfiguration/>
+	</Design.DataContext>
+	
+	<UserControl.Styles>
+		<Style Selector="TextBlock">
+			<Setter Property="TextTrimming" Value="{x:Static TextTrimming.CharacterEllipsis}"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="TextBox">
+			<Setter Property="TextWrapping" Value="Wrap"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+	</UserControl.Styles>
+	
+	<UserControl.Effect>
+		<DropShadowDirectionEffect BlurRadius="10" ShadowDepth="-5"/>
+	</UserControl.Effect>
+	
+	<DockPanel>
+		<StackPanel DockPanel.Dock="Top">
+			<TextBlock Text="Server options" FontSize="15" Margin="8 0 8 0"/>
+			<Border Opacity="0.75" Margin="0 4 0 0"
+			        BorderBrush="{DynamicResource ButtonBackground}" BorderThickness=".5"/>
+		</StackPanel>
+		
+		<ScrollViewer AllowAutoHide="False" Name="Scroller">
+			
+			<StackPanel Margin="8">
+				<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*" ColumnDefinitions="Auto,*"
+				      RowSpacing="5" ColumnSpacing="8">
+					
+					<TextBlock Grid.Row="0" Grid.Column="0" Text="Hostname:"/>
+					<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Hostname}"/>
+					
+					<TextBlock Grid.Row="1" Grid.Column="0" Text="Password:"/>
+					<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Password}"/>
+					
+					<TextBlock Grid.Row="2" Grid.Column="0" Text="Start Map:"/>
+					<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding StartMap}"/>
+					
+					<TextBlock Grid.Row="3" Grid.Column="0" Text="Max Players:"/>
+					<NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding Maxplayers}" Minimum="2" Maximum="255" FormatString="0"/>
+				    
+					<TextBlock Grid.Row="4" Grid.Column="0" Text="Config file:"/>
+					<TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ServerCfgFile}"/>
+					
+				    <TextBlock Grid.Row="5" Grid.Column="0" Text="Local IP:"/>
+				    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Ip}"/>
+				    
+				    <TextBlock Grid.Row="6" Grid.Column="0" Text="Port:"/>
+				    <NumericUpDown Grid.Row="6" Grid.Column="1" Value="{Binding Port}" Minimum="1" Maximum="65535" FormatString="0"/>
+				    
+				    <TextBlock Grid.Row="7" Grid.Column="0" Text="Strict Port Bind:"/>
+				    <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding StrictPortBind}"/>
+				    
+				    <TextBlock Grid.Row="8" Grid.Column="0" Text="LAN Mode:"/>
+				    <CheckBox Grid.Row="8" Grid.Column="1" IsChecked="{Binding Lan}"/>
+				    
+				    <TextBlock Grid.Row="9" Grid.Column="0" Text="Teamplay:"/>
+				    <CheckBox Grid.Row="9" Grid.Column="1" IsChecked="{Binding Teamplay}"/>
+				</Grid>
+				
+				<ContentControl Content="{Binding}"/>
+				
+				<StackPanel Spacing="4">
+					<TextBlock Text="╭ Custom Parameters ╮" HorizontalAlignment="Center" Margin="0 8 0 0"
+					           IsVisible="{Binding CustomParams.Count}"/>
+					<controls:CustomParamEntry DataContext="{Binding CustomParams}"/>
+				</StackPanel>
+			</StackPanel>
+		</ScrollViewer>
+	</DockPanel>
+	
+	<!-- Game specific templates -->
+	<UserControl.DataTemplates>
+		
+		<DataTemplate DataType="config:ServerConfigurationSDK2013">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*" RowSpacing="5" ColumnSpacing="8">
+				<TextBlock Grid.Row="0" Grid.Column="0" Text="Steam Networking:"/>
+				<CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding UseSteamNetworking}"/>
+			</Grid>
+		</DataTemplate>
+		
+		<!-- empty fallback -->
+		<DataTemplate DataType="config:ServerConfiguration"/>
+		
+	</UserControl.DataTemplates>
+</UserControl>

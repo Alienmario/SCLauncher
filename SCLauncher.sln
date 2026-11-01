@@ -1,6 +1,10 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCLauncher", "SCLauncher\SCLauncher.csproj", "{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCLauncher.UI", "SCLauncher.UI\SCLauncher.UI.csproj", "{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCLauncher.Backend", "SCLauncher.Backend\SCLauncher.Backend.csproj", "{A2B4C6D8-1E3F-4A5B-8C7D-9E0F1A2B3C4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCLauncher.Shared", "SCLauncher.Shared\SCLauncher.Shared.csproj", "{B3C5D7E9-2F4A-4B6C-9D8E-0F1A2B3C4D5E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +16,13 @@ Global
 		{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5A0F0D0-0BE2-4550-9EB3-1A882C32A60A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2B4C6D8-1E3F-4A5B-8C7D-9E0F1A2B3C4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2B4C6D8-1E3F-4A5B-8C7D-9E0F1A2B3C4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2B4C6D8-1E3F-4A5B-8C7D-9E0F1A2B3C4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2B4C6D8-1E3F-4A5B-8C7D-9E0F1A2B3C4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3C5D7E9-2F4A-4B6C-9D8E-0F1A2B3C4D5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3C5D7E9-2F4A-4B6C-9D8E-0F1A2B3C4D5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3C5D7E9-2F4A-4B6C-9D8E-0F1A2B3C4D5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3C5D7E9-2F4A-4B6C-9D8E-0F1A2B3C4D5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

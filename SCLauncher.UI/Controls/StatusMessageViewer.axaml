@@ -1,0 +1,153 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:model="using:SCLauncher.Shared.Model"
+             xmlns:converters="using:SCLauncher.UI.Converters"
+             xmlns:objectModel="using:System.Collections.ObjectModel"
+             xmlns:controls="using:SCLauncher.UI.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="60"
+             x:Class="SCLauncher.UI.Controls.StatusMessageViewer"
+             x:DataType="{x:Type objectModel:ObservableCollection, x:TypeArguments=model:StatusMessage}">
+
+	<Design.DataContext>
+		<objectModel:ObservableCollection x:TypeArguments="model:StatusMessage">
+			<model:StatusMessage>
+				<x:Arguments>
+					<x:String>Test message</x:String>
+					<model:MessageStatus>Info</model:MessageStatus>
+				</x:Arguments>
+			</model:StatusMessage>
+			<model:StatusMessage Details="This is a details message">
+				<x:Arguments>
+					<x:String>Test message2</x:String>
+					<model:MessageStatus>Warning</model:MessageStatus>
+				</x:Arguments>
+			</model:StatusMessage>
+			<model:StatusMessage>
+				<x:Arguments>
+					<x:String>Test message3</x:String>
+					<model:MessageStatus>Success</model:MessageStatus>
+				</x:Arguments>
+			</model:StatusMessage>
+			<model:StatusMessage Details="This is a details message">
+				<x:Arguments>
+					<x:String>Test message4</x:String>
+					<model:MessageStatus>Error</model:MessageStatus>
+				</x:Arguments>
+			</model:StatusMessage>
+		</objectModel:ObservableCollection>
+	</Design.DataContext>
+
+	<UserControl.Resources>
+		<converters:DecorateIfNotNullConverter x:Key="MessageWithDetailDecorator">
+			<x:Arguments>
+				<TextDecoration Location="Underline"
+				                StrokeOffset="1" StrokeOffsetUnit="Pixel"
+				                StrokeThickness="1" StrokeThicknessUnit="Pixel"/>
+			</x:Arguments>
+		</converters:DecorateIfNotNullConverter>
+	</UserControl.Resources>
+
+	<UserControl.Transitions>
+		<Transitions>
+			<DoubleTransition Property="MaxHeight" Duration="0:0:1" Easing="CubicEaseInOut"/>
+		</Transitions>
+	</UserControl.Transitions>
+	
+	<UserControl.Styles>
+		<!-- Flyout style for details message -->
+		<!-- Avalonia.Themes.Fluent/Controls/FlyoutPresenter.xaml -->
+		<Style Selector="FlyoutPresenter">
+			<Setter Property="Cursor" Value="{x:Null}"/>
+			<Setter Property="MaxWidth" Value="{Binding $parent[SelectableTextBlock].Bounds.Width}"/>
+			<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+			<Setter Property="CornerRadius" Value="0"/>
+			<Setter Property="Background">
+				<LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+					<GradientStop Color="Red" Offset="0.0"/>
+					<GradientStop Color="Green" Offset="0.5"/>
+					<GradientStop Color="Blue" Offset="1.0"/>
+				</LinearGradientBrush>
+			</Setter>
+
+			<Style Selector="^ /template/ ScrollViewer">
+				<Setter Property="Background" Value="{DynamicResource FlyoutPresenterBackground}"/>
+				<Setter Property="Opacity" Value="0.9"/>
+				<Setter Property="BorderThickness" Value="1"/>
+			</Style>
+		</Style>
+	</UserControl.Styles>
+
+	<Panel>
+		<ScrollViewer Name="Scroller" Margin="3.5 1.5 1.5 1.5" BringIntoViewOnFocusChange="False">
+			<ItemsControl Name="ItemsControl" ItemsSource="{Binding}" VerticalAlignment="Bottom">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<VirtualizingStackPanel/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate x:DataType="model:StatusMessage">
+						<DockPanel>
+							<TextBlock Text="{Binding Time, StringFormat='HH:mm:ss'}"
+							           IsVisible="{Binding $parent[controls:StatusMessageViewer].DisplayTime}"
+							           Margin="0 0 5 0"
+							           Foreground="LightGray"
+							           FontFamily="Consolas, Courier New, monospace"/>
+
+							<!-- Note: context flyout is disabled because it interferes with pointer exited event -->
+							<SelectableTextBlock
+								Classes.status-w="{Binding Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static model:MessageStatus.Warning}}"
+								Classes.status-s="{Binding Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static model:MessageStatus.Success}}"
+								Classes.status-e="{Binding Status, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static model:MessageStatus.Error}}"
+								TextDecorations="{Binding Details, Converter={StaticResource MessageWithDetailDecorator}}"
+								Cursor="{Binding Details, Converter={x:Static converters:SetCursorIfNotNullConverter.Hand}}"
+								TextWrapping="Wrap"
+								FontFamily="Consolas, Courier New, monospace"
+								Tapped="OnMessageTapped"
+								Text="{Binding Text}"
+								ContextFlyout="{x:Null}">
+								
+								<SelectableTextBlock.Styles>
+									<Style Selector="SelectableTextBlock.status-w">
+										<Setter Property="Foreground" Value="Orange"/>
+									</Style>
+									<Style Selector="SelectableTextBlock.status-s">
+										<Setter Property="Foreground" Value="GreenYellow"/>
+									</Style>
+									<Style Selector="SelectableTextBlock.status-e">
+										<Setter Property="Foreground" Value="Red"/>
+									</Style>
+								</SelectableTextBlock.Styles>
+
+								<FlyoutBase.AttachedFlyout>
+									<Flyout Placement="TopEdgeAlignedLeft" ShowMode="TransientWithDismissOnPointerMoveAway"
+									        PlacementConstraintAdjustment="None">
+										<SelectableTextBlock Text="{Binding Details}"
+										                     TextDecorations="{x:Null}"
+										                     TextWrapping="Wrap"
+										                     Padding="5">
+											<SelectableTextBlock.Effect>
+												<DropShadowEffect Color="Black" OffsetX="0" OffsetY="0"
+												                  BlurRadius="8" Opacity="0.7"/>
+											</SelectableTextBlock.Effect>
+										</SelectableTextBlock>
+									</Flyout>
+								</FlyoutBase.AttachedFlyout>
+							</SelectableTextBlock>
+						</DockPanel>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+		
+		<Button Name="ScrollToBottomButton" Classes="Transparent Grow" RenderTransform="Scale(1.5)"
+		        HorizontalAlignment="Right" VerticalAlignment="Bottom"
+		        Margin="0 0 25 25" Padding="3" Opacity="0.5"
+		        Click="OnScrollToBottomClicked"
+		        PointerWheelChanged="OnScrollToBottomPointerWheelChanged">
+			<PathIcon Data="{StaticResource arrow_down_circle_fill}"/>
+		</Button>
+	</Panel>
+</UserControl>

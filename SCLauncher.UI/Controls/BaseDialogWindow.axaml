@@ -1,0 +1,70 @@
+<!-- https://github.com/AvaloniaUI/Avalonia/blob/master/src/Avalonia.Themes.Fluent/Controls/Window.xaml -->
+
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:SCLauncher.UI.Controls"
+                    x:ClassModifier="internal">
+	
+	<Design.PreviewWith>
+		<controls:BaseDialogWindow>
+			<controls:BaseDialogWindow.MainContent>
+				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Main Content</TextBlock>
+			</controls:BaseDialogWindow.MainContent>
+			<controls:BaseDialogWindow.FooterContent>
+				<DockPanel Margin="20" HorizontalSpacing="15">
+					<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+						<Button Content="Cancel" Classes="action" HotKey="Escape"/>
+						<Button	Content="Save" Classes="action accent" HotKey="Enter"/>
+					</StackPanel>
+				</DockPanel>
+			</controls:BaseDialogWindow.FooterContent>
+		</controls:BaseDialogWindow>
+	</Design.PreviewWith>
+	
+	<ControlTheme x:Key="{x:Type controls:BaseDialogWindow}" TargetType="controls:BaseDialogWindow"
+	              BasedOn="{StaticResource {x:Type Window}}">
+		<Setter Property="Background" Value="{StaticResource WindowBackground}"/>
+		<Setter Property="WindowStartupLocation" Value="CenterOwner"/>
+		<Setter Property="Width" Value="400"/>
+		<Setter Property="Height" Value="180"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+		<Setter Property="ShowInTaskbar" Value="False"/>
+		<Setter Property="CanMinimize" Value="False"/>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Panel>
+					<Border Name="PART_TransparencyFallback" IsHitTestVisible="False" />
+					<Border Background="{TemplateBinding Background}" IsHitTestVisible="False" />
+					<Panel Background="Transparent" Margin="{TemplateBinding WindowDecorationMargin}" />
+					<VisualLayerManager Name="PART_VisualLayerManager">
+					
+						<DockPanel>
+							<!-- Footer Area -->
+							<ContentPresenter Name="PART_FooterPresenter" Content="{TemplateBinding FooterContent}"
+							                  DockPanel.Dock="Bottom" Background="#52000000"/>
+
+							<!-- Main Content Area -->
+							<ScrollViewer DockPanel.Dock="Top" AllowAutoHide="False" Name="ContentScrollViewer"
+							              Margin="{TemplateBinding Padding}"
+							              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+							              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+							              VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"
+							              Classes.ApplyDropShadow="{TemplateBinding ApplyDropShadow}">
+								<ScrollViewer.Styles>
+									<Style Selector="ScrollViewer.ApplyDropShadow">
+										<Setter Property="Effect">
+											<DropShadowDirectionEffect BlurRadius="20" ShadowDepth="-10"/>
+										</Setter>
+									</Style>
+								</ScrollViewer.Styles>
+
+								<ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding MainContent}"/>
+							</ScrollViewer>
+						</DockPanel>
+					</VisualLayerManager>
+				</Panel>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+</ResourceDictionary>
