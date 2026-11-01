@@ -12,6 +12,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using SCLauncher.Backend;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Config;
 using SCLauncher.Shared.Service;
 using SCLauncher.Shared.Util;

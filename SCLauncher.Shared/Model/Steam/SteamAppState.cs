@@ -1,6 +1,6 @@
 using System;
 
-namespace SCLauncher.Shared.Steam;
+namespace SCLauncher.Shared.Model.Steam;
 
 [Flags]
 public enum SteamAppState

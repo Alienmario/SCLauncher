@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
+using SCLauncher.Shared.Extensions;
 
 namespace SCLauncher.UI.Converters;
 

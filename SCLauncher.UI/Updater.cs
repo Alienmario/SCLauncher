@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Octokit;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Install;
 using SCLauncher.Shared.Service;
 using SCLauncher.Shared.Util;

@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.ServerInstall;
 using SCLauncher.Shared.Service;
 using SCLauncher.UI.Controls.Wizard;

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.UI;
 using Tmds.Utils;
 

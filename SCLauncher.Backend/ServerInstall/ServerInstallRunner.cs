@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using SCLauncher.Backend.Install;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model;
 using SCLauncher.Shared.Model.Install;
 using SCLauncher.Shared.Model.ServerInstall;

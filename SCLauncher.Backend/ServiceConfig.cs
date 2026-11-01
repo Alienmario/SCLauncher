@@ -23,14 +23,14 @@ public static class ServiceConfig
 		
 		// Services
 		collection.AddSingleton<IBackendService, BackendService>();
-		collection.AddSingleton<ProfilesService>();
-		collection.AddSingleton<IProfilesService>(sp => sp.GetRequiredService<ProfilesService>());
+		collection.AddSingleton<IProfilesService, ProfilesService>();
 		collection.AddSingleton<IServerInstallService, ServerInstallService>();
 		collection.AddSingleton<IServerControlService, ServerControlService>();
 		collection.AddSingleton<IServerMessageAnalyzerService, ServerMessageAnalyzerService>();
 		collection.AddSingleton<IClientControlService, ClientControlService>();
 		collection.AddSingleton<IPersistenceService, PersistenceService>();
 		collection.AddSingleton<IServerBrowserService, ServerBrowserService>();
+		collection.AddSingleton<IInstallHelperService, InstallHelperService>();
 
 		// Server install
 		collection.AddSingleton<ServerInstallRunner>();
@@ -42,7 +42,6 @@ public static class ServiceConfig
 		collection.AddSingleton<IServerComponentInstaller<ComponentInfo>, ModelChooserInstaller>();
 
 		collection.AddSingleton(new HttpClient { Timeout = TimeSpan.FromSeconds(20) });
-		collection.AddSingleton<IInstallHelperService, InstallHelperService>();
 	}
 	
 }

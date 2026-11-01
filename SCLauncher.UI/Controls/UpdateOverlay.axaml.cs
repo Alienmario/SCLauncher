@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Octokit;
+using SCLauncher.Shared.Extensions;
 
 namespace SCLauncher.UI.Controls;
 

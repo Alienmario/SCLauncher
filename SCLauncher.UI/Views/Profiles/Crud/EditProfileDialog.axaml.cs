@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Config;
 using SCLauncher.Shared.Model.Definition;
 using SCLauncher.Shared.Service;

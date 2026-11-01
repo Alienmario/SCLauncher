@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Definition;
 
 namespace SCLauncher.Shared.Model.Config;

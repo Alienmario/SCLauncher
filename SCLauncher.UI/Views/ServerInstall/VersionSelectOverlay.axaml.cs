@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using MarkView.Avalonia;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Install;
 using SCLauncher.Shared.Model.ServerInstall;
 using SCLauncher.UI.Controls;

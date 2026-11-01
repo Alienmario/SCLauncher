@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Definition;
 using SCLauncher.Shared.Service;
 using SCLauncher.UI.Controls;

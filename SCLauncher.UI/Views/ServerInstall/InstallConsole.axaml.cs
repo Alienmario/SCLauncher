@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model;
 using SCLauncher.Shared.Model.Install;
 using SCLauncher.Shared.Model.ServerInstall;

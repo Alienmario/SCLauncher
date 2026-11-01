@@ -11,6 +11,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model;
 using SCLauncher.Shared.Service;
 using SCLauncher.Shared.Util;

@@ -7,11 +7,12 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DepotDownloader;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model;
 using SCLauncher.Shared.Model.Config;
 using SCLauncher.Shared.Model.Install;
 using SCLauncher.Shared.Model.ServerInstall;
-using SCLauncher.Shared.Steam;
+using SCLauncher.Shared.Model.Steam;
 using SCLauncher.Shared.Util;
 
 namespace SCLauncher.Backend.ServerInstall.Components;

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using SCLauncher.Shared.Model.Exceptions;
+using SCLauncher.Shared.Exceptions;
 
 namespace SCLauncher.Shared.Service;
 

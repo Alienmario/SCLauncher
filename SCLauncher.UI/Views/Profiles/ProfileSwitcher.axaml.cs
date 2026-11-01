@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Config;
 using SCLauncher.Shared.Service;
 using SCLauncher.UI.Views.Profiles.Crud;

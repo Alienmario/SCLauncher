@@ -11,6 +11,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Definition;
 using SCLauncher.Shared.Model.Install;
 using SCLauncher.Shared.Model.ServerInstall;

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Octokit;
-using SCLauncher.Shared.Model.Exceptions;
+using SCLauncher.Shared.Exceptions;
 using SCLauncher.Shared.Model.Install;
 using SCLauncher.Shared.Service;
 

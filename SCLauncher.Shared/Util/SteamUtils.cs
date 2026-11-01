@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Gameloop.Vdf;
 using Gameloop.Vdf.Linq;
 using Microsoft.Win32;
-using SCLauncher.Shared.Steam;
+using SCLauncher.Shared.Model.Steam;
 
 namespace SCLauncher.Shared.Util;
 

@@ -1,7 +1,7 @@
 using System.IO;
 using Gameloop.Vdf.Linq;
 
-namespace SCLauncher.Shared.Steam;
+namespace SCLauncher.Shared.Model.Steam;
 
 public class SteamAppManifest(VObject vObject, SteamLibrary library)
 {

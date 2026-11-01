@@ -4,6 +4,7 @@ using System.IO;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Config;
 using SCLauncher.Shared.Service;
 using SCLauncher.UI.Views.Settings;

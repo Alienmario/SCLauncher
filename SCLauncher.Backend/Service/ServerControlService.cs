@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using SCLauncher.Backend.ServerInstall.Components;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Service;
 
 namespace SCLauncher.Backend.Service;

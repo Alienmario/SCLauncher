@@ -7,7 +7,7 @@ namespace SCLauncher.Backend.Service;
 
 internal class BackendService(
 	GlobalConfiguration globalConfig, IPersistenceService persistence,
-	IServerControlService serverControlService, ProfilesService profilesService) : IBackendService
+	IServerControlService serverControlService, IProfilesService profilesService) : IBackendService
 {
 	// events
 	public event EventHandler<bool>? CanSwitchProfilesChanged;
@@ -38,7 +38,7 @@ internal class BackendService(
 			globalConfig.SteamPath = steamPath;
 		}
 		
-		profilesService.Initialize();
+		((ProfilesService)profilesService).Initialize();
 	}
 	
 	private void ComputeCanSwitchProfiles()

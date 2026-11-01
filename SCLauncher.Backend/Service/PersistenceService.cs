@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Service;
 
 namespace SCLauncher.Backend.Service;

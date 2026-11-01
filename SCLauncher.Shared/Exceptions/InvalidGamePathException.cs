@@ -1,6 +1,6 @@
 using System;
 
-namespace SCLauncher.Shared.Model.Exceptions;
+namespace SCLauncher.Shared.Exceptions;
 
 public class InvalidGamePathException : Exception
 {

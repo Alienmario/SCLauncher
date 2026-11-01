@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.UI.Util;
 
 namespace SCLauncher.UI.Controls;

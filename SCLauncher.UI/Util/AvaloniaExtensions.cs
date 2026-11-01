@@ -6,6 +6,7 @@ internal static class AvaloniaExtensions
 {
 	extension(Panel panel)
 	{
+		/// Gets or sets the currently visible child control of the panel, hiding all others.
 		public Control? VisibleChild
 		{
 			set

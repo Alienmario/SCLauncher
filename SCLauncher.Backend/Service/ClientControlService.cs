@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using SCLauncher.Shared.Model.Exceptions;
+using SCLauncher.Shared.Extensions;
+using SCLauncher.Shared.Exceptions;
 using SCLauncher.Shared.Service;
 using Path = System.IO.Path;
 

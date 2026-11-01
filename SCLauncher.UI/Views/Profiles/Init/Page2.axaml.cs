@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
+using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Definition;
 using SCLauncher.Shared.Service;
 using SCLauncher.UI.Controls.Wizard;
