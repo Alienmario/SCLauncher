@@ -1,0 +1,164 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using SCLauncher.Shared.Model.Config;
+using SCLauncher.Shared.Model.Definition;
+using SCLauncher.Shared.Service;
+using SCLauncher.UI.Controls;
+using SCLauncher.UI.DesignTime;
+
+namespace SCLauncher.UI.Views.Profiles.Crud;
+
+public partial class EditProfileDialog : BaseDialogWindow
+{
+	private readonly IProfilesService profilesService;
+
+	public EditProfileDialog()
+	{
+		InitializeComponent();
+		profilesService = App.GetService<IProfilesService>();
+		
+		CancelButton.Click += OnCancelClick;
+		SaveButton.Click += OnSaveClick;
+		
+		DataContextChanged += delegate
+		{
+			if (DataContext is AppProfile profile)
+			{
+				LoadProfile(profile);
+			}
+		};
+		
+		if (Design.IsDesignMode)
+		{
+			DataContext = DAppProfile.Instance;
+		}
+	}
+
+	private void LoadProfile(AppProfile profile)
+	{
+		ProfileTypeTextBox.Text = profile.AppType.GetDescription();
+		AppPresetComboBox.ItemsSource = AppDefinitions.Get(profile.AppType).AvailablePresets;
+		AppPresetComboBox.SelectedItem = profile.AppPreset;
+		ProfileNameTextBox.Text = profile.Name;
+		GameAppIdTextBox.Text = profile.GameAppId.ToString();
+		ServerAppIdTextBox.Text = profile.ServerAppId.ToString();
+		GameInstallFolderTextBox.Text = profile.GameInstallFolder;
+		ServerInstallFolderTextBox.Text = profile.ServerInstallFolder;
+		ModFolderTextBox.Text = profile.ModFolder;
+
+		GameExecutableWinTextBox.Text = profile.GameExecutable
+			.TryGetValue(PlatformID.Win32NT, out var winExe) ? winExe : string.Empty;
+		GameExecutableLinuxTextBox.Text = profile.GameExecutable
+			.TryGetValue(PlatformID.Unix, out var linuxExe) ? linuxExe : string.Empty;
+		
+		// GamePathTextBox.Text = profile.GamePath ?? string.Empty;
+		// ServerPathTextBox.Text = profile.ServerPath ?? string.Empty;
+	}
+
+	private bool SaveProfile(AppProfile profile)
+	{
+		string? name = ProfileNameTextBox.Text?.Trim();
+		if (string.IsNullOrEmpty(name))
+		{
+			ShowError("Please enter a profile name");
+			return false;
+		}
+
+		// Check if name is different and if it conflicts with another profile
+		if (!name.Equals(profile.Name, StringComparison.OrdinalIgnoreCase) &&
+		    profilesService.Profiles.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+		{
+			ShowError("A profile with this name already exists");
+			return false;
+		}
+
+		// Validate Game App ID
+		if (!uint.TryParse(GameAppIdTextBox.Text?.Trim(), out var gameAppId))
+		{
+			ShowError("Please enter a valid Game App ID");
+			return false;
+		}
+
+		// Validate Server App ID
+		if (!uint.TryParse(ServerAppIdTextBox.Text?.Trim(), out var serverAppId))
+		{
+			ShowError("Please enter a valid Server App ID");
+			return false;
+		}
+
+		// Validate required string fields
+		var gameInstallFolder = GameInstallFolderTextBox.Text?.Trim();
+		if (string.IsNullOrEmpty(gameInstallFolder))
+		{
+			ShowError("Please enter a game install folder");
+			return false;
+		}
+
+		var serverInstallFolder = ServerInstallFolderTextBox.Text?.Trim();
+		if (string.IsNullOrEmpty(serverInstallFolder))
+		{
+			ShowError("Please enter a server install folder");
+			return false;
+		}
+
+		var modFolder = ModFolderTextBox.Text?.Trim();
+		if (string.IsNullOrEmpty(modFolder))
+		{
+			ShowError("Please enter a mod folder");
+			return false;
+		}
+
+		var gameExecutableWin = GameExecutableWinTextBox.Text?.Trim();
+		var gameExecutableLinux = GameExecutableLinuxTextBox.Text?.Trim();
+
+		try
+		{
+			profile.AppPreset = (AppPreset)AppPresetComboBox.SelectedItem!;
+			profile.Name = name;
+			profile.GameAppId = gameAppId;
+			profile.ServerAppId = serverAppId;
+			profile.GameInstallFolder = gameInstallFolder;
+			profile.ServerInstallFolder = serverInstallFolder;
+			profile.ModFolder = modFolder;
+			profile.GameExecutable = new Dictionary<PlatformID, string>();
+			if (!string.IsNullOrEmpty(gameExecutableWin))
+				profile.GameExecutable.Add(PlatformID.Win32NT, gameExecutableWin);
+			if (!string.IsNullOrEmpty(gameExecutableLinux))
+				profile.GameExecutable.Add(PlatformID.Unix, gameExecutableLinux);
+			// profile.GamePath = GamePathTextBox.Text?.Trim();
+			// profile.ServerPath = ServerPathTextBox.Text?.Trim();
+			return true;
+		}
+		catch (Exception e)
+		{
+			ShowError($"Failed to update profile: {e.Message}");
+			e.Log();
+			return false;
+		}
+	}
+	
+	private void OnCancelClick(object? sender, RoutedEventArgs args)
+	{
+		Close(null);
+	}
+
+	private void OnSaveClick(object? sender, RoutedEventArgs args)
+	{
+		if (DataContext is AppProfile profile)
+		{
+			if (SaveProfile(profile))
+			{
+				Close(profile);
+			}
+		}
+	}
+
+	private void ShowError(string message)
+	{
+		ErrorMessage.Text = message;
+		ErrorMessage.IsVisible = true;
+	}
+}

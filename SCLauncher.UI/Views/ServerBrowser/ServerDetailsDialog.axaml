@@ -1,0 +1,69 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:serverbrowser="clr-namespace:SCLauncher.Shared.Model.ServerBrowser;assembly=SCLauncher.Shared"
+        xmlns:design="clr-namespace:SCLauncher.UI.DesignTime"
+        mc:Ignorable="d"
+        x:Class="SCLauncher.UI.Views.ServerBrowser.ServerDetailsDialog"
+        x:DataType="serverbrowser:Server"
+        Width="650" SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="True"
+        Background="{StaticResource WindowBackground}">
+	
+	<Window.Title>
+		<Binding Path="Name" StringFormat="Server details: {0}"/>
+	</Window.Title>
+	
+	<Design.DataContext>
+		<x:Static Member="design:DServer.Instance"/>
+	</Design.DataContext>
+	
+	<Window.Resources>
+		<SolidColorBrush x:Key="DataGridCellFocusVisualPrimaryBrush" Color="Transparent" />
+		<SolidColorBrush x:Key="DataGridCellFocusVisualSecondaryBrush" Color="Transparent" />
+	</Window.Resources>
+	
+	<Window.Styles>
+		<Style Selector="Expander">
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="VerticalAlignment" Value="Stretch"/>
+			<Setter Property="Padding" Value="0"/>
+		</Style>
+		<Style Selector="DataGrid">
+			<Setter Property="MaxHeight" Value="200"/>
+			<Setter Property="Background" Value="{DynamicResource TextControlBackground}"/>
+			<Setter Property="IsReadOnly" Value="True"/>
+		</Style>
+	</Window.Styles>
+	
+	<Grid Margin="10" RowSpacing="10" RowDefinitions="Auto, Auto">
+		<Expander Grid.Row="0" IsExpanded="True">
+			<Expander.Header>PLAYERS</Expander.Header>
+		
+			<DataGrid Name="PlayersGrid" ItemsSource="{Binding Players}"
+			          CanUserResizeColumns="False" CanUserSortColumns="True">
+	            <DataGrid.Columns>
+	                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
+	                <DataGridTextColumn Header="Score" Binding="{Binding Score}"/>
+	                <DataGridTextColumn Header="Duration" Binding="{Binding DurationFormatted}" SortMemberPath="Duration"/>
+	            </DataGrid.Columns>
+	        </DataGrid>
+		</Expander>
+		
+		<Expander Grid.Row="1" IsExpanded="True">
+			<Expander.Header>RULES</Expander.Header>
+			
+	        <DataGrid Name="RulesGrid" ItemsSource="{Binding Rules}"
+	                  CanUserResizeColumns="True" CanUserSortColumns="True">
+	            <DataGrid.Columns>
+	                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+	                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*"/>
+	            </DataGrid.Columns>
+	        </DataGrid>
+		</Expander>
+	</Grid>
+	
+</Window>

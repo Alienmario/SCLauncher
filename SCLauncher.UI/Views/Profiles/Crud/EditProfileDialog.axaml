@@ -1,0 +1,97 @@
+<controls:BaseDialogWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:SCLauncher.UI.Controls"
+        xmlns:config="clr-namespace:SCLauncher.Shared.Model.Config;assembly=SCLauncher.Shared"
+        xmlns:converters="clr-namespace:SCLauncher.UI.Converters"
+        mc:Ignorable="d"
+        x:Class="SCLauncher.UI.Views.Profiles.Crud.EditProfileDialog"
+        x:DataType="config:AppProfile"
+        Title="Edit Profile"
+        Width="500" Height="600">
+
+	<controls:BaseDialogWindow.MainContent>
+		<StackPanel Margin="20" Spacing="10" HorizontalAlignment="Stretch">
+			<TextBlock Text="Edit Profile" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+			
+			<StackPanel Spacing="5" HorizontalAlignment="Stretch">
+				<TextBlock Text="Type and preset"/>
+				
+				<UniformGrid ColumnSpacing="10" Rows="1">
+					<TextBox Name="ProfileTypeTextBox" VerticalAlignment="Center" IsEnabled="False"/>
+
+					<ComboBox Name="AppPresetComboBox" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+					          DisplayMemberBinding="{Binding Converter={x:Static converters:EnumDescriptionConverter.Instance}}"/>
+				</UniformGrid>
+			</StackPanel>
+			
+			<StackPanel Spacing="5">
+				<TextBlock Text="Name"/>
+				<TextBox Name="ProfileNameTextBox" PlaceholderText="Enter profile name"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Game App ID"/>
+				<TextBox Name="GameAppIdTextBox" PlaceholderText="Enter game App ID"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Server App ID"/>
+				<TextBox Name="ServerAppIdTextBox" PlaceholderText="Enter server App ID"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Game Install Folder"/>
+				<TextBox Name="GameInstallFolderTextBox" PlaceholderText="Enter game install folder"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Server Install Folder"/>
+				<TextBox Name="ServerInstallFolderTextBox" PlaceholderText="Enter server install folder"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Mod Folder"/>
+				<TextBox Name="ModFolderTextBox" PlaceholderText="Enter mod folder"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Game Executable (Windows)"/>
+				<TextBox Name="GameExecutableWinTextBox" PlaceholderText="Enter Windows executable"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Game Executable (Linux)"/>
+				<TextBox Name="GameExecutableLinuxTextBox" PlaceholderText="Enter Linux executable"/>
+			</StackPanel>
+
+			<!--
+			<StackPanel Spacing="5">
+				<TextBlock Text="Game Path"/>
+				<TextBox Name="GamePathTextBox" PlaceholderText="Enter game path (optional)"/>
+			</StackPanel>
+
+			<StackPanel Spacing="5">
+				<TextBlock Text="Server Path"/>
+				<TextBox Name="ServerPathTextBox" PlaceholderText="Enter server path (optional)"/>
+			</StackPanel>
+			-->
+
+		</StackPanel>
+	</controls:BaseDialogWindow.MainContent>
+
+	<controls:BaseDialogWindow.FooterContent>
+		<DockPanel Margin="20" HorizontalSpacing="15">
+			<!-- Action Buttons -->
+			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+				<Button Name="CancelButton" Content="Cancel" Classes="action" HotKey="Escape"/>
+				<Button Name="SaveButton" Content="Save" Classes="action accent" HotKey="Enter"/>
+			</StackPanel>
+			<!-- Error Message -->
+			<TextBlock DockPanel.Dock="Left" Name="ErrorMessage" Foreground="Red" FontWeight="SemiBold"
+			           TextWrapping="Wrap" IsVisible="False" VerticalAlignment="Center"/>
+		</DockPanel>
+	</controls:BaseDialogWindow.FooterContent>
+
+</controls:BaseDialogWindow>

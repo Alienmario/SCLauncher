@@ -1,0 +1,188 @@
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using SCLauncher.Backend.ServerInstall.Components;
+using SCLauncher.Shared.Service;
+
+namespace SCLauncher.Backend.Service;
+
+internal class ServerControlService : IServerControlService
+{
+	public event DataReceivedEventHandler? OutputReceived;
+	public event DataReceivedEventHandler? ErrorReceived;
+	public event EventHandler<bool>? StateChanged;
+
+	private readonly IProfilesService _profilesService;
+	private Process? _serverProcess;
+
+	public ServerControlService(IProfilesService profilesService)
+	{
+		_profilesService = profilesService;
+
+		AppDomain.CurrentDomain.ProcessExit += (sender, args) => Stop();
+	}
+
+	public bool IsRunning
+	{
+		get
+		{
+			try
+			{
+				return _serverProcess != null && !_serverProcess.HasExited;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
+	}
+
+	public bool Start()
+	{
+		if (_profilesService.ActiveProfile.ServerPath == null)
+			return false;
+		if (IsRunning)
+			return false;
+
+		string executable;
+		try
+		{
+			executable = Path.Join(_profilesService.ActiveProfile.ServerPath, SrcdsFixInstaller.GetExecForCurrentPlatform());
+		}
+		catch (PlatformNotSupportedException e)
+		{
+			e.Log();
+			return false;
+		}
+
+		Trace.WriteLine("Using srcds executable: " + executable);
+		
+		if (!File.Exists(executable))
+		{
+			Trace.WriteLine("Executable not found!");
+			return false;
+		}
+		
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+		{
+			string srcdsLinux = Path.Join(_profilesService.ActiveProfile.ServerPath, "srcds_linux");
+			try
+			{
+				File.SetUnixFileMode(executable, File.GetUnixFileMode(executable) | UnixFileMode.UserExecute);
+				File.SetUnixFileMode(srcdsLinux, File.GetUnixFileMode(srcdsLinux) | UnixFileMode.UserExecute);
+			}
+			catch (Exception e)
+			{
+				e.Log();
+				return false;
+			}
+		}
+		
+		try
+		{
+			_serverProcess = new Process
+			{
+				EnableRaisingEvents = true,
+				StartInfo = new ProcessStartInfo
+				{
+					FileName = executable,
+					WorkingDirectory = _profilesService.ActiveProfile.ServerPath,
+					UseShellExecute = false,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					RedirectStandardInput = true,
+					CreateNoWindow = true
+				}
+			};
+
+			var args = _serverProcess.StartInfo.ArgumentList;
+			var appInfo = _profilesService.ActiveProfile;
+			args.Add("-console");
+			args.Add("-nocrashdialog");
+			args.Add("-game");
+			args.Add(QuoteArgument(appInfo.ModFolder));
+			foreach (string arg in _profilesService.ActiveProfile.ServerConfig.ToLaunchParams())
+			{
+				args.Add(QuoteArgument(arg));
+			}
+			
+			_serverProcess.OutputDataReceived += (s, e) => OutputReceived?.Invoke(s, e);
+			_serverProcess.ErrorDataReceived += (s, e) => ErrorReceived?.Invoke(s, e);
+			_serverProcess.Start();
+			
+			if (IsRunning)
+			{
+				StateChanged?.Invoke(this, true);
+				_serverProcess.Exited += (sender, _) => StateChanged?.Invoke(sender, false);
+				_serverProcess.BeginOutputReadLine();
+				_serverProcess.BeginErrorReadLine();
+				
+				return true;
+			}
+		}
+		catch (Exception e)
+		{
+			e.Log();
+			Stop();
+		}
+
+		return false;
+	}
+
+	public void Stop()
+	{
+		if (_serverProcess == null)
+			return;
+		
+		try
+		{
+			Process process = _serverProcess;
+			try
+			{
+				process.Kill(true);
+			}
+			catch (Exception e)
+			{
+				e.Log();
+			}
+
+			Task.Run(() =>
+			{
+				process.WaitForExit();
+				process.Dispose();
+			});
+			_serverProcess = null;
+		}
+		catch (Exception e)
+		{
+			e.Log();
+		}
+	}
+
+	public void Command(string cmd)
+	{
+		if (IsRunning)
+		{
+			_serverProcess!.StandardInput.WriteLine(cmd);
+		}
+	}
+
+	/// <summary>
+	/// On Linux, srcds rebuilds its command line by joining argv with spaces without preserving quotes,
+	/// so a value like "My Server" would be split and only "My" would reach the console command.
+	/// Wrap such values in literal quotes so the engine's tokenizer keeps them together.
+	/// On Windows the raw command line (with .NET's quoting) is used, so no extra quoting is needed.
+	/// </summary>
+	private static string QuoteArgument(string value)
+	{
+		if (OperatingSystem.IsWindows() || string.IsNullOrEmpty(value) || !value.Any(char.IsWhiteSpace))
+			return value;
+
+		// the engine tokenizer has no escape sequence for quotes, so drop any embedded ones
+		return "\"" + value.Replace("\"", "") + "\"";
+	}
+
+}
