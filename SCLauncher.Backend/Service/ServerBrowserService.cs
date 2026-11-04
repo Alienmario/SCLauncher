@@ -15,7 +15,6 @@ using SCLauncher.Shared.Util;
 using SteamKit2;
 using SteamQuery;
 using SteamQuery.Models;
-using System.Net.Http;
 
 namespace SCLauncher.Backend.Service;
 
@@ -140,13 +139,8 @@ internal class ServerBrowserService(IProfilesService profilesService, GlobalConf
 			uint appId = profilesService.ActiveProfile.GameAppId;
 
 			using var gameServersService = WebAPI.GetAsyncInterface("IGameServersService", globalConfig.SteamWebApiKey);
-			KeyValue response = await gameServersService.CallAsync("QueryByFakeIP", 1, new()
-			{
-				{ "fake_ip", encodedIp },
-				{ "fake_port", port },
-				{ "app_id", appId },
-				{ "query_type", 1 }
-			}).ConfigureAwait(false);
+			KeyValue response = await QueryByFakeIp(gameServersService, encodedIp, port, appId, FakeIpQueryType.Information)
+				.ConfigureAwait(false);
 				
 			ct.ThrowIfCancellationRequested();
 			
@@ -156,13 +150,8 @@ internal class ServerBrowserService(IProfilesService profilesService, GlobalConf
 				
 				if (players)
 				{
-					KeyValue playersResponse = await gameServersService.CallAsync("QueryByFakeIP", 1, new()
-					{
-						{ "fake_ip", encodedIp },
-						{ "fake_port", port },
-						{ "app_id", appId },
-						{ "query_type", 2 }
-					}).ConfigureAwait(false);
+					KeyValue playersResponse = await QueryByFakeIp(gameServersService, encodedIp, port, appId, FakeIpQueryType.Players)
+						.ConfigureAwait(false);
 
 					ct.ThrowIfCancellationRequested();
 
@@ -178,13 +167,8 @@ internal class ServerBrowserService(IProfilesService profilesService, GlobalConf
 				
 				if (rules)
 				{
-					KeyValue rulesResponse = await gameServersService.CallAsync("QueryByFakeIP", 1, new()
-					{
-						{ "fake_ip", encodedIp },
-						{ "fake_port", port },
-						{ "app_id", appId },
-						{ "query_type", 3 }
-					}).ConfigureAwait(false);
+					KeyValue rulesResponse = await QueryByFakeIp(gameServersService, encodedIp, port, appId, FakeIpQueryType.Rules)
+						.ConfigureAwait(false);
 
 					ct.ThrowIfCancellationRequested();
 
@@ -216,6 +200,20 @@ internal class ServerBrowserService(IProfilesService profilesService, GlobalConf
 			}
 		}
 		return null;
+	}
+
+	private enum FakeIpQueryType { Information = 1, Players = 2, Rules = 3 }
+
+	private static Task<KeyValue> QueryByFakeIp(WebAPI.AsyncInterface service, uint fakeIp, uint fakePort, uint appId,
+		FakeIpQueryType queryType)
+	{
+		return service.CallAsync("QueryByFakeIP", 1, new()
+		{
+			{ "fake_ip", fakeIp },
+			{ "fake_port", fakePort },
+			{ "app_id", appId },
+			{ "query_type", (int)queryType }
+		});
 	}
 
 	/// Translates server from Steamkit2 Web API
