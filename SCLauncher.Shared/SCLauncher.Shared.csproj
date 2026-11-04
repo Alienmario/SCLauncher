@@ -4,6 +4,7 @@
 		<RootNamespace>SCLauncher.Shared</RootNamespace>
 		<Nullable>enable</Nullable>
 		<DebugType>embedded</DebugType>
+		<IsTrimmable>true</IsTrimmable>
 	</PropertyGroup>
 
 	<ItemGroup>

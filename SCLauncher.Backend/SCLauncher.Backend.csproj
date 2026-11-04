@@ -5,6 +5,7 @@
 		<Nullable>enable</Nullable>
 		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
 		<DebugType>embedded</DebugType>
+		<IsTrimmable>true</IsTrimmable>
 	</PropertyGroup>
 
 	<ItemGroup>
