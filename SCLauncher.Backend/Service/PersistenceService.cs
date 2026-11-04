@@ -116,17 +116,20 @@ internal class PersistenceService : IPersistenceService
 
 	public void LoadAndMerge(string name, object instance, IJsonTypeInfoResolver? context = null)
 	{
+		if (instance is IEnumerable and not IList)
+			throw new NotSupportedException($"Cannot merge into collection of type {instance.GetType()}, only {nameof(IList)} is supported");
+
 		object? loaded = Load(name, instance.GetType(), context);
 		if (loaded != null)
 		{
-			if (instance is IList dstList)
+			if (instance is IList destList)
 			{
-				if (loaded is IEnumerable srcEnumerable and not string)
+				if (loaded is IEnumerable srcEnumerable)
 				{
-					dstList.Clear();
+					destList.Clear();
 					foreach (var item in srcEnumerable)
 					{
-						dstList.Add(item);
+						destList.Add(item);
 					}
 				}
 			}
