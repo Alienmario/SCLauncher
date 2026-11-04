@@ -92,6 +92,11 @@ file static class Modifiers
 			}
 		};
 
-		props[index] = JsonMetadataServices.CreatePropertyInfo(typeInfo.Options, surrogateInfo);
+		// JsonMetadataServices constructs the strongly-typed JsonPropertyInfo<JsonElement> directly, avoiding the
+		// reflection-based JsonTypeInfo.CreateJsonPropertyInfo(Type, string).
+		var surrogate = JsonMetadataServices.CreatePropertyInfo(typeInfo.Options, surrogateInfo);
+		surrogate.ShouldSerialize = (_, value) => value is JsonElement { ValueKind: not JsonValueKind.Undefined };
+
+		props[index] = surrogate;
 	}
 }
