@@ -15,6 +15,8 @@ public class ServerInstallComponent
 
 	public string? Description { get; init; }
 
+	public string? Url { get; init; }
+
 	public required int InstallOrder { get; init; }
 
 	/// Ensure that this component is installed
@@ -46,7 +48,7 @@ public class ServerInstallComponent
 	public static readonly ServerInstallComponent SrcdsFix = new()
 	{
 		Title = "Fixed server executable",
-		Description = "Necessary for running within the launcher",
+		Description = "Patched SRCDS executable required to run the server inside SCLauncher",
 		InstallOrder = 2,
 		Required = true,
 		Dependencies = [Server]
@@ -55,7 +57,9 @@ public class ServerInstallComponent
 	public static readonly ServerInstallComponent MetaMod = new()
 	{
 		Title = "MetaMod:Source",
-		Description = "A modding platform that provides low-level support to other server addons",
+		Description = "Ground-level modding environment that provides hooking support to dependent addons\n\n" +
+		              "Inert on its own, does not alter gameplay in any way.",
+		Url = "https://www.sourcemm.net/",
 		InstallOrder = 3,
 		Dependencies = [Server],
 		AppTypes = Exclude([AppType.GMOD])
@@ -64,7 +68,9 @@ public class ServerInstallComponent
 	public static readonly ServerInstallComponent SourceMod = new()
 	{
 		Title = "SourceMod",
-		Description = "Administration and scripting framework for Source",
+		Description = "Server modding framework built on MetaMod:Source\n\n" +
+		              "Provides basic server administration and commands in addition to extension / plugin management.",
+		Url = "https://www.sourcemod.net/",
 		InstallOrder = 4,
 		Dependencies = [MetaMod],
 		AppTypes = Exclude([AppType.GMOD])
@@ -73,7 +79,9 @@ public class ServerInstallComponent
 	public static readonly ServerInstallComponent SourceCoop = new()
 	{
 		Title = "SourceCoop",
-		Description = "Cooperative mod built on SourceMod",
+		Description = "Cooperative mod made with SourceMod\n\n" +
+		              "Covers all the necessities for a smooth playthrough of supported campaigns and maps in multiplayer.",
+		Url = "https://github.com/ampreeT/SourceCoop",
 		InstallOrder = PluginsOrder,
 		Dependencies = [SourceMod],
 		AppTypes = [AppType.BlackMesa, AppType.HL2DM],
@@ -83,7 +91,10 @@ public class ServerInstallComponent
 	public static readonly ServerInstallComponent ModelChooser = new()
 	{
 		Title = "ModelChooser",
-		Description = "Advanced third-person player model chooser",
+		Description = "SourceMod plugin that lets players customize their player model in game (by typing /model)\n\n" +
+		              "Features an interactive third-person preview and extensive customization. Includes default presets." +
+		              "\n\nOverrides the game's built-in model selection!",
+		Url = "https://github.com/Alienmario/ModelChooser",
 		InstallOrder = PluginsOrder,
 		Dependencies = [SourceMod],
 		AppTypes = [AppType.BlackMesa, AppType.HL2DM]

@@ -54,7 +54,6 @@ public partial class GameView : UserControl
     private void OnConfiguratorResetClicked(object? sender, RoutedEventArgs args)
     {
         DataContext = profilesService.ActiveProfile.ResetClientConfig();
-        ResetConfigButton?.Flyout?.Hide();
     }
 
 }

@@ -30,6 +30,7 @@
 		<Color x:Key="BackgroundPane">#34595959</Color> <!-- Translucent panels -->
 		<Color x:Key="BackgroundPane2">#3E909090</Color> <!-- Translucent panels -->
 		<Color x:Key="BackgroundPane3">#F5232323</Color> <!-- Translucent panels -->
+		<Color x:Key="BackgroundPane4">#0C151515</Color> <!-- Translucent panels -->
 
 		<SolidColorBrush x:Key="Highlight" Color="{StaticResource HighlightColor}"/>
 		<SolidColorBrush x:Key="Secondary" Color="{StaticResource SecondaryColor}"/>

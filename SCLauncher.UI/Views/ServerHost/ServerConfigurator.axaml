@@ -15,13 +15,16 @@
 	</Design.DataContext>
 	
 	<UserControl.Styles>
-		<Style Selector="TextBlock">
-			<Setter Property="TextTrimming" Value="{x:Static TextTrimming.CharacterEllipsis}"/>
+		<Style Selector="StackPanel.Label">
+			<Setter Property="Orientation" Value="Horizontal"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Spacing" Value="6"/>
+			<Style Selector="^ > controls|InfoIcon">
+				<Setter Property="RenderTransform" Value="Scale(0.85)"/>
+			</Style>
 		</Style>
 		<Style Selector="TextBox">
 			<Setter Property="TextWrapping" Value="Wrap"/>
-			<Setter Property="VerticalAlignment" Value="Center"/>
 		</Style>
 	</UserControl.Styles>
 	
@@ -42,34 +45,66 @@
 				<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*" ColumnDefinitions="Auto,*"
 				      RowSpacing="5" ColumnSpacing="8">
 					
-					<TextBlock Grid.Row="0" Grid.Column="0" Text="Hostname:"/>
+					<StackPanel Grid.Row="0" Grid.Column="0" Classes="Label">
+						<controls:InfoIcon Text="Server name displayed in the server browser and scoreboard.&#10;&#10;(+hostname)"/>
+						<TextBlock Text="Hostname"/>
+					</StackPanel>
 					<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Hostname}"/>
 					
-					<TextBlock Grid.Row="1" Grid.Column="0" Text="Password:"/>
+					<StackPanel Grid.Row="1" Grid.Column="0" Classes="Label">
+						<controls:InfoIcon Text="Password players must enter to join the server. Leave empty for a public server.&#10;&#10;(+sv_password)"/>
+						<TextBlock Text="Password"/>
+					</StackPanel>
 					<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Password}"/>
 					
-					<TextBlock Grid.Row="2" Grid.Column="0" Text="Start Map:"/>
+					<StackPanel Grid.Row="2" Grid.Column="0" Classes="Label">
+						<controls:InfoIcon Text="Map loaded at server start, without the .bsp extension.&#10;&#10;(+map)"/>
+						<TextBlock Text="Start map"/>
+					</StackPanel>
 					<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding StartMap}"/>
 					
-					<TextBlock Grid.Row="3" Grid.Column="0" Text="Max Players:"/>
-					<NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding Maxplayers}" Minimum="2" Maximum="255" FormatString="0"/>
+					<StackPanel Grid.Row="3" Grid.Column="0" Classes="Label">
+						<controls:InfoIcon Text="Number of players slots. Games clip this value to their own maximum.&#10;&#10;(+maxplayers)"/>
+						<TextBlock Text="Max players"/>
+					</StackPanel>
+					<NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding Maxplayers}"
+					               Minimum="2" Maximum="255" FormatString="0" ClipValueToMinMax="True"/>
 				    
-					<TextBlock Grid.Row="4" Grid.Column="0" Text="Config file:"/>
+					<StackPanel Grid.Row="4" Grid.Column="0" Classes="Label">
+						<controls:InfoIcon Text="Executed every time a map change occurs, relative to the game's cfg folder.&#10;&#10;(+servercfgfile)"/>
+						<TextBlock Text="Config file"/>
+					</StackPanel>
 					<TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ServerCfgFile}"/>
 					
-				    <TextBlock Grid.Row="5" Grid.Column="0" Text="Local IP:"/>
+					<StackPanel Grid.Row="5" Grid.Column="0" Classes="Label">
+						<controls:InfoIcon Text="Local network interface address the server binds to. Use 0.0.0.0 to listen on all interfaces.&#10;&#10;(-ip)"/>
+						<TextBlock Text="Local IP"/>
+					</StackPanel>
 				    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Ip}"/>
 				    
-				    <TextBlock Grid.Row="6" Grid.Column="0" Text="Port:"/>
-				    <NumericUpDown Grid.Row="6" Grid.Column="1" Value="{Binding Port}" Minimum="1" Maximum="65535" FormatString="0"/>
+					<StackPanel Grid.Row="6" Grid.Column="0" Classes="Label">
+						<controls:InfoIcon Text="UDP port the server listens on for connections.&#10;&#10;(-port)"/>
+						<TextBlock Text="Port"/>
+					</StackPanel>
+				    <NumericUpDown Grid.Row="6" Grid.Column="1" Value="{Binding Port}"
+				                   Minimum="1" Maximum="65535" FormatString="0"/>
 				    
-				    <TextBlock Grid.Row="7" Grid.Column="0" Text="Strict Port Bind:"/>
+					<StackPanel Grid.Row="7" Grid.Column="0" Classes="Label">
+						<controls:InfoIcon Text="If checked, the server will refuse to start when the specified port is already occupied.&#10;&#10;If unchecked, gracefully falls back to the next free port.&#10;&#10;(-strictportbind)"/>
+						<TextBlock Text="Strict port bind"/>
+					</StackPanel>
 				    <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding StrictPortBind}"/>
 				    
-				    <TextBlock Grid.Row="8" Grid.Column="0" Text="LAN Mode:"/>
+					<StackPanel Grid.Row="8" Grid.Column="0" Classes="Label">
+						<controls:InfoIcon Text="Only allows players from your local network. LAN servers are not visible on the internet and do not use VAC. Note that LAN access is always possible, even if this is unchecked.&#10;&#10;(+sv_lan 1)"/>
+						<TextBlock Text="LAN only"/>
+					</StackPanel>
 				    <CheckBox Grid.Row="8" Grid.Column="1" IsChecked="{Binding Lan}"/>
 				    
-				    <TextBlock Grid.Row="9" Grid.Column="0" Text="Teamplay:"/>
+					<StackPanel Grid.Row="9" Grid.Column="0" Classes="Label">
+						<controls:InfoIcon Text="Enables team-based gameplay. Particular gameplay impact depends on the game.&#10;&#10;(+mp_teamplay)"/>
+						<TextBlock Text="Teamplay"/>
+					</StackPanel>
 				    <CheckBox Grid.Row="9" Grid.Column="1" IsChecked="{Binding Teamplay}"/>
 				</Grid>
 				
@@ -89,7 +124,10 @@
 		
 		<DataTemplate DataType="config:ServerConfigurationSDK2013">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*" RowSpacing="5" ColumnSpacing="8">
-				<TextBlock Grid.Row="0" Grid.Column="0" Text="Steam Networking:"/>
+				<StackPanel Grid.Row="0" Grid.Column="0" Classes="Label">
+					<controls:InfoIcon Text="Allow players to connect through Steam's networking relay, which can work without port forwarding.&#10;&#10;(+sv_use_steam_networking)"/>
+					<TextBlock Text="Steam Networking"/>
+				</StackPanel>
 				<CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding UseSteamNetworking}"/>
 			</Grid>
 		</DataTemplate>

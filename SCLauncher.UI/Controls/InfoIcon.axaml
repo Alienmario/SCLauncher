@@ -1,0 +1,60 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:SCLauncher.UI.Controls"
+                    x:ClassModifier="internal">
+
+	<Design.PreviewWith>
+		<UniformGrid Margin="100" ColumnSpacing="10" RowSpacing="10">
+			<controls:InfoIcon Text="Top" ToolTip.Placement="Top"/>
+			<controls:InfoIcon Text="Bottom" ToolTip.Placement="Bottom"/>
+			<controls:InfoIcon Text="Left" ToolTip.Placement="Left"/>
+			<controls:InfoIcon Text="Right" ToolTip.Placement="Right"/>
+		</UniformGrid>
+	</Design.PreviewWith>
+
+	<ControlTheme x:Key="InfoIconToolTip" TargetType="ToolTip"
+	              BasedOn="{StaticResource {x:Type ToolTip}}">
+		<Setter Property="MaxWidth" Value="350"/>
+		<Setter Property="FontSize" Value="13"/>
+		<Setter Property="Background" Value="{DynamicResource FlyoutPresenterBackground}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource FlyoutBorderThemeBrush}"/>
+		<Setter Property="BorderThickness" Value="{DynamicResource FlyoutBorderThemeThickness}"/>
+	</ControlTheme>
+
+	<ControlTheme x:Key="{x:Type controls:InfoIcon}" TargetType="controls:InfoIcon"
+	              BasedOn="{StaticResource {x:Type PathIcon}}">
+		<Setter Property="Data" Value="{StaticResource info_regular}"/>
+		<Setter Property="Width" Value="14"/>
+		<Setter Property="Height" Value="14"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="Foreground" Value="{StaticResource SecondaryColor}"/>
+		<Setter Property="IsVisible" Value="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+		<Setter Property="ToolTip.Placement" Value="Top"/>
+		<Setter Property="ToolTip.ShowDelay" Value="100"/>
+		<Setter Property="ToolTip.BetweenShowDelay" Value="0"/>
+		<Setter Property="ToolTip.VerticalOffset" Value="0"/>
+		<Setter Property="ToolTip.HorizontalOffset" Value="0"/>
+		<Setter Property="ToolTip.Tip">
+			<Template>
+				<ToolTip Theme="{StaticResource InfoIconToolTip}" 
+				         Content="{Binding $parent[controls:InfoIcon].Text}"/>
+			</Template>
+		</Setter>
+
+		<Style Selector="^:pointerover">
+			<Setter Property="Foreground" Value="{StaticResource Highlight}"/>
+		</Style>
+		<Style Selector="^[(ToolTip.Placement)=Top]">
+			<Setter Property="ToolTip.VerticalOffset" Value="-7"/>
+		</Style>
+		<Style Selector="^[(ToolTip.Placement)=Bottom]">
+			<Setter Property="ToolTip.VerticalOffset" Value="7"/>
+		</Style>
+		<Style Selector="^[(ToolTip.Placement)=Left]">
+			<Setter Property="ToolTip.HorizontalOffset" Value="-7"/>
+		</Style>
+		<Style Selector="^[(ToolTip.Placement)=Right]">
+			<Setter Property="ToolTip.HorizontalOffset" Value="7"/>
+		</Style>
+	</ControlTheme>
+</ResourceDictionary>

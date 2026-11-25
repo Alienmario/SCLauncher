@@ -7,6 +7,7 @@
              xmlns:design="using:SCLauncher.UI.DesignTime"
              xmlns:li="using:LoadingIndicators.Avalonia"
              xmlns:converters="using:SCLauncher.UI.Converters"
+             xmlns:controls="using:SCLauncher.UI.Controls"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
              x:Class="SCLauncher.UI.Views.ServerInstall.InstallOverview"
              x:DataType="serverinstallmodel:ServerInstallParams">
@@ -81,16 +82,27 @@
 							          IsChecked="{Binding Enabled}"
 							          IsEnabled="{Binding Editable}">
 							          
-								<TextBlock TextWrapping="Wrap" VerticalAlignment="Center">
+								<TextBlock TextWrapping="Wrap" VerticalAlignment="Center"
+								           FontSize="14" Foreground="{DynamicResource TextControlForeground}"
+								           Text="{Binding Component.Title}">
 									<TextBlock.Effect>
 										<DropShadowEffect BlurRadius="15" Color="#80151515"/>
 									</TextBlock.Effect>
-									<Run FontSize="14" Foreground="{DynamicResource TextControlForeground}"
-									     Text="{Binding Component.Title}"/>
-									<Run FontSize="12" Foreground="#BEBEBE" FontWeight="DemiBold"
-									     Text="{Binding Component.Description}"/>
 								</TextBlock>
 							</CheckBox>
+							
+							<!-- Component description -->
+							<controls:InfoIcon DockPanel.Dock="Left" Text="{Binding Component.Description}" Margin="6 0 0 0"/>
+							
+							<!-- Component URL -->
+							<HyperlinkButton DockPanel.Dock="Left" Classes="Transparent"
+							                 Padding="0" BorderThickness="0" VerticalAlignment="Center"
+							                 Margin="6 0 0 0"
+							                 IsVisible="{Binding Component.Url, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+							                 NavigateUri="{Binding Component.Url}">
+								<controls:InfoIcon Text="{Binding Component.Url}"
+								                   Data="{StaticResource open_regular}"/>
+							</HyperlinkButton>
 							
 							<!-- Middle dots fill in -->
 							<Border Classes="DashedUnderline" Padding="0 10" VerticalAlignment="Bottom"/>
