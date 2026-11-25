@@ -66,10 +66,10 @@ internal class PersistenceService : IPersistenceService
 
 	public void Bind(string name, object instance, IJsonTypeInfoResolver? context = null, bool loadNow = true)
 	{
-	    _persistedObjects[name] = (instance, context);
+		_persistedObjects[name] = (instance, context);
 		if (loadNow)
 		{
-	        LoadAndMerge(name, instance, context);
+			LoadAndMerge(name, instance, context);
 		}
 	}
 	
@@ -82,7 +82,7 @@ internal class PersistenceService : IPersistenceService
 	{
 		foreach (var (name, (instance, context)) in _persistedObjects)
 		{
-		    Save(name, instance, context);
+			Save(name, instance, context);
 		}
 	}
 	
@@ -90,7 +90,7 @@ internal class PersistenceService : IPersistenceService
 	{
 		foreach (var (name, (instance, context)) in _persistedObjects)
 		{
-		    LoadAndMerge(name, instance, context);
+			LoadAndMerge(name, instance, context);
 		}
 	}
 
@@ -99,14 +99,11 @@ internal class PersistenceService : IPersistenceService
 		if (!Available)
 			return false;
 		
-		string json = JsonSerializer.Serialize(o, new JsonSerializerOptions(_serializerOptions)
-		{
-			TypeInfoResolver = context
-		});
-		
 		string path = Path.Join(_dir, name + ".json");
 		try
 		{
+			JsonTypeInfo typeInfo = GetTypeInfo(o.GetType(), context);
+			string json = JsonSerializer.Serialize(o, typeInfo);
 			File.WriteAllText(path, json);
 			return true;
 		}
@@ -119,24 +116,26 @@ internal class PersistenceService : IPersistenceService
 
 	public void LoadAndMerge(string name, object instance, IJsonTypeInfoResolver? context = null)
 	{
+		if (instance is IEnumerable and not IList)
+			throw new NotSupportedException($"Cannot merge into collection of type {instance.GetType()}, only {nameof(IList)} is supported");
+
 		object? loaded = Load(name, instance.GetType(), context);
 		if (loaded != null)
 		{
-			if (instance is IEnumerable and not string)
+			if (instance is IList destList)
 			{
-				if (loaded is IEnumerable srcEnumerable and not string)
+				if (loaded is IEnumerable srcEnumerable)
 				{
-					dynamic dynamicCollection = instance;
-					dynamicCollection.Clear();
+					destList.Clear();
 					foreach (var item in srcEnumerable)
 					{
-						dynamicCollection.Add((dynamic)item);
+						destList.Add(item);
 					}
 				}
 			}
 			else
 			{
-				MergeProperties(loaded, instance);
+				MergeProperties(loaded, instance, context);
 			}
 		}
 	}
@@ -150,10 +149,8 @@ internal class PersistenceService : IPersistenceService
 		try
 		{
 			string json = File.ReadAllText(path);
-			return JsonSerializer.Deserialize(json, type, new JsonSerializerOptions(_serializerOptions)
-			{
-				TypeInfoResolver = context
-			});
+			JsonTypeInfo typeInfo = GetTypeInfo(type, context);
+			return JsonSerializer.Deserialize(json, typeInfo);
 		}
 		catch (Exception e)
 		{
@@ -166,14 +163,23 @@ internal class PersistenceService : IPersistenceService
 		}
 	}
 
-	private static void MergeProperties(object source, object target)
+	private JsonTypeInfo GetTypeInfo(Type type, IJsonTypeInfoResolver? context)
 	{
-		foreach (var prop in source.GetType().GetProperties())
+		var options = new JsonSerializerOptions(_serializerOptions)
 		{
-			var targetProp = target.GetType().GetProperty(prop.Name);
-			if (targetProp != null && targetProp.CanWrite)
+			TypeInfoResolver = context
+		};
+		return options.GetTypeInfo(type);
+	}
+
+	private void MergeProperties(object source, object target, IJsonTypeInfoResolver? context)
+	{
+		JsonTypeInfo typeInfo = GetTypeInfo(target.GetType(), context);
+		foreach (JsonPropertyInfo prop in typeInfo.Properties)
+		{
+			if (prop.Get != null && prop.Set != null)
 			{
-				targetProp.SetValue(target, prop.GetValue(source));
+				prop.Set(target, prop.Get(source));
 			}
 		}
 	}

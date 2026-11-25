@@ -31,15 +31,16 @@ internal class ServerBrowserService(IProfilesService profilesService, GlobalConf
 		
 		var queryTasks = new List<Task<Server>>();
 
-		using (dynamic gameServersService = WebAPI.GetAsyncInterface("IGameServersService", globalConfig.SteamWebApiKey))
+		using (var gameServersService = WebAPI.GetAsyncInterface("IGameServersService", globalConfig.SteamWebApiKey))
 		{
 			KeyValue? serverList;
 			try
 			{
-				serverList = await gameServersService.GetServerList(
-						filter: "appid\\" + profilesService.ActiveProfile.GameAppId,
-						limit: 9999)
-					.ConfigureAwait(false);
+				serverList = await gameServersService.CallAsync("GetServerList", 1, new()
+				{
+					{ "filter", "appid\\" + profilesService.ActiveProfile.GameAppId },
+					{ "limit", 9999 }
+				}).ConfigureAwait(false);
 			}
 			catch (WebAPIRequestException e) when (e.StatusCode == HttpStatusCode.Forbidden)
 			{
@@ -137,12 +138,9 @@ internal class ServerBrowserService(IProfilesService profilesService, GlobalConf
 			uint port = uint.Parse(parts[1]);
 			uint appId = profilesService.ActiveProfile.GameAppId;
 
-			using dynamic gameServersService = WebAPI.GetAsyncInterface("IGameServersService", globalConfig.SteamWebApiKey);
-			KeyValue response = await gameServersService.QueryByFakeIP(
-				fake_ip: encodedIp,
-				fake_port: port,
-				app_id: appId,
-				query_type: 1);
+			using var gameServersService = WebAPI.GetAsyncInterface("IGameServersService", globalConfig.SteamWebApiKey);
+			KeyValue response = await QueryByFakeIp(gameServersService, encodedIp, port, appId, FakeIpQueryType.Information)
+				.ConfigureAwait(false);
 				
 			ct.ThrowIfCancellationRequested();
 			
@@ -152,12 +150,11 @@ internal class ServerBrowserService(IProfilesService profilesService, GlobalConf
 				
 				if (players)
 				{
-					KeyValue playersResponse = await gameServersService.QueryByFakeIP(
-						fake_ip: encodedIp,
-						fake_port: port,
-						app_id: appId,
-						query_type: 2);
+					KeyValue playersResponse = await QueryByFakeIp(gameServersService, encodedIp, port, appId, FakeIpQueryType.Players)
+						.ConfigureAwait(false);
+
 					ct.ThrowIfCancellationRequested();
+
 					foreach (var playerKv in playersResponse["players_data"]["players"].Children)
 					{
 						server.Players.Add(new ServerPlayer {
@@ -170,12 +167,11 @@ internal class ServerBrowserService(IProfilesService profilesService, GlobalConf
 				
 				if (rules)
 				{
-					KeyValue rulesResponse = await gameServersService.QueryByFakeIP(
-						fake_ip: encodedIp,
-						fake_port: port,
-						app_id: appId,
-						query_type: 3);
+					KeyValue rulesResponse = await QueryByFakeIp(gameServersService, encodedIp, port, appId, FakeIpQueryType.Rules)
+						.ConfigureAwait(false);
+
 					ct.ThrowIfCancellationRequested();
+
 					foreach (var ruleKv in rulesResponse["rules_data"]["rules"].Children)
 					{
 						server.Rules.Add(new ServerRule {
@@ -191,8 +187,11 @@ internal class ServerBrowserService(IProfilesService profilesService, GlobalConf
 		else
 		{
 			// barebones un-authenticated check
-			using dynamic steamAppsService = WebAPI.GetAsyncInterface("ISteamApps");
-			KeyValue response = await steamAppsService.GetServersAtAddress(addr: address);
+			using var steamAppsService = WebAPI.GetAsyncInterface("ISteamApps");
+			KeyValue response = await steamAppsService
+				.CallAsync("GetServersAtAddress", 1, new() { { "addr", address } })
+				.ConfigureAwait(false);
+
 			ct.ThrowIfCancellationRequested();
 			
 			if (response["servers"].Children.Count > 0)
@@ -201,6 +200,20 @@ internal class ServerBrowserService(IProfilesService profilesService, GlobalConf
 			}
 		}
 		return null;
+	}
+
+	private enum FakeIpQueryType { Information = 1, Players = 2, Rules = 3 }
+
+	private static Task<KeyValue> QueryByFakeIp(WebAPI.AsyncInterface service, uint fakeIp, uint fakePort, uint appId,
+		FakeIpQueryType queryType)
+	{
+		return service.CallAsync("QueryByFakeIP", 1, new()
+		{
+			{ "fake_ip", fakeIp },
+			{ "fake_port", fakePort },
+			{ "app_id", appId },
+			{ "query_type", (int)queryType }
+		});
 	}
 
 	/// Translates server from Steamkit2 Web API
