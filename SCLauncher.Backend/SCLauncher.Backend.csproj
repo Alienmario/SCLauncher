@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFramework>net11.0</TargetFramework>
 		<RootNamespace>SCLauncher.Backend</RootNamespace>
 		<Nullable>enable</Nullable>
 		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
@@ -13,7 +13,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="DepotDownloaderSubProcess" Version="3.4.0-sp1" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
 		<PackageReference Include="SteamQuery.NET" Version="2.0.2" />
 	</ItemGroup>
 

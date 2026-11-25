@@ -4,10 +4,15 @@
                     x:ClassModifier="internal">
 	
 	<Design.PreviewWith>
-		<Panel Background="White" Width="800" Height="450">
-			<controls:BaseOverlay>
-				<TextBlock Text="Base overlay" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-			</controls:BaseOverlay>
+		<Panel Width="800" Height="450" Background="White">
+			<Panel>
+				<Panel.Background>
+					<ImageBrush Source="/Assets/logo-sc.ico"/>
+				</Panel.Background>
+				<controls:BaseOverlay>
+					<TextBlock Text="Base overlay" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+				</controls:BaseOverlay>
+			</Panel>
 		</Panel>
 	</Design.PreviewWith>
 	

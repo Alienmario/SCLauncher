@@ -11,55 +11,25 @@ namespace SCLauncher.UI.Controls;
 
 public partial class StatusMessageViewer : UserControl
 {
-	public static readonly StyledProperty<bool> DisplayTimeProperty =
-		AvaloniaProperty.Register<StatusMessageViewer, bool>(nameof(DisplayTime), defaultValue: true);
-	
-	public static readonly StyledProperty<bool> CanMinimizeProperty =
-		AvaloniaProperty.Register<StatusMessageViewer, bool>(nameof(CanMinimize), defaultValue: false);
-	
-	public static readonly StyledProperty<bool> IsExpandedProperty =
-		AvaloniaProperty.Register<StatusMessageViewer, bool>(nameof(IsExpanded), defaultValue: false);
-	
-	public static readonly StyledProperty<double> MinMinimizedHeightProperty =
-		AvaloniaProperty.Register<StatusMessageViewer, double>(nameof(MinMinimizedHeight), defaultValue: 22);
-	
-	public static readonly StyledProperty<double> MaxMinimizedHeightProperty =
-		AvaloniaProperty.Register<StatusMessageViewer, double>(nameof(MaxMinimizedHeight), defaultValue: 66);
-	
+	[GeneratedStyledProperty(DefaultValue = true)]
+	public partial bool DisplayTime { get; set; }
+
+	[GeneratedStyledProperty]
+	public partial bool CanMinimize { get; set; }
+
+	[GeneratedStyledProperty]
+	public partial bool IsExpanded { get; set; }
+
+	[GeneratedStyledProperty(DefaultValue = 22d)]
+	public partial double MinMinimizedHeight { get; set; }
+
+	[GeneratedStyledProperty(DefaultValue = 66d)]
+	public partial double MaxMinimizedHeight { get; set; }
+
 	public new ObservableCollection<StatusMessage>? DataContext
 	{
 		get => (ObservableCollection<StatusMessage>?) base.DataContext;
 		set => base.DataContext = value;
-	}
-
-	public bool DisplayTime
-	{
-		get => GetValue(DisplayTimeProperty);
-		set => SetValue(DisplayTimeProperty, value);
-	}
-	
-	public bool CanMinimize
-	{
-		get => GetValue(CanMinimizeProperty);
-		set => SetValue(CanMinimizeProperty, value);
-	}
-	
-	public bool IsExpanded
-	{
-		get => GetValue(IsExpandedProperty);
-		set => SetValue(IsExpandedProperty, value);
-	}
-	
-	public double MinMinimizedHeight
-	{
-		get => GetValue(MinMinimizedHeightProperty);
-		set => SetValue(MinMinimizedHeightProperty, value);
-	}
-	
-	public double MaxMinimizedHeight
-	{
-		get => GetValue(MaxMinimizedHeightProperty);
-		set => SetValue(MaxMinimizedHeightProperty, value);
 	}
 
 	public int Limit { get; set; } = int.MaxValue;

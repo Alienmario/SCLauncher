@@ -35,7 +35,7 @@ public partial class InstallConsole : UserControl, IWizardPage
 	private async void RunInstaller(WizardNavigator wizard)
 	{
 		string operation;
-		IAsyncEnumerable<object> installer;
+		IAsyncEnumerable<InstallProgress> installer;
 		switch (DataContext)
 		{
 			case ServerInstallParams sip:
@@ -58,18 +58,19 @@ public partial class InstallConsole : UserControl, IWizardPage
 		{
 			await foreach (var data in installer.WithCancellation(cts.Token))
 			{
-				if (data is StatusMessage msg)
+				switch (data)
 				{
-					AppendMessage(msg);
-				}
-				else if (data is ProgressUpdate update)
-				{
-					if (update.Text != null)
-						Header.Text = update.Text;
-					if (update.NumSteps != null)
-						ProgressBar.Maximum = (double)update.NumSteps;
-					if (update.Step != null)
-						ProgressBar.Value = (double)update.Step;
+					case StatusMessage msg:
+						AppendMessage(msg);
+						break;
+					case ProgressUpdate update:
+						if (update.Text != null)
+							Header.Text = update.Text;
+						if (update.NumSteps != null)
+							ProgressBar.Maximum = (double)update.NumSteps;
+						if (update.Step != null)
+							ProgressBar.Value = (double)update.Step;
+						break;
 				}
 			}
 		}

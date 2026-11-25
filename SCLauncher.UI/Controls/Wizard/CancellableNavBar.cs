@@ -5,23 +5,11 @@ namespace SCLauncher.UI.Controls.Wizard;
 
 public partial class CancellableNavBar : UserControl, IWizardNavBar
 {
-	public static readonly StyledProperty<bool> ShowProgressBarProperty =
-		AvaloniaProperty.Register<CancellableNavBar, bool>(nameof(ShowProgressBar));
-	
-	public static readonly StyledProperty<bool> CompletedProperty =
-		AvaloniaProperty.Register<CancellableNavBar, bool>(nameof(Completed));
+	[GeneratedStyledProperty]
+	public partial bool ShowProgressBar { get; set; }
 
-	public bool ShowProgressBar
-	{
-		get => GetValue(ShowProgressBarProperty);
-		set => SetValue(ShowProgressBarProperty, value);
-	}
-
-	public bool Completed
-	{
-		get => GetValue(CompletedProperty);
-		set => SetValue(CompletedProperty, value);
-	}
+	[GeneratedStyledProperty]
+	public partial bool Completed { get; set; }
 
 	public CancellableNavBar()
 	{

@@ -15,7 +15,7 @@ namespace SCLauncher.Backend.ServerInstall;
 
 internal class ServerInstallRunner(IEnumerable<IServerComponentInstaller<ComponentInfo>> installers)
 {
-	internal async IAsyncEnumerable<object> Installer(ServerInstallParams installParams,
+	internal async IAsyncEnumerable<InstallProgress> Installer(ServerInstallParams installParams,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
 		ServerInstallContext ctx = new ServerInstallContext(installParams);
@@ -85,7 +85,7 @@ internal class ServerInstallRunner(IEnumerable<IServerComponentInstaller<Compone
 		yield return new ProgressUpdate { Text = "All done!", Step = step };
 	}
 
-	internal async IAsyncEnumerable<object> Uninstaller(ServerUninstallParams uninstallParams,
+	internal async IAsyncEnumerable<InstallProgress> Uninstaller(ServerUninstallParams uninstallParams,
 		[EnumeratorCancellation] CancellationToken ct = default)
 	{
 		ServerUninstallContext ctx = new ServerUninstallContext(uninstallParams);

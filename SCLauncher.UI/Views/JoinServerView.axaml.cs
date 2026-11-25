@@ -11,9 +11,9 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using SCLauncher.Shared.Exceptions;
 using SCLauncher.Shared.Extensions;
 using SCLauncher.Shared.Model.Config;
-using SCLauncher.Shared.Exceptions;
 using SCLauncher.Shared.Model.ServerBrowser;
 using SCLauncher.Shared.Service;
 using SCLauncher.Shared.Util;
@@ -37,14 +37,8 @@ public partial class JoinServerView : UserControl
 	private string? directQueryEndpoint;
 	private string? directQueryPassword;
 
-	public static readonly DirectProperty<JoinServerView, bool> IsRefreshingProperty =
-		AvaloniaProperty.RegisterDirect<JoinServerView, bool>(nameof(IsRefreshing), o => o.IsRefreshing);
-
-	public bool IsRefreshing
-	{
-		get;
-		private set => SetAndRaise(IsRefreshingProperty, ref field, value);
-	}
+	[GeneratedDirectProperty]
+	public partial bool IsRefreshing { get; private set; }
 
 	public JoinServerView()
 	{

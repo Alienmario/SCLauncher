@@ -8,44 +8,19 @@ namespace SCLauncher.UI.Controls;
 /// <summary>
 /// A base pre-styled dialog window with main content area and a footer area.
 /// </summary>
-public class BaseDialogWindow : Window
+public partial class BaseDialogWindow : Window
 {
 	protected override Type StyleKeyOverride => typeof(BaseDialogWindow);
 
-	public static readonly StyledProperty<object?> MainContentProperty =
-		AvaloniaProperty.Register<BaseDialogWindow, object?>(nameof(MainContent));
+	[GeneratedStyledProperty]
+	public partial object? MainContent { get; set; }
 
-	public static readonly StyledProperty<object?> FooterContentProperty =
-		AvaloniaProperty.Register<BaseDialogWindow, object?>(nameof(FooterContent));
+	[GeneratedStyledProperty]
+	public partial object? FooterContent { get; set; }
 
-	public static readonly StyledProperty<ScrollBarVisibility> VerticalScrollBarVisibilityProperty =
-		AvaloniaProperty.Register<BaseDialogWindow, ScrollBarVisibility>(nameof(VerticalScrollBarVisibility));
-	
-	public static readonly StyledProperty<bool> ApplyDropShadowProperty =
-		AvaloniaProperty.Register<BaseDialogWindow, bool>(nameof(ApplyDropShadow), defaultValue: true);
-	
-	public object? MainContent
-	{
-		get => GetValue(MainContentProperty);
-		set => SetValue(MainContentProperty, value);
-	}
+	[GeneratedStyledProperty]
+	public partial ScrollBarVisibility VerticalScrollBarVisibility { get; set; }
 
-	public object? FooterContent
-	{
-		get => GetValue(FooterContentProperty);
-		set => SetValue(FooterContentProperty, value);
-	}
-	
-	public ScrollBarVisibility VerticalScrollBarVisibility
-	{
-		get => GetValue(VerticalScrollBarVisibilityProperty);
-		set => SetValue(VerticalScrollBarVisibilityProperty, value);
-	}
-
-	public bool ApplyDropShadow
-	{
-		get => GetValue(ApplyDropShadowProperty);
-		set => SetValue(ApplyDropShadowProperty, value);
-	}
-
+	[GeneratedStyledProperty(DefaultValue = true)]
+	public partial bool ApplyDropShadow { get; set; }
 }

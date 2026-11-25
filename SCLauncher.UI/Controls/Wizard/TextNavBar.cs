@@ -1,7 +1,6 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Data;
 using Avalonia.LogicalTree;
 using Avalonia.Reactive;
 
@@ -10,13 +9,8 @@ namespace SCLauncher.UI.Controls.Wizard;
 public partial class TextNavBar : UserControl, IWizardNavBar
 {
 	// Attached property for individual pages, also usable directly
-	public static readonly AttachedProperty<string?> TextProperty =
-		AvaloniaProperty.RegisterAttached<TextNavBar, Control, string?>("Text");
-
-	public static void SetText(Control ctl, string? value) =>
-		ctl.SetValue(TextProperty, value, BindingPriority.Template);
-
-	public static string? GetText(Control ctl) => ctl.GetValue(TextProperty);
+	[GeneratedAttachedProperty]
+	public static partial string? GetText(Control element);
 
 	private WizardNavigator? _wizard;
 	private IDisposable? _wizardPageDisposable;

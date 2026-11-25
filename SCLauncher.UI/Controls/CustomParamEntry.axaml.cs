@@ -12,14 +12,8 @@ namespace SCLauncher.UI.Controls;
 public partial class CustomParamEntry : UserControl
 {
 
-	public static readonly StyledProperty<bool> ShowHintProperty =
-		AvaloniaProperty.Register<CustomParamEntry, bool>(nameof(ShowHint), defaultValue: true);
-
-	public bool ShowHint
-	{
-		get => GetValue(ShowHintProperty);
-		set => SetValue(ShowHintProperty, value);
-	}
+	[GeneratedStyledProperty(DefaultValue = true)]
+	public partial bool ShowHint { get; set; }
 
 	public ObservableCollection<CustomParam>? CustomParams => DataContext as ObservableCollection<CustomParam>;
 

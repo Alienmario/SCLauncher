@@ -13,9 +13,9 @@ public interface IServerInstallService
 
 	ServerUninstallParams NewUninstallParams();
 
-	IAsyncEnumerable<object> GetInstaller(ServerInstallParams installParams);
+	IAsyncEnumerable<InstallProgress> GetInstaller(ServerInstallParams installParams);
 
-	IAsyncEnumerable<object> GetUninstaller(ServerUninstallParams uninstallParams);
+	IAsyncEnumerable<InstallProgress> GetUninstaller(ServerUninstallParams uninstallParams);
 
 	Task<IDictionary<ServerInstallComponent, ComponentInfo>> GatherComponentInfosAsync(
 		ServerInstallParams p, bool checkForUpgrades, CancellationToken ct = default);

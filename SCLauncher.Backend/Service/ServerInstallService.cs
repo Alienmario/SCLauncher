@@ -50,14 +50,12 @@ internal class ServerInstallService(
 		};
 	}
 
-	// Todo: change return to union (ProgressUpdate and StatusMessage)
-	public IAsyncEnumerable<object> GetInstaller(ServerInstallParams installParams)
+	public IAsyncEnumerable<InstallProgress> GetInstaller(ServerInstallParams installParams)
 	{
 		return serverInstallRunner.Installer(installParams);
 	}
 	
-	// Todo: change return to union (ProgressUpdate and StatusMessage)
-	public IAsyncEnumerable<object> GetUninstaller(ServerUninstallParams uninstallParams)
+	public IAsyncEnumerable<InstallProgress> GetUninstaller(ServerUninstallParams uninstallParams)
 	{
 		return serverInstallRunner.Uninstaller(uninstallParams);
 	}
